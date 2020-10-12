@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home Activity -->
+    <string name="app_name">ماهيتاب.كوم</string>
+    <string name="home">الصفحة الرئيسية</string>
+    <string name="categories">الاقسام</string>
+    <string name="cart">عربة التسوق</string>
+    <string name="account">حسابى</string>
+    <string name="back_again">الرجاء النقر فوق "رجوع" مرة أخرى للخروج</string>
+    <string name="search">بحث</string>
+    <!-- Home Activity -->
+
+
+</resources>

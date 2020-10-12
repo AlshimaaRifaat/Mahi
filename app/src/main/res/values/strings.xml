@@ -1,0 +1,12 @@
+<resources>
+    <!-- Home Activity -->
+    <string name="app_name">Mahitab.com</string>
+    <string name="home">Home</string>
+    <string name="categories">Categories</string>
+    <string name="cart">Cart</string>
+    <string name="account">Account</string>
+    <string name="back_again">Please click BACK again to exit</string>
+    <string name="search">Search</string>
+    <!-- Home Activity -->
+
+</resources>
