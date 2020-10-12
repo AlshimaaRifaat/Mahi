@@ -20,6 +20,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions { //for supporting lambda expressions
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -32,11 +36,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    // For Image Slider
+    //For Image Slider
     implementation 'com.asksira.android:loopingviewpager:1.1.4'
     implementation 'com.romandanylyk:pageindicatorview:1.0.3@aar'
 
     //Glide Image Loader
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //Shopify SDK
+    implementation 'com.shopify.mobilebuysdk:buy3:3.1.1'
+    implementation 'com.shopify.mobilebuysdk:buy3-pay-support:1.0.2'
 }
