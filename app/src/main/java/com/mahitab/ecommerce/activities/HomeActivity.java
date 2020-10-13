@@ -1,5 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
+import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -18,6 +20,8 @@ import com.mahitab.ecommerce.fragments.CartFragment;
 import com.mahitab.ecommerce.fragments.CategoriesFragment;
 import com.mahitab.ecommerce.fragments.HomeFragment;
 
+import java.util.Locale;
+
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private boolean doubleBackToExitPressedOnce = false;
@@ -26,6 +30,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setArDefaultLocale(this);
         setContentView(R.layout.activity_main);
 
         bnvHomeNavigation = findViewById(R.id.bnvHomeNavigation_HomeActivity);
@@ -108,4 +113,12 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         fragmentTransaction.commitNowAllowingStateLoss();
     }
 
+    public static void setArDefaultLocale(Activity context) {
+        Locale locale = new Locale("ar");
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        Locale.setDefault(locale);
+        config.setLocale(locale);
+        context.getBaseContext().getResources().updateConfiguration(config,
+                context.getBaseContext().getResources().getDisplayMetrics());
+    }
 }

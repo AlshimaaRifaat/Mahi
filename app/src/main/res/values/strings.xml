@@ -7,6 +7,7 @@
     <string name="account">Account</string>
     <string name="back_again">Please click BACK again to exit</string>
     <string name="search">Search</string>
+    <string name="see_all">See All</string>
     <!-- Home Activity -->
 
 </resources>

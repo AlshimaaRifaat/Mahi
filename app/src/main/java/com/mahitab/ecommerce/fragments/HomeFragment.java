@@ -12,11 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
+import com.mahitab.ecommerce.adapters.CollectionProductsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ImageSliderModel;
 import com.rd.PageIndicatorView;
 
@@ -26,11 +32,16 @@ import java.util.Objects;
 
 public class HomeFragment extends Fragment {
 
+    private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
     private LoopingViewPager lvpImageSlider;
     private PageIndicatorView indicatorView;
     private List<ImageSliderModel> sliderImages;
     private ImageSliderAdapter sliderAdapter;
+
+    private RecyclerView rvCollectionProducts;
+    private List<CollectionModel> collections;
+    private CollectionProductsAdapter collectionProductsAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -54,6 +65,8 @@ public class HomeFragment extends Fragment {
 
         sliderImages = new ArrayList<>();
 
+        DataManager.getInstance().setClientManager(getContext()); // init shopify sdk
+
         sliderAdapter = new ImageSliderAdapter(getContext(), sliderImages, true);
         getSliderImages();
         lvpImageSlider.setAdapter(sliderAdapter);
@@ -73,6 +86,13 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+        geCollectionsWithProducts();
+
+        rvCollectionProducts.setHasFixedSize(true);
+        rvCollectionProducts.setLayoutManager(new LinearLayoutManager(getContext()));
+        collectionProductsAdapter = new CollectionProductsAdapter();
+        rvCollectionProducts.setAdapter(collectionProductsAdapter);
     }
 
     @Override
@@ -90,6 +110,7 @@ public class HomeFragment extends Fragment {
         toolbar = view.findViewById(R.id.toolbar);
         lvpImageSlider = view.findViewById(R.id.viewPager);
         indicatorView = view.findViewById(R.id.pageIndicatorView);
+        rvCollectionProducts = view.findViewById(R.id.rvCollectionProducts);
     }
 
     private void getSliderImages() {
@@ -97,4 +118,26 @@ public class HomeFragment extends Fragment {
         sliderImages.add(new ImageSliderModel(" خصومات حتي 60%\n" + "علي مستلزمات الخياطة", "https://souqcms.s3-eu-west-1.amazonaws.com/cms/boxes/img/desktop/L_1602409788_GW-MB-Bundles-ar.png"));
         sliderAdapter.notifyDataSetChanged();
     }
+
+    private void geCollectionsWithProducts() {
+        DataManager.getInstance().collections(new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                if (status == 200) {
+                    requireActivity().runOnUiThread(() -> {
+                        collections = DataManager.getInstance().getCollections();
+                        collectionProductsAdapter.setCollections(collections);
+                    });
+                } else {
+                    this.onFailure("An unknown error has occurred");
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+    }
+
 }

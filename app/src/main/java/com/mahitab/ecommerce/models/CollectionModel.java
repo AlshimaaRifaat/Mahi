@@ -50,6 +50,10 @@ public class CollectionModel {
         return mImage;
     }
 
+    public void setImage(String mImage) {
+        this.mImage = mImage;
+    }
+
     public DateTime getUpdatedAt() {
         return mUpdatedAt;
     }
