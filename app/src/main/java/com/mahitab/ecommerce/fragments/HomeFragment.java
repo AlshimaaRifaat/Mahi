@@ -126,6 +126,7 @@ public class HomeFragment extends Fragment {
                 if (status == 200) {
                     requireActivity().runOnUiThread(() -> {
                         collections = DataManager.getInstance().getCollections();
+                        collections.removeIf(collection -> (collection.getPreviewProducts().size() == 0)); //remove collection if has no products
                         collectionProductsAdapter.setCollections(collections);
                     });
                 } else {
