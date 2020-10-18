@@ -133,16 +133,13 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     @Override
     public void onBannerClick(BannerModel banner) {
-        String type = null;
-        if (banner.getType().startsWith("p"))
-            type = "Product";
-        else if (banner.getType().startsWith("c"))
-            type = "Collection";
-        String target = "gid://shopify/" + type + "/" + banner.getId();
-        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-        targetId = targetId.trim(); //remove \n from targetId
+        String type;
         Intent intent;
         if (banner.getType().startsWith("p")) {
+            type = "Product";
+            String target = "gid://shopify/" + type + "/" + banner.getId();
+            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+            targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), ProductDetailsActivity.class);
             ProductModel product = DataManager.getInstance().getProductByID(targetId);
             if (product != null) {
@@ -150,12 +147,16 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
                 startActivity(intent);
             }
         } else if (banner.getType().startsWith("c")) {
+            type = "Collection";
+            String target = "gid://shopify/" + type + "/" + banner.getId();
+            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+            targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), CollectionProductsActivity.class);
             CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
-           if (collection!=null){
-               intent.putExtra("collection", collection);
-               startActivity(intent);
-           }
+            if (collection != null) {
+                intent.putExtra("collection", collection);
+                startActivity(intent);
+            }
         }
     }
 
