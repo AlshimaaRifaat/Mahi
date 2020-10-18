@@ -1,6 +1,9 @@
 package com.mahitab.ecommerce.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,23 +20,39 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.CollectionProductsActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
-import com.mahitab.ecommerce.adapters.CollectionProductsAdapter;
+import com.mahitab.ecommerce.activities.ProductDetailsActivity;
+import com.mahitab.ecommerce.adapters.BannerAdapter;
+import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.BannerList;
+import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ImageSliderModel;
+import com.mahitab.ecommerce.models.ProductModel;
+import com.mahitab.ecommerce.utils.OlgorClient;
 import com.rd.PageIndicatorView;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener {
 
     private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
+
+    private RecyclerView rvBanners;
+    private BannerAdapter bannerAdapter;
+
     private LoopingViewPager lvpImageSlider;
     private PageIndicatorView indicatorView;
     private List<ImageSliderModel> sliderImages;
@@ -41,7 +60,7 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView rvCollectionProducts;
     private List<CollectionModel> collections;
-    private CollectionProductsAdapter collectionProductsAdapter;
+    private CollectionsAdapter collectionsAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -65,14 +84,19 @@ public class HomeFragment extends Fragment {
 
         sliderImages = new ArrayList<>();
 
-        DataManager.getInstance().setClientManager(getContext()); // init shopify sdk
+        getBanners();
+
+        rvBanners.setHasFixedSize(true);
+        rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        bannerAdapter = new BannerAdapter();
+        rvBanners.setAdapter(bannerAdapter);
+        bannerAdapter.setBannerClickListener(HomeFragment.this);
 
         sliderAdapter = new ImageSliderAdapter(getContext(), sliderImages, true);
         getSliderImages();
         lvpImageSlider.setAdapter(sliderAdapter);
         //Tell the IndicatorView that how many indicators should it display:
         indicatorView.setCount(lvpImageSlider.getIndicatorCount());
-
         //Set IndicatorPageChangeListener on LoopingViewPager.
         //When the methods are called, update the Indicator accordingly.
         lvpImageSlider.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
@@ -86,13 +110,14 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        DataManager.getInstance().setClientManager(getContext()); // init shopify sdk
 
         geCollectionsWithProducts();
 
         rvCollectionProducts.setHasFixedSize(true);
         rvCollectionProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-        collectionProductsAdapter = new CollectionProductsAdapter();
-        rvCollectionProducts.setAdapter(collectionProductsAdapter);
+        collectionsAdapter = new CollectionsAdapter(getContext());
+        rvCollectionProducts.setAdapter(collectionsAdapter);
     }
 
     @Override
@@ -106,11 +131,57 @@ public class HomeFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBannerClick(BannerModel banner) {
+        String type = null;
+        if (banner.getType().startsWith("p"))
+            type = "Product";
+        else if (banner.getType().startsWith("c"))
+            type = "Collection";
+        String target = "gid://shopify/" + type + "/" + banner.getId();
+        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+        targetId = targetId.trim(); //remove \n from targetId
+        Intent intent;
+        if (banner.getType().startsWith("p")) {
+            intent = new Intent(getContext(), ProductDetailsActivity.class);
+            ProductModel product = DataManager.getInstance().getProductByID(targetId);
+            if (product != null) {
+                intent.putExtra("product", product);
+                startActivity(intent);
+            }
+        } else if (banner.getType().startsWith("c")) {
+            intent = new Intent(getContext(), CollectionProductsActivity.class);
+            CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
+           if (collection!=null){
+               intent.putExtra("collection", collection);
+               startActivity(intent);
+           }
+        }
+    }
+
     private void initView(View view) {
         toolbar = view.findViewById(R.id.toolbar);
+        rvBanners = view.findViewById(R.id.rvBanners);
         lvpImageSlider = view.findViewById(R.id.viewPager);
         indicatorView = view.findViewById(R.id.pageIndicatorView);
         rvCollectionProducts = view.findViewById(R.id.rvCollectionProducts);
+    }
+
+    private void getBanners() {
+        OlgorClient.getInstance().getApi().getBanners().enqueue(new Callback<BannerList>() {
+            @Override
+            public void onResponse(@NonNull Call<BannerList> call, @NonNull Response<BannerList> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<BannerModel> banners = response.body().getBanners();
+                    bannerAdapter.setBannerList(banners);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BannerList> call, @NonNull Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
 
     private void getSliderImages() {
@@ -127,7 +198,7 @@ public class HomeFragment extends Fragment {
                     requireActivity().runOnUiThread(() -> {
                         collections = DataManager.getInstance().getCollections();
                         collections.removeIf(collection -> (collection.getPreviewProducts().size() == 0)); //remove collection if has no products
-                        collectionProductsAdapter.setCollections(collections);
+                        collectionsAdapter.setCollections(collections);
                     });
                 } else {
                     this.onFailure("An unknown error has occurred");
@@ -140,5 +211,4 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
 }

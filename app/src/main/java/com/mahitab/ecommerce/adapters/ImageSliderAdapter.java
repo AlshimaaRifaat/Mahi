@@ -18,8 +18,8 @@ import com.mahitab.ecommerce.models.ImageSliderModel;
 import java.util.List;
 
 public class ImageSliderAdapter extends LoopingPagerAdapter<ImageSliderModel> {
-    private List<ImageSliderModel> imageSliderModelList;
-    private Context context;
+    private final List<ImageSliderModel> imageSliderModelList;
+    private final Context context;
 
     public ImageSliderAdapter(Context context, List<ImageSliderModel> itemList, boolean isInfinite) {
         super(context, itemList, isInfinite);

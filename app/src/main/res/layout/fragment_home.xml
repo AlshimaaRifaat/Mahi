@@ -42,6 +42,16 @@
             android:fitsSystemWindows="true"
             android:orientation="vertical">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBanners"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:minHeight="55dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/banner_item" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -69,7 +79,6 @@
                     app:layout_constraintBottom_toBottomOf="@+id/viewPager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/viewPager"
-                    app:piv_animationType="worm"
                     app:piv_interactiveAnimation="true"
                     app:piv_selectedColor="@color/colorPrimary"
                     app:piv_unselectedColor="@color/colorAccent"

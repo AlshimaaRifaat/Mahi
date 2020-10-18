@@ -1,7 +1,5 @@
 package com.mahitab.ecommerce.activities;
 
-import android.app.Activity;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -20,7 +18,7 @@ import com.mahitab.ecommerce.fragments.CartFragment;
 import com.mahitab.ecommerce.fragments.CategoriesFragment;
 import com.mahitab.ecommerce.fragments.HomeFragment;
 
-import java.util.Locale;
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -59,32 +57,21 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
             }
             doubleBackToExitPressedOnce = true;
             Toast.makeText(this, getString(R.string.back_again), Toast.LENGTH_SHORT).show();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    doubleBackToExitPressedOnce = false;
-                }
-            }, 2000);
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
         }
     }
 
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.home_navigation:
-                changeFragment(new HomeFragment(), HomeFragment.class.getName(), item);
-                break;
-            case R.id.categories_navigation:
-                changeFragment(new CategoriesFragment(), CategoriesFragment.class.getName(), item);
-                break;
-            case R.id.cart_navigation:
-                changeFragment(new CartFragment(), CartFragment.class.getName(), item);
-                break;
-            case R.id.account_navigation:
-                changeFragment(new AccountFragment(), AccountFragment.class.getName(), item);
-                break;
-        }
+        if (item.getItemId() == R.id.home_navigation)
+            changeFragment(new HomeFragment(), HomeFragment.class.getName(), item);
+        else if (item.getItemId() == R.id.categories_navigation)
+            changeFragment(new CategoriesFragment(), CategoriesFragment.class.getName(), item);
+        else if (item.getItemId() == R.id.cart_navigation)
+            changeFragment(new CartFragment(), CartFragment.class.getName(), item);
+        else if (item.getItemId() == R.id.account_navigation)
+            changeFragment(new AccountFragment(), AccountFragment.class.getName(), item);
         return true;
     }
 
@@ -111,14 +98,5 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         fragmentTransaction.setPrimaryNavigationFragment(fragmentTemp);
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitNowAllowingStateLoss();
-    }
-
-    public static void setArDefaultLocale(Activity context) {
-        Locale locale = new Locale("ar");
-        Configuration config = new Configuration(context.getResources().getConfiguration());
-        Locale.setDefault(locale);
-        config.setLocale(locale);
-        context.getBaseContext().getResources().updateConfiguration(config,
-                context.getBaseContext().getResources().getDisplayMetrics());
     }
 }

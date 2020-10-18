@@ -1,5 +1,8 @@
 package com.mahitab.ecommerce.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 
@@ -7,7 +10,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-public class CollectionModel {
+public class CollectionModel implements Parcelable {
     private ID mID;
     private String mTitle;
     private String mImage;
@@ -37,6 +40,24 @@ public class CollectionModel {
             mPreviewProducts.add(newProduct);
         }
     }
+
+    protected CollectionModel(Parcel in) {
+        mTitle = in.readString();
+        mImage = in.readString();
+        mPreviewProducts = in.createTypedArrayList(ProductModel.CREATOR);
+    }
+
+    public static final Creator<CollectionModel> CREATOR = new Creator<CollectionModel>() {
+        @Override
+        public CollectionModel createFromParcel(Parcel in) {
+            return new CollectionModel(in);
+        }
+
+        @Override
+        public CollectionModel[] newArray(int size) {
+            return new CollectionModel[size];
+        }
+    };
 
     public ID getID() {
         return mID;
@@ -71,5 +92,17 @@ public class CollectionModel {
         newCollection.setPreview(collectionProducts);
 
         return newCollection;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTitle);
+        dest.writeString(mImage);
+        dest.writeTypedList(mPreviewProducts);
     }
 }

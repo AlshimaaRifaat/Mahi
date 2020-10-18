@@ -1,5 +1,8 @@
 package com.mahitab.ecommerce.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 
@@ -10,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProductModel {
+public class ProductModel implements Parcelable {
     private ID mID;
     private String mTitle;
     private String mDescription;
@@ -63,6 +66,26 @@ public class ProductModel {
 
     public ProductModel() {
     }
+
+    protected ProductModel(Parcel in) {
+        mTitle = in.readString();
+        mDescription = in.readString();
+        mImages = in.createStringArray();
+        mTags = in.createStringArray();
+        mCollectionID = in.readString();
+    }
+
+    public static final Creator<ProductModel> CREATOR = new Creator<ProductModel>() {
+        @Override
+        public ProductModel createFromParcel(Parcel in) {
+            return new ProductModel(in);
+        }
+
+        @Override
+        public ProductModel[] newArray(int size) {
+            return new ProductModel[size];
+        }
+    };
 
     public ID getID() {
         return mID;
@@ -146,6 +169,20 @@ public class ProductModel {
 
     private ProductVariantModel convertToVariantModel(Storefront.ProductVariantEdge variantEdge) {
         return new ProductVariantModel(variantEdge, mID.toString());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTitle);
+        dest.writeString(mDescription);
+        dest.writeStringArray(mImages);
+        dest.writeStringArray(mTags);
+        dest.writeString(mCollectionID);
     }
 
     //region Product Variants

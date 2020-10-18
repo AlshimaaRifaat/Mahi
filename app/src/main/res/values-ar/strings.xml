@@ -11,5 +11,6 @@
     <string name="see_all">المزيد</string>
     <!-- Home Activity -->
 
+    <string name="title_activity_product_details">تفاصيل المنتج</string>
 
 </resources>

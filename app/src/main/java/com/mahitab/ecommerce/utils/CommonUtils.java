@@ -5,7 +5,9 @@ package com.mahitab.ecommerce.utils;
  */
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
@@ -14,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.shopify.buy3.Storefront;
+
+import java.util.Locale;
 
 public class CommonUtils {
 
@@ -128,6 +132,15 @@ public class CommonUtils {
 
     public enum AccountStatus {
         ACCOUNT_REQUIRED, ACCOUNT_NOT_REQUIRED
+    }
+
+    public static void setArDefaultLocale(Activity context) {
+        Locale locale = new Locale("ar");
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        Locale.setDefault(locale);
+        config.setLocale(locale);
+        context.getBaseContext().getResources().updateConfiguration(config,
+                context.getBaseContext().getResources().getDisplayMetrics());
     }
 }
 

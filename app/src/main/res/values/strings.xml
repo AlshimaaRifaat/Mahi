@@ -10,4 +10,6 @@
     <string name="see_all">See All</string>
     <!-- Home Activity -->
 
+    <string name="title_activity_product_details">Product Details</string>
+
 </resources>
