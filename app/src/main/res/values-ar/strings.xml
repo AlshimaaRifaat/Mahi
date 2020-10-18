@@ -12,5 +12,11 @@
     <!-- Home Activity -->
 
     <string name="title_activity_product_details">تفاصيل المنتج</string>
+    <string name="egp">جنيه</string>
+
+    <string name="payment_upon_receipt">الدفع عند الاستلام</string>
+    <string name="free_shipping">شحن مجاني</string>
+    <string name="free_returns_and_exchanges">ارجاع واستبدال</string>
+    <string name="description">الوصف</string>
 
 </resources>

@@ -20,6 +20,7 @@ public class CollectionProductsActivity extends AppCompatActivity {
     private static final String TAG = "CollectionProductsActiv";
 
     private RecyclerView rvCollectionProducts;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,23 +32,23 @@ public class CollectionProductsActivity extends AppCompatActivity {
         initView();
 
         if (getIntent().getExtras() != null) {
-            CollectionModel collection  = getIntent().getExtras().getParcelable("collection");
+            CollectionModel collection = getIntent().getExtras().getParcelable("collection");
             if (collection != null) {
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(collection.getTitle());
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-                    rvCollectionProducts.setHasFixedSize(true);
-                    rvCollectionProducts.setLayoutManager(new GridLayoutManager(this,2));
-                    ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
-                    rvCollectionProducts.setAdapter(productAdapter);
                 }
+
+                rvCollectionProducts.setHasFixedSize(true);
+                rvCollectionProducts.setLayoutManager(new GridLayoutManager(this, 2));
+                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                rvCollectionProducts.setAdapter(productAdapter);
             }
         }
     }
 
     private void initView() {
-        rvCollectionProducts=findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);
+        rvCollectionProducts = findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);
     }
 
     @Override

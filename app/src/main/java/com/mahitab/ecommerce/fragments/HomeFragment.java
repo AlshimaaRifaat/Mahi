@@ -141,11 +141,9 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
             targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), ProductDetailsActivity.class);
-            ProductModel product = DataManager.getInstance().getProductByID(targetId);
-            if (product != null) {
-                intent.putExtra("product", product);
-                startActivity(intent);
-            }
+            intent.putExtra("productId", targetId);
+            Log.e(TAG, "onBannerClick: "+targetId );
+            startActivity(intent);
         } else if (banner.getType().startsWith("c")) {
             type = "Collection";
             String target = "gid://shopify/" + type + "/" + banner.getId();

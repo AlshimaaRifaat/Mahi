@@ -25,7 +25,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
         , CollectionProductsAdapter.ProductClickListener {
 
     private List<CollectionModel> collectionList;
-    private Context context;
+    private final Context context;
 
     public CollectionsAdapter(Context context) {
         this.collectionList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
     @Override
     public void onProductClick(ProductModel product) {
         Intent intent = new Intent(context, ProductDetailsActivity.class);
-        intent.putExtra("product", product);
+        intent.putExtra("productId", product.getID().toString());
         context.startActivity(intent);
     }
 

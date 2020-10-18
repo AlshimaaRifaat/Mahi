@@ -11,5 +11,10 @@
     <!-- Home Activity -->
 
     <string name="title_activity_product_details">Product Details</string>
+    <string name="egp">EGP</string>
+    <string name="payment_upon_receipt">Payment upon receipt</string>
+    <string name="free_shipping">Free shipping</string>
+    <string name="free_returns_and_exchanges">Free returns and exchanges</string>
+    <string name="description">Description</string>
 
 </resources>

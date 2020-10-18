@@ -12,12 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.CollectionProductsActivity"
+            android:name=".activities.DescriptionActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".activities.CollectionProductsActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activities.ProductDetailsActivity"
-            android:label="@string/title_activity_product_details"
+            android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.HomeActivity">
             <intent-filter>
