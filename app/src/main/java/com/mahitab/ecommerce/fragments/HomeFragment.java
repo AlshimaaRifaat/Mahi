@@ -1,8 +1,10 @@
 package com.mahitab.ecommerce.fragments;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +34,6 @@ import com.mahitab.ecommerce.models.BannerList;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ImageSliderModel;
-import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.utils.OlgorClient;
 import com.rd.PageIndicatorView;
 
@@ -86,9 +87,11 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
         getBanners();
 
+        DisplayMetrics displaymetrics = Resources.getSystem().getDisplayMetrics();
+
         rvBanners.setHasFixedSize(true);
         rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        bannerAdapter = new BannerAdapter();
+        bannerAdapter = new BannerAdapter(displaymetrics.widthPixels);
         rvBanners.setAdapter(bannerAdapter);
         bannerAdapter.setBannerClickListener(HomeFragment.this);
 
@@ -142,7 +145,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), ProductDetailsActivity.class);
             intent.putExtra("productId", targetId);
-            Log.e(TAG, "onBannerClick: "+targetId );
+            Log.e(TAG, "onBannerClick: " + targetId);
             startActivity(intent);
         } else if (banner.getType().startsWith("c")) {
             type = "Collection";

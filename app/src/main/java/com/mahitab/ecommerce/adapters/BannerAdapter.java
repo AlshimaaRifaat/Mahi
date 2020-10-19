@@ -1,8 +1,6 @@
 package com.mahitab.ecommerce.adapters;
 
 
-import android.app.Activity;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,17 +20,18 @@ import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
     private List<BannerModel> bannerList;
-    private final DisplayMetrics displaymetrics = new DisplayMetrics();
+    private final int sectionWidth;
     private BannerClickListener listener;
 
-    public BannerAdapter() {
+    public BannerAdapter(int sectionWidth) {
         this.bannerList = new ArrayList<>();
+        this.sectionWidth = sectionWidth;
     }
 
     @NonNull
     @Override
     public BannerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new BannerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.banner_item,parent,false));
+        return new BannerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.banner_item, parent, false));
     }
 
     @Override
@@ -55,32 +54,37 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     public class BannerViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivImage;
+
         public BannerViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            ivImage=itemView.findViewById(R.id.ivImage_BannerItem);
-            ((Activity) itemView.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            //if you need three fix imageview in width
-            itemView.getLayoutParams().width = displaymetrics.widthPixels / 3;
+            ivImage = itemView.findViewById(R.id.ivImage_BannerItem);
+
+            if (bannerList.size() == 1)
+                itemView.getLayoutParams().width = sectionWidth;
+            else if (bannerList.size() == 2)
+                itemView.getLayoutParams().width = sectionWidth / 2;
+            else
+                itemView.getLayoutParams().width = sectionWidth / 3;
 
             itemView.setOnClickListener(v -> {
-                if (listener!=null)
+                if (listener != null)
                     listener.onBannerClick(bannerList.get(getAdapterPosition()));
             });
         }
     }
 
-    public void setBannerList(List<BannerModel> bannerList){
-        this.bannerList=bannerList;
+    public void setBannerList(List<BannerModel> bannerList) {
+        this.bannerList = bannerList;
         notifyDataSetChanged();
     }
 
-    public interface BannerClickListener{
+    public interface BannerClickListener {
         void onBannerClick(BannerModel banner);
     }
 
-    public void setBannerClickListener(BannerClickListener listener){
-        this.listener=listener;
+    public void setBannerClickListener(BannerClickListener listener) {
+        this.listener = listener;
     }
 
 }

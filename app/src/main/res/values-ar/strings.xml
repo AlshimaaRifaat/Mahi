@@ -18,5 +18,8 @@
     <string name="free_shipping">شحن مجاني</string>
     <string name="free_returns_and_exchanges">ارجاع واستبدال</string>
     <string name="description">الوصف</string>
+    <string name="colors">الالوان</string>
+    <string name="shapes">الأشكال</string>
+    <string name="related_products">منتجات ذات صله</string>
 
 </resources>

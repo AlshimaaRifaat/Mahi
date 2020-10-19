@@ -16,5 +16,19 @@
     <string name="free_shipping">Free shipping</string>
     <string name="free_returns_and_exchanges">Free returns and exchanges</string>
     <string name="description">Description</string>
+    <string name="colors">Colors</string>
+    <string name="shapes">Shapes</string>
+    <string name="related_products">Related Products</string>
 
+    <string-array name="colors">
+        <item>#FFFFFF</item>
+        <item>#000000</item>
+        <item>#FF0000</item>
+        <item>#0000FF</item>
+        <item>#A52A2A</item>
+        <item>#008000</item>
+        <item>#FFFF00</item>
+        <item>#87CEEB</item>
+        <item>#000080</item>
+    </string-array>
 </resources>

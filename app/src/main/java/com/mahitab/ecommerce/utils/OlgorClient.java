@@ -1,6 +1,9 @@
 package com.mahitab.ecommerce.utils;
 
 import com.mahitab.ecommerce.models.BannerList;
+import com.mahitab.ecommerce.models.CategoryModel;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -17,7 +20,6 @@ public class OlgorClient {
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
     }
 
     public static synchronized OlgorClient getInstance() {
@@ -31,5 +33,8 @@ public class OlgorClient {
     public interface Api {
         @GET("appbanners.php")
         Call<BannerList> getBanners();
+
+        @GET("categories.php")
+        Call<List<CategoryModel>> getCategories();
     }
 }

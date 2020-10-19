@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:orientation="vertical"
     tools:context=".fragments.CategoriesFragment">
+
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -21,4 +22,29 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-</FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        tools:ignore="DisableBaselineAlignment">
+
+        <fragment
+            android:id="@+id/mainFragment"
+            android:name="com.mahitab.ecommerce.fragments.categories.MainCategoriesFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".6"
+            tools:ignore="FragmentTagUsage"
+            tools:layout="@layout/fragment_main_categories" />
+
+        <fragment
+            android:id="@+id/subFragment"
+            android:name="com.mahitab.ecommerce.fragments.categories.SubCategoriesFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.8"
+            tools:ignore="FragmentTagUsage"
+            tools:layout="@layout/fragment_sub_categories" />
+
+    </LinearLayout>
+</LinearLayout>
