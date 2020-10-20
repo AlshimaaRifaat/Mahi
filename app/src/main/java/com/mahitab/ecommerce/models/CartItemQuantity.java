@@ -1,36 +1,19 @@
 package com.mahitab.ecommerce.models;
 
-import com.shopify.graphql.support.ID;
-
 public class CartItemQuantity {
-    public ID id = null;
     public int quantity;
     public String productID;
 
-
-    public CartItemQuantity(ID id, int quantity, String productID) {
-        this.id = id;
+    public CartItemQuantity(int quantity, String productID) {
         this.quantity = quantity;
         this.productID = productID;
     }
 
-    public CartItemQuantity(ID id) {
-        this.id = id;
-    }
-
-    public ID getId() {
-        return id;
-    }
-
-    public void setId(ID id) {
-        this.id = id;
-    }
-
-    public void setproductID(String productID) {
+    public void setProductID(String productID) {
         this.productID = productID;
     }
 
-    public String getproductID() {
+    public String getProductID() {
         return productID;
     }
 

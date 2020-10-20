@@ -47,8 +47,13 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //Shopify SDK
-    implementation 'com.shopify.mobilebuysdk:buy3:3.1.1'
+    implementation 'com.shopify.mobilebuysdk:buy3:3.2.3'
     implementation 'com.shopify.mobilebuysdk:buy3-pay-support:1.0.2'
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
+    //DateTime
+    implementation 'net.danlew:android.joda:2.10.6.1'
 
     //Retrofit for fetch home banner images
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

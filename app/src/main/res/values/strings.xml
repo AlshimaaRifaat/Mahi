@@ -19,6 +19,9 @@
     <string name="colors">Colors</string>
     <string name="shapes">Shapes</string>
     <string name="related_products">Related Products</string>
+    <string name="buy">Buy</string>
+    <string name="subtotal">SubTotal:</string>
+    <string name="add_to_cart">Add to cart</string>
 
     <string-array name="colors">
         <item>#FFFFFF</item>

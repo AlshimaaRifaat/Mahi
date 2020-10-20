@@ -21,5 +21,8 @@
     <string name="colors">الالوان</string>
     <string name="shapes">الأشكال</string>
     <string name="related_products">منتجات ذات صله</string>
+    <string name="buy">شراء</string>
+    <string name="subtotal">المجموع الفرعي:</string>
+    <string name="add_to_cart">إضافة إلى السلة</string>
 
 </resources>

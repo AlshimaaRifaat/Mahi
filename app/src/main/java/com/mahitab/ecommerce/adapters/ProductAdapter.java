@@ -48,18 +48,18 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         viewHolder2.tvTitle.setText(singleItem.getTitle());
 
-//        if (singleItem.getVariants().get(0).getOldPrice() != null &&
-//                singleItem.getVariants().get(0).getOldPrice().compareTo(singleItem.getVariants().get(0).getPrice()) > 0 &&
-//                singleItem.getVariants().get(0).isAvailableForSale()) {
-//            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getOldPrice().toString() + ' ');
-//            viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-//            viewHolder2.tvPrice.setVisibility(View.VISIBLE);
-//            viewHolder2.tvPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
-//        } else {
-//            viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
-//            viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
-//            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
-//        }
+        if (singleItem.getVariants().get(0).getOldPrice() != null &&
+                singleItem.getVariants().get(0).getOldPrice().compareTo(singleItem.getVariants().get(0).getPrice()) > 0 &&
+                singleItem.getVariants().get(0).isAvailableForSale()) {
+            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getOldPrice().toString() + ' ');
+            viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            viewHolder2.tvPrice.setVisibility(View.VISIBLE);
+            viewHolder2.tvPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
+        } else {
+            viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
+            viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
+            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
+        }
     }
 
     @Override
