@@ -65,7 +65,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
     private TextView tvCartQuantity;
     private ImageView ivDecreaseQuantity;
     private ImageView ivBuyByPhone;
-    private LinearLayout llBuy;
+    private Button btnBuy;
 
     private MenuItem cartMenuItem;
 
@@ -151,7 +151,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
         ivBuyByPhone.setOnClickListener(this);
         ivIncreaseQuantity.setOnClickListener(this);
         ivDecreaseQuantity.setOnClickListener(this);
-        llBuy.setOnClickListener(this);
+        btnBuy.setOnClickListener(this);
     }
 
     @Override
@@ -238,7 +238,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                 cartProductsCount = cartProducts.size();
                 updateCartBadge(cartProductsCount);
             }
-        } else if (v.getId() == R.id.llBuy_ProductDetailsActivity)
+        } else if (v.getId() == R.id.btnBuy_ProductDetailsActivity)
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
     }
 
@@ -264,7 +264,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
         tvCartQuantity = findViewById(R.id.tvCartQuantity_ProductDetailsActivity);
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
-        llBuy = findViewById(R.id.llBuy_ProductDetailsActivity);
+        btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {

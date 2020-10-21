@@ -84,14 +84,14 @@
                 android:text="متر"
                 android:textSize="17sp" />
 
-            <LinearLayout
-                android:id="@+id/llBuy_ProductDetailsActivity"
+            <Button
+                android:id="@+id/btnBuy_ProductDetailsActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:background="@drawable/rounded_button_yellow"
                 android:clickable="true"
+                android:drawableEnd="@drawable/ic_shopping_cart_white_24dp"
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -99,22 +99,8 @@
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
-                android:text="@string/buy">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/buy"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_shopping_cart_white_24dp"
-                    tools:ignore="ContentDescription" />
-            </LinearLayout>
+                android:text="@string/buy"
+                android:textAllCaps="false" />
         </LinearLayout>
 
         <Button
@@ -124,7 +110,6 @@
             android:layout_gravity="center"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@drawable/rounded_button_yellow"
             android:text="@string/add_to_cart"
             android:visibility="gone" />
 

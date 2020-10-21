@@ -69,7 +69,6 @@
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_button_yellow"
                     android:text="@string/buy" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

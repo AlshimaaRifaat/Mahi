@@ -25,5 +25,11 @@
     <string name="subtotal">المجموع الفرعي:\u0020</string>
     <string name="add_to_cart">إضافة إلى السلة</string>
     <string name="your_cart_is_empty_add_now_what_you_love">عربة التسوق الخاصة بك فارغة !، أضف الآن ما تحب 😍</string>
+    <string name="welcome">مرحبًا,\u0020</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="register">تسجيل</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمه المرور</string>
+    <string name="forget_your_password">نسيت كلمة المرور؟</string>
 
 </resources>
