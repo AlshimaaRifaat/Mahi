@@ -11,7 +11,7 @@
     <!-- Home Activity -->
 
     <string name="title_activity_product_details">Product Details</string>
-    <string name="egp">EGP</string>
+    <string name="egp">\u0020EGP</string>
     <string name="payment_upon_receipt">Payment upon receipt</string>
     <string name="free_shipping">Free shipping</string>
     <string name="free_returns_and_exchanges">Free returns and exchanges</string>
@@ -20,8 +20,9 @@
     <string name="shapes">Shapes</string>
     <string name="related_products">Related Products</string>
     <string name="buy">Buy</string>
-    <string name="subtotal">SubTotal:</string>
+    <string name="subtotal">SubTotal:\u0020</string>
     <string name="add_to_cart">Add to cart</string>
+    <string name="your_cart_is_empty_add_now_what_you_love">Your cart is empty!, Add Now what you love 😍</string>
 
     <string-array name="colors">
         <item>#FFFFFF</item>

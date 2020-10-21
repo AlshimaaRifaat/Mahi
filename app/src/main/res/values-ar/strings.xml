@@ -12,7 +12,7 @@
     <!-- Home Activity -->
 
     <string name="title_activity_product_details">تفاصيل المنتج</string>
-    <string name="egp">جنيه</string>
+    <string name="egp">جنيه\u0020</string>
 
     <string name="payment_upon_receipt">الدفع عند الاستلام</string>
     <string name="free_shipping">شحن مجاني</string>
@@ -22,7 +22,8 @@
     <string name="shapes">الأشكال</string>
     <string name="related_products">منتجات ذات صله</string>
     <string name="buy">شراء</string>
-    <string name="subtotal">المجموع الفرعي:</string>
+    <string name="subtotal">المجموع الفرعي:\u0020</string>
     <string name="add_to_cart">إضافة إلى السلة</string>
+    <string name="your_cart_is_empty_add_now_what_you_love">عربة التسوق الخاصة بك فارغة !، أضف الآن ما تحب 😍</string>
 
 </resources>

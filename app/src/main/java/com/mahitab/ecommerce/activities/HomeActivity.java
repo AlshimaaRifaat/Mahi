@@ -1,5 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -7,16 +9,24 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.fragments.AccountFragment;
 import com.mahitab.ecommerce.fragments.CartFragment;
 import com.mahitab.ecommerce.fragments.CategoriesFragment;
 import com.mahitab.ecommerce.fragments.HomeFragment;
+import com.mahitab.ecommerce.models.CartItemQuantity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
@@ -24,6 +34,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     private boolean doubleBackToExitPressedOnce = false;
     private BottomNavigationView bnvHomeNavigation;
+    private SharedPreferences defaultPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +43,8 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         setContentView(R.layout.activity_main);
 
         bnvHomeNavigation = findViewById(R.id.bnvHomeNavigation_HomeActivity);
+
+        defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
         //loading the home default fragment
         changeFragment(new HomeFragment(), HomeFragment.class.getName(),
@@ -43,6 +56,24 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume() {
         super.onResume();
+
+        List<CartItemQuantity> cartProducts;
+        if (defaultPreferences.getString("cartProducts", null) == null)
+            cartProducts = new ArrayList<>();
+        else
+            cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
+            }.getType());
+
+        // change the number to see cartBadge in action
+        int cartProductsCount = cartProducts.size();
+
+        BadgeDrawable cartBadge = bnvHomeNavigation.getOrCreateBadge(R.id.cart_navigation);
+        if (cartProductsCount >= 1) {
+            cartBadge.setVisible(true);
+            cartBadge.setNumber(cartProductsCount);
+            cartBadge.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        } else cartBadge.setVisible(false);
+
         overridePendingTransition(0, 0); // remove activity default transition
     }
 
@@ -98,5 +129,9 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         fragmentTransaction.setPrimaryNavigationFragment(fragmentTemp);
         fragmentTransaction.setReorderingAllowed(true);
         fragmentTransaction.commitNowAllowingStateLoss();
+    }
+
+    public BottomNavigationView getBnvHomeNavigation() {
+        return bnvHomeNavigation;
     }
 }

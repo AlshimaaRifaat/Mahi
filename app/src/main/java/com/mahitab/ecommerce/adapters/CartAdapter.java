@@ -1,7 +1,6 @@
 package com.mahitab.ecommerce.adapters;
 
 import android.graphics.Paint;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +18,16 @@ import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.ProductModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
-    private List<CartItemQuantity> cartItemQuantities;
+    private final List<CartItemQuantity> cartItemQuantities;
 
-    public CartAdapter() {
-        cartItemQuantities = new ArrayList<>();
+    private CartProductClickListener listener;
+
+    public CartAdapter(List<CartItemQuantity> cartItemQuantities) {
+        this.cartItemQuantities = cartItemQuantities;
     }
 
     @NonNull
@@ -39,7 +39,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID());
-
         Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)
@@ -73,33 +72,56 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return cartItemQuantities.size();
     }
 
-    public class CartViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivProductImage;
-        private ImageView ivDelete;
-        private TextView tvProductTitle;
-        private TextView tvPrice;
-        private TextView tvOldPrice;
-        private TextView tvQuantityType;
-        private ImageView ivIncreaseQuantity;
-        private TextView tvQuantity;
-        private ImageView ivDecreaseQuantity;
+    public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final ImageView ivProductImage;
+        private final TextView tvProductTitle;
+        private final TextView tvPrice;
+        private final TextView tvOldPrice;
+        private final TextView tvQuantityType;
+        private final TextView tvQuantity;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProductImage = itemView.findViewById(R.id.ivProductImage_CartItem);
             tvProductTitle = itemView.findViewById(R.id.tvProductTitle_CartItem);
-            ivDelete = itemView.findViewById(R.id.ivDelete_CartItem);
+            ImageView ivDelete = itemView.findViewById(R.id.ivDelete_CartItem);
             tvPrice = itemView.findViewById(R.id.tvPrice_CartItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_CartItem);
             tvQuantityType = itemView.findViewById(R.id.tvQuantityType_CartItem);
-            ivIncreaseQuantity = itemView.findViewById(R.id.ivIncreaseQuantity_CartItem);
+            ImageView ivIncreaseQuantity = itemView.findViewById(R.id.ivIncreaseQuantity_CartItem);
             tvQuantity = itemView.findViewById(R.id.tvQuantity_CartItem);
-            ivDecreaseQuantity = itemView.findViewById(R.id.ivDecreaseQuantity_CartItem);
+            ImageView ivDecreaseQuantity = itemView.findViewById(R.id.ivDecreaseQuantity_CartItem);
+
+            ivDelete.setOnClickListener(this);
+            ivIncreaseQuantity.setOnClickListener(this);
+            ivDecreaseQuantity.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.ivDelete_CartItem) {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                    listener.onDeleteProductClick(getAdapterPosition());
+            } else if (v.getId() == R.id.ivIncreaseQuantity_CartItem) {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                    listener.onIncreaseProductQuantityClick(getAdapterPosition());
+            } else if (v.getId() == R.id.ivDecreaseQuantity_CartItem) {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                    listener.onDecreaseProductQuantityClick(getAdapterPosition());
+            }
         }
     }
 
-    public void setCartItemQuantities(List<CartItemQuantity> cartItemQuantities) {
-        this.cartItemQuantities = cartItemQuantities;
-        notifyDataSetChanged();
+    public interface CartProductClickListener {
+        void onIncreaseProductQuantityClick(int position);
+
+        void onDecreaseProductQuantityClick(int position);
+
+        void onDeleteProductClick(int position);
     }
+
+    public void setCartProductClickListener(CartProductClickListener listener) {
+        this.listener = listener;
+    }
+
 }

@@ -2,11 +2,13 @@ package com.mahitab.ecommerce.models;
 
 public class CartItemQuantity {
     public int quantity;
+    public double productPrice;
     public String productID;
 
-    public CartItemQuantity(int quantity, String productID) {
+    public CartItemQuantity(int quantity, String productID,double productPrice) {
         this.quantity = quantity;
         this.productID = productID;
+        this.productPrice = productPrice;
     }
 
     public void setProductID(String productID) {
@@ -35,4 +37,7 @@ public class CartItemQuantity {
         this.quantity = quantity;
     }
 
+    public double getProductPrice() {
+        return productPrice;
+    }
 }

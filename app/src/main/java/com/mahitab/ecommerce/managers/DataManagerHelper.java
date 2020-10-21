@@ -105,7 +105,7 @@ public class DataManagerHelper {
 
     //region Cart Management
     public void addToCart(CartItemQuantity variantItem) {
-        mCart.add(new CartItemQuantity(variantItem.quantity, variantItem.productID));
+        mCart.add(new CartItemQuantity(variantItem.quantity, variantItem.productID,variantItem.getProductPrice()));
     }
 
     public void emptyCart() {
