@@ -40,4 +40,8 @@
     <string name="my_wishlist">المفضلة</string>
     <string name="my_addresses">العناوين</string>
     <string name="help">مساعدة؟</string>
+    <string name="order_no">رقم الطلب</string>
+    <string name="grand_total">إجمالي المبلغ</string>
+    <string name="order_date">تاريخ الطلب</string>
+    <string name="order_status">حالة الطلب</string>
 </resources>
