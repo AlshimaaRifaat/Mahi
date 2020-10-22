@@ -6,9 +6,11 @@ import com.mahitab.ecommerce.models.CurrentUser;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphClient;
 import com.shopify.buy3.HttpCachePolicy;
+import com.shopify.buy3.MutationGraphCall;
 import com.shopify.buy3.QueryGraphCall;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
+import com.shopify.graphql.support.Nullable;
 
 import java.util.UUID;
 
@@ -87,6 +89,16 @@ public final class GraphClientManager {
         }
 
         mClient.mutateGraph(query).enqueue(callback);
+    }
+
+    void register(String email, String password, String firstName, String lastName, @Nullable boolean acceptsMarketing,
+                  GraphCall.Callback<Storefront.Mutation> callback) {
+        Storefront.MutationQuery query = ClientQuery.mutationForCreateUser(
+                email, password, firstName, lastName
+        );
+        MutationGraphCall call = mClient.mutateGraph(query);
+
+        call.enqueue(callback);
     }
 }
 

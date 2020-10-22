@@ -15,10 +15,12 @@ import androidx.fragment.app.Fragment;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.LoginActivity;
+import com.mahitab.ecommerce.activities.RegisterActivity;
 
-public class AccountFragment extends Fragment implements View.OnClickListener{
+public class AccountFragment extends Fragment {
     private Toolbar toolbar;
     private Button btnLogin;
+    private Button btnRegister;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -41,7 +43,9 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
             ((HomeActivity) getActivity()).setSupportActionBar(toolbar);
             setHasOptionsMenu(true);
         }
-        btnLogin.setOnClickListener(this);
+
+        btnLogin.setOnClickListener(v -> startActivity(new Intent(getContext(), LoginActivity.class)));
+        btnRegister.setOnClickListener(v -> startActivity(new Intent(getContext(), RegisterActivity.class)));
     }
 
     @Override
@@ -52,14 +56,9 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btnLogin_AccountFragment)
-            startActivity(new Intent(getContext(), LoginActivity.class));
-    }
-
     private void initView(View view) {
         toolbar = view.findViewById(R.id.toolbar);
         btnLogin = view.findViewById(R.id.btnLogin_AccountFragment);
+        btnRegister = view.findViewById(R.id.btnRegister_AccountFragment);
     }
 }

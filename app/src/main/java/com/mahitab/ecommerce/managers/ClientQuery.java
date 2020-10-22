@@ -177,4 +177,18 @@ public class ClientQuery {
                         )
         );
     }
+
+    static Storefront.MutationQuery mutationForCreateUser(
+            String email, String password, String firstName, String lastName
+    ) {
+
+        Storefront.CustomerCreateInput input = new Storefront
+                .CustomerCreateInput(email, password)
+                .setFirstName(firstName)
+                .setLastName(lastName);
+
+        return ClientMutation.mutationForCreateUser(
+                input
+        );
+    }
 }

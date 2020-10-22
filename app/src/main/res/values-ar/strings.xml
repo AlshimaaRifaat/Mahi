@@ -31,5 +31,8 @@
     <string name="email">البريد الإلكتروني</string>
     <string name="password">كلمه المرور</string>
     <string name="forget_your_password">نسيت كلمة المرور؟</string>
-
+    <string name="first_name">الاسم الاول</string>
+    <string name="last_name">الاسم الاخير</string>
+    <string name="mobile_number">رقم الموبايل</string>
+    <string name="empty_field_error_message">لا يمكن أن يكون الحقل فارغًا</string>
 </resources>

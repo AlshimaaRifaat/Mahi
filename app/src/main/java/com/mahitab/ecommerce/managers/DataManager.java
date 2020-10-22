@@ -35,37 +35,6 @@ public final class DataManager extends Observable {
         private static final DataManager INSTANCE = new DataManager();
     }
 
-  /*  public void resetPassword(String email, BaseCallback callback) {
-        mClientManager.resetUserPassword(email, new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                if(response.hasErrors()) {
-                    callback.onFailure(response.errors().get(0).message());
-                    return;
-                }
-
-                if(response.data() == null) {
-                    callback.onFailure("Data is null");
-                    return;
-                }
-
-                assert response.data() != null;
-                Storefront.CustomerRecoverPayload payload = response.data().getCustomerRecover();
-                if(payload.getUserErrors().size() != 0) {
-                    callback.onFailure(payload.getUserErrors().get(0).getMessage());
-                    return;
-                }
-
-                callback.onResponse(BaseCallback.RESULT_OK);
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-                callback.onFailure(error.getLocalizedMessage());
-            }
-        });
-    }*/
-
     public synchronized static DataManager getInstance() {
         return InstanceHelper.INSTANCE;
     }
@@ -927,6 +896,45 @@ public final class DataManager extends Observable {
 
     public ArrayList<ProductModel> getAllProducts() {
         return DataManagerHelper.getInstance().getAllProducts();
+    }
+
+    public void register(
+            String email, String password,
+            String firstName, String lastName,
+            boolean acceptsMarketing,
+            BaseCallback callback) {
+        mClientManager.register(
+                email, password,
+                firstName, lastName,
+                acceptsMarketing,
+                new GraphCall.Callback<Storefront.Mutation>() {
+                    @Override
+                    public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+                        if (!response.hasErrors()) {
+                            if (response.data() == null || response.data().getCustomerCreate() == null) {
+                                callback.onFailure("Error creating user");
+                                return;
+                            }
+
+                            Storefront.CustomerCreatePayload payload = response.data().getCustomerCreate();
+                            if (payload.getUserErrors() != null && payload.getUserErrors().size() != 0) {
+                                callback.onFailure(payload.getUserErrors().get(0).getMessage());
+                                return;
+                            }
+
+                            callback.onResponse(BaseCallback.RESULT_OK);
+                            return;
+                        }
+
+                        callback.onFailure("Response: " + response.errors().get(0).message());
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull GraphError error) {
+                        callback.onFailure(error.getLocalizedMessage());
+                    }
+                }
+        );
     }
 }
 
