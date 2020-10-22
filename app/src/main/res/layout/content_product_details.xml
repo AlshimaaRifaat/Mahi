@@ -132,7 +132,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="8dp"
-                        android:src="@drawable/ic_arrow_forward_ios_gray_24dp"
+                        android:src="@drawable/ic_keyboard_arrow_right_gray_24dp"
                         tools:ignore="ContentDescription" />
                 </LinearLayout>
 

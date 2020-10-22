@@ -1,5 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -34,6 +36,8 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etMobileNumber;
     private Button btnRegister;
 
+    private SharedPreferences defaultPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         initView();
+
+        defaultPreferences=getSharedPreferences(getPackageName(),Context.MODE_PRIVATE);
 
         btnRegister.setOnClickListener(v -> {
             String email = etEmail.getText().toString();
@@ -99,6 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onResponse(int status) {
                         if (status == RESULT_OK) {
                             runOnUiThread(new Thread(() -> {
+                                saveEmailAndPassword(email,password);
                                 onBackPressed();
                                 Toast.makeText(getApplicationContext(), "Account created successfully", Toast.LENGTH_SHORT).show();
                             }));
@@ -165,5 +172,10 @@ public class RegisterActivity extends AppCompatActivity {
             isValid = false;
         }
         return isValid;
+    }
+
+    private void saveEmailAndPassword(String email,String password) {
+        defaultPreferences.edit().putString("email", email).apply();
+        defaultPreferences.edit().putString("password", password).apply();
     }
 }

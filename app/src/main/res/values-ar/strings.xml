@@ -35,4 +35,9 @@
     <string name="last_name">الاسم الاخير</string>
     <string name="mobile_number">رقم الموبايل</string>
     <string name="empty_field_error_message">لا يمكن أن يكون الحقل فارغًا</string>
+    <string name="sign_out">تسجيل الخروج</string>
+    <string name="my_orders">طلباتي</string>
+    <string name="my_wishlist">المفضلة</string>
+    <string name="my_addresses">العناوين</string>
+    <string name="help">مساعدة؟</string>
 </resources>
