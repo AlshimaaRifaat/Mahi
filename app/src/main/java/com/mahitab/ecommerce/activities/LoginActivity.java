@@ -1,7 +1,6 @@
 package com.mahitab.ecommerce.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
-        tvForgetPassword.setOnClickListener(v -> Log.e(TAG, "onClick: " ));
+        tvForgetPassword.setOnClickListener(v -> Log.e(TAG, "onClick: "));
 
         btnLogin.setOnClickListener(v -> {
             email = etEmail.getText().toString();
@@ -79,12 +78,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        tilEmail = (TextInputLayout) findViewById(R.id.tilEmail_LoginActivity);
-        etEmail = (EditText) findViewById(R.id.etEmail_LoginActivity);
-        tilPassword = (TextInputLayout) findViewById(R.id.tilPassword_LoginActivity);
-        etPassword = (EditText) findViewById(R.id.etPassword_LoginActivity);
-        tvForgetPassword = (TextView) findViewById(R.id.tvForgetPassword_LoginActivity);
-        btnLogin = (Button) findViewById(R.id.btnLogin_LoginActivity);
+        tilEmail = findViewById(R.id.tilEmail_LoginActivity);
+        etEmail = findViewById(R.id.etEmail_LoginActivity);
+        tilPassword = findViewById(R.id.tilPassword_LoginActivity);
+        etPassword = findViewById(R.id.etPassword_LoginActivity);
+        tvForgetPassword = findViewById(R.id.tvForgetPassword_LoginActivity);
+        btnLogin = findViewById(R.id.btnLogin_LoginActivity);
     }
 
     private boolean validateFields(String email, String pass) {
@@ -134,13 +133,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
                 runOnUiThread(() -> {
                     Log.d(TAG, "state: " + "success");
-                    if (response.data()!=null){
+                    if (response.data() != null) {
                         accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
                         Log.d(TAG, "token: " + accessToken);
                         saveAccessToken(accessToken);
-                        Intent goToMain = new Intent(LoginActivity.this, HomeActivity.class);
-                        startActivity(goToMain);
-                        finish();
+                        onBackPressed();
                     }
                 });
             }
@@ -157,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void saveEmailAndPassword(String email,String password) {
+    private void saveEmailAndPassword(String email, String password) {
         defaultPreferences.edit().putString("email", email).apply();
         defaultPreferences.edit().putString("password", password).apply();
     }

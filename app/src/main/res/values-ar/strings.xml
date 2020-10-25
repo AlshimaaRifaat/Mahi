@@ -44,4 +44,8 @@
     <string name="grand_total">إجمالي المبلغ</string>
     <string name="order_date">تاريخ الطلب</string>
     <string name="order_status">حالة الطلب</string>
+    <string name="edit">تعديل</string>
+    <string name="sign_out_message">لقد تم تسجيل خروجك بنجاح!</string>
+    <string name="add_address">اضف عنوان</string>
+    <string name="edit_address">تعديل العنوان</string>
 </resources>
