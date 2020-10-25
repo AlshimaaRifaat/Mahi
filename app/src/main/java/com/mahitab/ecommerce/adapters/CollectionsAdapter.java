@@ -68,7 +68,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
     @Override
     public void onCollectionClick(CollectionModel collection) {
         Intent intent = new Intent(context, CollectionProductsActivity.class);
-        intent.putExtra("collection", collection);
+        intent.putExtra("collectionId", collection.getID().toString());
         context.startActivity(intent);
     }
 

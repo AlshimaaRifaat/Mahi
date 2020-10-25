@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CollectionModel;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
@@ -32,7 +33,8 @@ public class CollectionProductsActivity extends AppCompatActivity {
         initView();
 
         if (getIntent().getExtras() != null) {
-            CollectionModel collection = getIntent().getExtras().getParcelable("collection");
+            String collectionId=getIntent().getExtras().getString("collectionId");
+            CollectionModel collection = DataManager.getInstance().getCollectionByID(collectionId);
             if (collection != null) {
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(collection.getTitle());

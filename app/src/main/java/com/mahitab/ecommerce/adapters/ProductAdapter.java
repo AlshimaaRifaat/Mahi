@@ -34,10 +34,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder viewHolder2, int position) {
-        ProductModel singleItem = productList.get(position);
+        ProductModel product = productList.get(position);
 
         Glide.with(viewHolder2.itemView.getContext())
-                .load(singleItem.getImages()[0])
+                .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
                 .placeholder(R.drawable.ic_image_gray_24dp)
@@ -46,19 +46,21 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(viewHolder2.ivImage);
 
-        viewHolder2.tvTitle.setText(singleItem.getTitle());
+        viewHolder2.tvTitle.setText(product.getTitle());
 
-        if (singleItem.getVariants().get(0).getOldPrice() != null &&
-                singleItem.getVariants().get(0).getOldPrice().compareTo(singleItem.getVariants().get(0).getPrice()) > 0 &&
-                singleItem.getVariants().get(0).isAvailableForSale()) {
-            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getOldPrice().toString() + ' ');
-            viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            viewHolder2.tvPrice.setVisibility(View.VISIBLE);
-            viewHolder2.tvPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
-        } else {
-            viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
-            viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
-            viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
+        if (product.getVariants()!=null){
+            if (product.getVariants().get(0).getOldPrice() != null &&
+                    product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
+                    product.getVariants().get(0).isAvailableForSale()) {
+                viewHolder2.tvOldPrice.setText(product.getVariants().get(0).getOldPrice().toString() + ' ');
+                viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                viewHolder2.tvPrice.setVisibility(View.VISIBLE);
+                viewHolder2.tvPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
+            } else {
+                viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
+                viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
+                viewHolder2.tvOldPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
+            }
         }
     }
 

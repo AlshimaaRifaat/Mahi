@@ -1,10 +1,14 @@
 package com.mahitab.ecommerce.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,7 +27,10 @@ import com.mahitab.ecommerce.fragments.AccountFragment;
 import com.mahitab.ecommerce.fragments.CartFragment;
 import com.mahitab.ecommerce.fragments.CategoriesFragment;
 import com.mahitab.ecommerce.fragments.HomeFragment;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.CartItemQuantity;
+import com.mahitab.ecommerce.models.CollectionModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +43,19 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView bnvHomeNavigation;
     private SharedPreferences defaultPreferences;
 
+    private LinearLayout llHome;
+    private LinearLayout llSplash;
+
+    private List<CollectionModel> collections;
+    private static CollectionLoadListener collectionLoadListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setArDefaultLocale(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
 
-        bnvHomeNavigation = findViewById(R.id.bnvHomeNavigation_HomeActivity);
+        initView();
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
@@ -51,6 +64,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                 bnvHomeNavigation.getMenu().getItem(0));
 
         bnvHomeNavigation.setOnNavigationItemSelectedListener(this);
+
+        DataManager.getInstance().setClientManager(this); // init shopify sdk
+
+        geCollectionsWithProducts();
     }
 
     @Override
@@ -65,7 +82,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
             }.getType());
 
         // change the number to see cartBadge in action
-        int cartProductsCount = cartProducts.size();
+        int cartProductsCount = 0;
+        if (cartProducts != null) {
+            cartProductsCount = cartProducts.size();
+        }
 
         BadgeDrawable cartBadge = bnvHomeNavigation.getOrCreateBadge(R.id.cart_navigation);
         if (cartProductsCount >= 1) {
@@ -106,6 +126,12 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
+    private void initView() {
+        llHome = findViewById(R.id.llHome_HomeActivity);
+        llSplash = findViewById(R.id.llSplash_HomeActivity);
+        bnvHomeNavigation = findViewById(R.id.bnvHomeNavigation_HomeActivity);
+    }
+
     private void changeFragment(Fragment fragment, String tagFragmentName, MenuItem item) {
 
         FragmentManager mFragmentManager = getSupportFragmentManager();
@@ -133,5 +159,48 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     public BottomNavigationView getBnvHomeNavigation() {
         return bnvHomeNavigation;
+    }
+
+    private void geCollectionsWithProducts() {
+        DataManager.getInstance().collections(new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                if (status == 200) {
+                    runOnUiThread(() -> {
+                        collections = DataManager.getInstance().getCollections();
+                        collections.removeIf(collection -> (collection.getPreviewProducts().size() == 0)); //remove collection if has no products
+                        if (collectionLoadListener != null)
+                            collectionLoadListener.onCollectionLoaded(collections);
+                        llSplash.animate()
+                                .translationY(llSplash.getHeight())
+                                .alpha(0.0f)
+                                .setDuration(300)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        llSplash.setVisibility(View.GONE);
+                                        llHome.setVisibility(View.VISIBLE);
+                                    }
+                                });
+                    });
+                } else {
+                    this.onFailure("An unknown error has occurred");
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+    }
+
+    public interface CollectionLoadListener {
+        void onCollectionLoaded(List<CollectionModel> collections);
+    }
+
+    public static void setCollectionLoadListener(CollectionLoadListener collectionLoadListener) {
+        HomeActivity.collectionLoadListener = collectionLoadListener;
     }
 }

@@ -140,11 +140,8 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
             String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
             targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), CollectionProductsActivity.class);
-            CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
-            if (collection != null) {
-                intent.putExtra("collection", collection);
-                startActivity(intent);
-            }
+            intent.putExtra("collectionId", targetId);
+            startActivity(intent);
         }
     }
 

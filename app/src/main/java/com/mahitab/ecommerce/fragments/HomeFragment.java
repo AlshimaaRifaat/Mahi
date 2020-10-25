@@ -29,7 +29,6 @@ import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
-import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.BannerList;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
@@ -46,7 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener {
+public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener {
 
     private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
@@ -60,7 +59,6 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
     private ImageSliderAdapter sliderAdapter;
 
     private RecyclerView rvCollectionProducts;
-    private List<CollectionModel> collections;
     private CollectionsAdapter collectionsAdapter;
 
     public HomeFragment() {
@@ -113,10 +111,8 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             }
         });
 
-        DataManager.getInstance().setClientManager(getContext()); // init shopify sdk
-
-        geCollectionsWithProducts();
-
+        HomeActivity.setCollectionLoadListener(this);
+        
         rvCollectionProducts.setHasFixedSize(true);
         rvCollectionProducts.setLayoutManager(new LinearLayoutManager(getContext()));
         collectionsAdapter = new CollectionsAdapter(getContext());
@@ -153,12 +149,14 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
             targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), CollectionProductsActivity.class);
-            CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
-            if (collection != null) {
-                intent.putExtra("collection", collection);
-                startActivity(intent);
-            }
+            intent.putExtra("collectionId", targetId);
+            startActivity(intent);
         }
+    }
+
+    @Override
+    public void onCollectionLoaded(List<CollectionModel> collections) {
+        collectionsAdapter.setCollections(collections);
     }
 
     private void initView(View view) {
@@ -190,27 +188,5 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         sliderImages.add(new ImageSliderModel(" خصومات حتي 60%\n" + "علي مستلزمات الخياطة", "https://souqcms.s3-eu-west-1.amazonaws.com/cms/boxes/img/desktop/L_1602409788_GW-MB-BestDeals-ar.png"));
         sliderImages.add(new ImageSliderModel(" خصومات حتي 60%\n" + "علي مستلزمات الخياطة", "https://souqcms.s3-eu-west-1.amazonaws.com/cms/boxes/img/desktop/L_1602409788_GW-MB-Bundles-ar.png"));
         sliderAdapter.notifyDataSetChanged();
-    }
-
-    private void geCollectionsWithProducts() {
-        DataManager.getInstance().collections(new BaseCallback() {
-            @Override
-            public void onResponse(int status) {
-                if (status == 200) {
-                    requireActivity().runOnUiThread(() -> {
-                        collections = DataManager.getInstance().getCollections();
-                        collections.removeIf(collection -> (collection.getPreviewProducts().size() == 0)); //remove collection if has no products
-                        collectionsAdapter.setCollections(collections);
-                    });
-                } else {
-                    this.onFailure("An unknown error has occurred");
-                }
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        });
     }
 }
