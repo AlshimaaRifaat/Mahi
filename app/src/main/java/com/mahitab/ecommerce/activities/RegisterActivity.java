@@ -80,17 +80,17 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        tilFirstName = (TextInputLayout) findViewById(R.id.tilFirstName_RegisterActivity);
-        etFirstName = (EditText) findViewById(R.id.etFirstName_RegisterActivity);
-        tilLastName = (TextInputLayout) findViewById(R.id.tilLastName_RegisterActivity);
-        etLastName = (EditText) findViewById(R.id.etLastName_RegisterActivity);
-        tilEmail = (TextInputLayout) findViewById(R.id.tilEmail_RegisterActivity);
-        etEmail = (EditText) findViewById(R.id.etEmail_RegisterActivity);
-        tilPassword = (TextInputLayout) findViewById(R.id.tilPassword_RegisterActivity);
-        etPassword = (EditText) findViewById(R.id.etPassword_RegisterActivity);
-        tilMobileNumber = (TextInputLayout) findViewById(R.id.tilMobileNumber_RegisterActivity);
-        etMobileNumber = (EditText) findViewById(R.id.etMobileNumber_RegisterActivity);
-        btnRegister = (Button) findViewById(R.id.btnRegister_RegisterActivity);
+        tilFirstName = findViewById(R.id.tilFirstName_RegisterActivity);
+        etFirstName = findViewById(R.id.etFirstName_RegisterActivity);
+        tilLastName = findViewById(R.id.tilLastName_RegisterActivity);
+        etLastName = findViewById(R.id.etLastName_RegisterActivity);
+        tilEmail = findViewById(R.id.tilEmail_RegisterActivity);
+        etEmail = findViewById(R.id.etEmail_RegisterActivity);
+        tilPassword = findViewById(R.id.tilPassword_RegisterActivity);
+        etPassword = findViewById(R.id.etPassword_RegisterActivity);
+        tilMobileNumber = findViewById(R.id.tilMobileNumber_RegisterActivity);
+        etMobileNumber = findViewById(R.id.etMobileNumber_RegisterActivity);
+        btnRegister = findViewById(R.id.btnRegister_RegisterActivity);
     }
 
     private void sendRegisterRequest(String email, String password, String firstName, String lastName) {

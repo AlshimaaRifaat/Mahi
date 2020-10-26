@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ProductModel;
 import com.shopify.buy3.GraphCall;
@@ -935,6 +936,12 @@ public final class DataManager extends Observable {
                     }
                 }
         );
+    }
+
+    public ArrayList<AddressModel> getAddresses() {
+        ArrayList<AddressModel> addresses = new ArrayList<AddressModel>();
+        addresses.addAll(DataManagerHelper.getInstance().fetchAddresses().values());
+        return addresses;
     }
 }
 

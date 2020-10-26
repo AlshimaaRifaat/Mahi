@@ -60,5 +60,17 @@
     <string name="sign_out_message">You are Logged Out Successfully!</string>
     <string name="add_address">Add Address</string>
     <string name="edit_address">Edit Address</string>
+    <string name="address">Address</string>
+    <string name="building_number_role_apartment">Building No. , Role, Apartment</string>
+    <string name="city_neighborhood">City / Neighborhood</string>
+    <string name="zip_code">Zip Code</string>
+    <string name="city">City</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="address_added_successfully">Address Added Successfully</string>
 
+    <string-array name="provinces">
+        <item>Select Province</item>
+        <item>Cairo</item>
+    </string-array>
 </resources>

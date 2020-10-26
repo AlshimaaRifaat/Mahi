@@ -4,6 +4,7 @@ package com.mahitab.ecommerce.managers;
  */
 
 
+import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CartModel;
 import com.mahitab.ecommerce.models.CollectionModel;
@@ -39,6 +40,7 @@ public class DataManagerHelper {
     private CartModel mCart = new CartModel();
     private HashMap<String, CollectionModel> mCollections;
     private HashMap<String, ArrayList<ProductModel>> mProductsByCollection;
+    private HashMap<String, AddressModel> addresses;
 
     public void setShop(Storefront.Shop shop) {
         synchronized (mLock) {
@@ -146,4 +148,8 @@ public class DataManagerHelper {
         this.mCart = new CartModel();
     }
     //endregion
+
+    public HashMap<String, AddressModel> fetchAddresses() {
+        return addresses;
+    }
 }

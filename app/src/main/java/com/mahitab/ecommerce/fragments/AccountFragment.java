@@ -179,10 +179,9 @@ public class AccountFragment extends Fragment {
                     Storefront.Customer customer = response.data().getCustomer();
 
                     if (response.data().getCustomer().getFirstName() != null) {
-                        tvCustomerName.setText(customer.getFirstName());
+                        requireActivity().runOnUiThread(() -> tvCustomerName.setText(customer.getFirstName()));
                         Log.e("data", "user..." + response.data().getCustomer().getFirstName());
                     }
-
 
                     Log.e(TAG, "onResponse: getDisplayName" + customer.getDisplayName() + " getFirstName " + customer.getFirstName() + " getLastName" + customer.getLastName());
                 } else Log.e(TAG, "onResponse: here");

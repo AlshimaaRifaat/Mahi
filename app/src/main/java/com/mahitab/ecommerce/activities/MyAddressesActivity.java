@@ -2,22 +2,41 @@ package com.mahitab.ecommerce.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.MenuItem;
-import android.view.View;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.adapters.AddressAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.DataManagerHelper;
+import com.mahitab.ecommerce.managers.GraphClientManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.AddressModel;
+import com.shopify.buy3.GraphCall;
+import com.shopify.buy3.GraphError;
+import com.shopify.buy3.GraphResponse;
+import com.shopify.buy3.Storefront;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class MyAddressesActivity extends AppCompatActivity {
+
+    private static final String TAG = "MyAddressesActivity";
+    private RecyclerView rvAddresses;
+    private List<AddressModel> addresses;
+    private AddressAdapter addressAdapter;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +51,13 @@ public class MyAddressesActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        initView();
+
+        addresses=new ArrayList<>();
+
+
         fab.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), AddEditAddressActivity.class)));
+
     }
 
     @Override
@@ -48,4 +72,93 @@ public class MyAddressesActivity extends AppCompatActivity {
             onBackPressed();
         return super.onOptionsItemSelected(item);
     }
+
+    private void initView() {
+        rvAddresses = findViewById(R.id.rvAddresses_MyAddressesActivity);
+        fab = findViewById(R.id.fab);
+    }
+
+    private void queryAddresses(String accessToken) {
+        Storefront.QueryRootQuery query = Storefront.query(root -> root
+                .customer(accessToken, customer -> customer
+                        .addresses(arg -> arg.first(10), connection -> connection
+                                .edges(edge -> edge
+                                        .node(node -> node
+                                                .address1()
+                                                .address2()
+                                                .city()
+                                                .province()
+                                                .country()
+
+                                        )
+                                )
+                        )
+                )
+        );
+        getAddressList(query, new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+    }
+
+    private void getAddressList(Storefront.QueryRootQuery query,BaseCallback callback) {
+        GraphClientManager.mClient.queryGraph(query).enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
+
+                if (!response.hasErrors()) {
+                    Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
+                    for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
+
+
+                        AddressModel newAddressesModel= new AddressModel(edge);
+                        Log.d(TAG, "id: "+newAddressesModel.getmID().toString());
+                        DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+
+
+
+                    }
+                    for (int i = 0; i< DataManager.getInstance().getAddresses().size(); i++) {
+                        Log.d(TAG, "cities: " +DataManager.getInstance().getAddresses().get(i).getCity().toString());
+                    }
+                    addresses=DataManager.getInstance().getAddresses();
+
+                    runOnUiThread(() -> {
+                        Log.d(TAG, "run: "+"success");
+
+                        rvAddresses.setHasFixedSize(true);
+                        rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
+                        addressAdapter=new AddressAdapter(addresses);
+                        rvAddresses.setAdapter(addressAdapter);
+                    });
+                    callback.onResponse(BaseCallback.RESULT_OK);
+                    return;
+
+                }
+
+                callback.onFailure(response.errors().get(0).message());
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                Log.d(TAG, "onFailure: "+ error.getMessage());
+
+            }
+        });
+    }
+
 }

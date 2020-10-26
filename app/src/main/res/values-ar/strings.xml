@@ -48,4 +48,17 @@
     <string name="sign_out_message">لقد تم تسجيل خروجك بنجاح!</string>
     <string name="add_address">اضف عنوان</string>
     <string name="edit_address">تعديل العنوان</string>
+    <string name="address">العنوان</string>
+    <string name="building_number_role_apartment">رقم المنزل, دور, شقة</string>
+    <string name="city_neighborhood">المدينة / الحي</string>
+    <string name="zip_code">رقم البريد</string>
+    <string name="city">المحافطة</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="address_added_successfully">تمت إضافة العنوان بنجاح</string>
+
+    <string-array name="provinces">
+        <item>اختار المحافطة</item>
+        <item>القاهرة</item>
+    </string-array>
 </resources>
