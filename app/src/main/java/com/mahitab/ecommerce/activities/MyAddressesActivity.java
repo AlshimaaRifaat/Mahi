@@ -27,12 +27,13 @@ import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
-
-public class MyAddressesActivity extends AppCompatActivity  implements AddressAdapter.DeleteFromAddressListInterface{
+public class MyAddressesActivity extends AppCompatActivity
+        implements AddressAdapter.DeleteFromAddressListInterface
+,AddressAdapter.EditAddressItemInterface{
 
     private static final String TAG = "MyAddressesActivity";
     private RecyclerView rvAddresses;
@@ -70,7 +71,7 @@ public class MyAddressesActivity extends AppCompatActivity  implements AddressAd
         sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString("token", null);
         Log.d(TAG, "getSavedAccessToken: " + accessToken);
-        queryAddresses(accessToken);
+        queryAddressList(accessToken);
     }
 
 
@@ -92,7 +93,7 @@ public class MyAddressesActivity extends AppCompatActivity  implements AddressAd
         fab = findViewById(R.id.fab);
     }
 
-    private void queryAddresses(String accessToken) {
+    private void queryAddressList(String accessToken) {
         Storefront.QueryRootQuery query = Storefront.query(root -> root
                 .customer(accessToken, customer -> customer
                         .addresses(arg -> arg.first(10), connection -> connection
@@ -154,7 +155,8 @@ public class MyAddressesActivity extends AppCompatActivity  implements AddressAd
                             Log.d(TAG, "run: "+"success");
 
                             addressAdapter = new AddressAdapter(MyAddressesActivity.this,addresses);
-                           addressAdapter.onClickDeleteFromAddressList(MyAddressesActivity.this);
+                            addressAdapter.onClickDeleteFromAddressList(MyAddressesActivity.this);
+                            addressAdapter.onClickEditAddressItem(MyAddressesActivity.this);
                             rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
                             rvAddresses.setHasFixedSize(true);
                             rvAddresses.setAdapter(addressAdapter);
@@ -206,6 +208,14 @@ public class MyAddressesActivity extends AppCompatActivity  implements AddressAd
 
             }
         });
+
     }
 
+
+    @Override
+    public void editAddressItem(AddressModel addressModel, ID addressId, int Position) {
+        Intent i = new Intent(MyAddressesActivity.this, AddEditAddressActivity.class);
+        i.putExtra("addressModel", addressModel);
+        startActivity(i);
+    }
 }

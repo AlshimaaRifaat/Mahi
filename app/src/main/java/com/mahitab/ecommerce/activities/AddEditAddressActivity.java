@@ -1,6 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,10 +17,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.managers.GraphClientManager;
+import com.mahitab.ecommerce.models.AddressModel;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
+import com.shopify.graphql.support.ID;
 
 public class AddEditAddressActivity extends AppCompatActivity {
 
@@ -32,32 +35,133 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private Button btnCancel;
 
     private SharedPreferences defaultPreferences;
-
+    String addressId,firstName,lastName,phone,zipCode,city,province,address2,address1,accessToken;
+    Intent intent;
+    AddressModel addressModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_address);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        initView();
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
-
+        accessToken = defaultPreferences.getString("token", null);
+        Log.d(TAG, "onCreate: "+accessToken);
         if (getIntent().getExtras() != null) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.edit_address));
-        } else getSupportActionBar().setTitle(getResources().getString(R.string.add_address));
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-        btnSave.setOnClickListener(v -> {
-            String accessToken = defaultPreferences.getString("token", null);
-            if (accessToken != null)
-                queryCreateAddress(accessToken);
-        });
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            initView();
+            getSupportActionBar().setTitle(getResources().getString(R.string.edit_address));
+            getAddressData();
+        } else {
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            initView();
+
+            getSupportActionBar().setTitle(getResources().getString(R.string.add_address));
+            btnSave.setOnClickListener(v -> {
+
+                    queryCreateAddress(accessToken);
+            });
+        }
+
         btnCancel.setOnClickListener(v -> onBackPressed());
     }
+
+
+    private void getAddressData() {
+
+        addressModel = (AddressModel) getIntent().getExtras().getSerializable("addressModel");
+
+        addressId = addressModel.getmID().toString();
+        firstName = addressModel.getFirstName();
+        lastName = addressModel.getLastName();
+        phone = addressModel.getPhone();
+        zipCode = addressModel.getZipCode();
+        city = addressModel.getCity();
+        province = addressModel.getProvince();
+        address2 = addressModel.getAddress2();
+        address1 = addressModel.getAddress1();
+        Log.d(TAG, "edit int addressID: "+addressId);
+        setAddressData(addressId,firstName,lastName,phone,zipCode,city,province,address2,address1);
+    }
+
+    private void setAddressData(String addressId,String firstName, String lastName, String phone, String zipCode,
+                                String city, String province, String address2, String address1) {
+    etFirstName.setText(firstName);
+    etLastName.setText(lastName);
+    etPhone.setText(phone);
+    etZipCode.setText(zipCode);
+    etCity.setText(city);
+    etProvince.setText(province);
+    etAddress1.setText(address1);
+    etAddress2.setText(address2);
+
+
+        btnSave.setOnClickListener(v -> {
+                queryEditAddress(accessToken,addressId);
+
+        });
+    }
+
+    private void queryEditAddress(String accessToken, String addressId) {
+
+        Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
+                .setFirstName(etFirstName.getText().toString())
+                .setLastName(etLastName.getText().toString())
+                .setPhone(etPhone.getText().toString())
+                .setCity(etCity.getText().toString())
+                .setCountry("Egypt")
+                .setZip(etZipCode.getText().toString())
+                .setProvince(etProvince.getText().toString())
+                .setAddress1(etAddress1.getText().toString())
+                .setAddress2(etAddress2.getText().toString());
+        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
+                .customerAddressUpdate(accessToken,new ID(addressId), inputAddress, query -> query
+                        .customerAddress(customerAddress -> customerAddress
+                                .address1()
+                                .address2()
+                        )
+                        .userErrors(userErrorQuery -> userErrorQuery
+                                .field()
+                                .message()
+                        )
+                )
+        );
+       editAddress(mutationQuery);
+    }
+
+    private void editAddress( Storefront.MutationQuery mutationQuery) {
+        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+
+                Log.d("edit ", "onResponse: "+"Address updated successfuly ");
+                if (!response.hasErrors()) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.address_updated_successfully), Toast.LENGTH_SHORT).show();
+                        onBackPressed();
+                    });
+                }
+
+            }
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                Log.d("edit ", "onFailure: "+error.getMessage());
+
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {

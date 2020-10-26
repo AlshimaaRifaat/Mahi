@@ -20,6 +20,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     private final List<AddressModel> addressList;
     Context context;
     DeleteFromAddressListInterface deleteFromAddressListInterface;
+    EditAddressItemInterface editAddressItemInterface;
     public AddressAdapter( Context context,List<AddressModel> addressList) {
         this.addressList = addressList;
         this.context=context;
@@ -34,6 +35,10 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     {
         this.deleteFromAddressListInterface=deleteFromAddressListInterface;
     }
+    public void onClickEditAddressItem(EditAddressItemInterface editAddressItemInterface)
+    {
+        this.editAddressItemInterface=editAddressItemInterface;
+    }
 
     @Override
     public void onBindViewHolder(@NonNull AddressViewHolder holder, int position) {
@@ -47,6 +52,14 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
             public void onClick(View v) {
                 deleteFromAddressListInterface.removeFromAddressList(addressList.get(position).getmID(),position);
                 addressList.remove(position);
+                notifyDataSetChanged();
+            }
+        });
+        holder.tvEditAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editAddressItemInterface.editAddressItem(addressList.get(position),addressList.get(position).getmID(),position);
+
                 notifyDataSetChanged();
             }
         });
@@ -79,6 +92,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     }
     public interface DeleteFromAddressListInterface {
         void removeFromAddressList(ID addressId, int Position);
-
+    }
+    public interface EditAddressItemInterface {
+        void editAddressItem(AddressModel addressModel,ID addressId, int Position);
     }
 }
