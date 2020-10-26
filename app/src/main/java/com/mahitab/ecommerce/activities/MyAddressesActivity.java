@@ -1,6 +1,8 @@
 package com.mahitab.ecommerce.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,11 +39,13 @@ public class MyAddressesActivity extends AppCompatActivity {
     private AddressAdapter addressAdapter;
 
     private FloatingActionButton fab;
+    SharedPreferences sharedPreferences;
+    String accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setArDefaultLocale(this);
+       // setArDefaultLocale(this);
         setContentView(R.layout.activity_my_addresses);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,13 +56,22 @@ public class MyAddressesActivity extends AppCompatActivity {
         }
 
         initView();
-
-        addresses=new ArrayList<>();
-
-
         fab.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), AddEditAddressActivity.class)));
+        DataManager.getInstance().setClientManager(MyAddressesActivity.this);
+        addresses=new ArrayList<>();
+        getSavedAccessToken();
+
+
+
 
     }
+    private void getSavedAccessToken() {
+        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        accessToken = sharedPreferences.getString("token", null);
+        Log.d(TAG, "getSavedAccessToken: " + accessToken);
+        queryAddresses(accessToken);
+    }
+
 
     @Override
     protected void onResume() {
@@ -89,6 +102,7 @@ public class MyAddressesActivity extends AppCompatActivity {
                                                 .city()
                                                 .province()
                                                 .country()
+                                                .phone()
 
                                         )
                                 )
@@ -127,21 +141,23 @@ public class MyAddressesActivity extends AppCompatActivity {
                         Log.d(TAG, "id: "+newAddressesModel.getmID().toString());
                         DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
 
-
-
                     }
-                    for (int i = 0; i< DataManager.getInstance().getAddresses().size(); i++) {
+                    for (int i=0;i<DataManager.getInstance().getAddresses().size();i++) {
                         Log.d(TAG, "cities: " +DataManager.getInstance().getAddresses().get(i).getCity().toString());
                     }
                     addresses=DataManager.getInstance().getAddresses();
 
-                    runOnUiThread(() -> {
-                        Log.d(TAG, "run: "+"success");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "run: "+"success");
 
-                        rvAddresses.setHasFixedSize(true);
-                        rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
-                        addressAdapter=new AddressAdapter(addresses);
-                        rvAddresses.setAdapter(addressAdapter);
+                            addressAdapter = new AddressAdapter(MyAddressesActivity.this,addresses);
+                          //  addressAdapter.onClickDeleteFromAddressList(AddressesActivity.this);
+                            rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
+                            rvAddresses.setHasFixedSize(true);
+                            rvAddresses.setAdapter(addressAdapter);
+                        }
                     });
                     callback.onResponse(BaseCallback.RESULT_OK);
                     return;
@@ -155,7 +171,7 @@ public class MyAddressesActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull GraphError error) {
-                Log.d(TAG, "onFailure: "+ error.getMessage());
+                Log.d(TAG, "onFailure: "+error.getMessage().toString());
 
             }
         });

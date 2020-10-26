@@ -8,6 +8,7 @@ import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CartModel;
 import com.mahitab.ecommerce.models.CollectionModel;
+import com.mahitab.ecommerce.models.MyOrdersModel;
 import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.ShopModel;
 import com.shopify.buy3.Storefront;
@@ -28,6 +29,8 @@ public class DataManagerHelper {
     private DataManagerHelper() {
         mCollections = new HashMap<String, CollectionModel>();
         mProductsByCollection = new HashMap<String, ArrayList<ProductModel>>();
+        mMyOrders = new HashMap<String, MyOrdersModel>();
+        addresses = new HashMap<String, AddressModel>();
     }
 
     public static DataManagerHelper getInstance() {
@@ -41,6 +44,7 @@ public class DataManagerHelper {
     private HashMap<String, CollectionModel> mCollections;
     private HashMap<String, ArrayList<ProductModel>> mProductsByCollection;
     private HashMap<String, AddressModel> addresses;
+    private HashMap<String, MyOrdersModel> mMyOrders;
 
     public void setShop(Storefront.Shop shop) {
         synchronized (mLock) {
@@ -60,6 +64,9 @@ public class DataManagerHelper {
 
     public ArrayList<ProductModel> getProductsByCollectionID(String collectionID) {
         return mProductsByCollection.get(collectionID);
+    }
+    public HashMap<String, MyOrdersModel> fetchMyOrders() {
+        return mMyOrders;
     }
 
     public void createProductsListForCollectionId(String collectionID) {

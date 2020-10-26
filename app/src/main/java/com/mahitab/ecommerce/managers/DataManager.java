@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CollectionModel;
+import com.mahitab.ecommerce.models.MyOrdersModel;
 import com.mahitab.ecommerce.models.ProductModel;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
@@ -884,6 +885,12 @@ public final class DataManager extends Observable {
 
     public CollectionModel getCollectionByID(String collectionId) {
         return DataManagerHelper.getInstance().getCollections().get(collectionId);
+    }
+    public ArrayList<MyOrdersModel> getMyOrders() {
+        ArrayList<MyOrdersModel> orders = new ArrayList<MyOrdersModel>();
+        orders.addAll(DataManagerHelper.getInstance().fetchMyOrders().values());
+
+        return orders;
     }
 
    /*  public ArrayList<ProductModel> getProducts(ID collectionID) {

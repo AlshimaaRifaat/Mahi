@@ -27,6 +27,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tOrderNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/order_no"
@@ -48,6 +49,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tTotalPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/grand_total"
@@ -67,6 +69,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/order_date"
@@ -91,10 +94,11 @@
             android:paddingBottom="16dp">
 
             <TextView
+                android:id="@+id/tMoreDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/order_status"
+                android:text="@string/moreDetails"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 

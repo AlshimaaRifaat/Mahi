@@ -60,7 +60,7 @@
     <string name="sign_out_message">You are Logged Out Successfully!</string>
     <string name="add_address">Add Address</string>
     <string name="edit_address">Edit Address</string>
-    <string name="address">Address</string>
+    <string name="address">Address 1</string>
     <string name="building_number_role_apartment">Building No. , Role, Apartment</string>
     <string name="city_neighborhood">City / Neighborhood</string>
     <string name="zip_code">Zip Code</string>
@@ -68,6 +68,16 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="address_added_successfully">Address Added Successfully</string>
+    <string name="moreDetails">More details</string>
+    <string name="OrderNumber">Order Number</string>
+    <string name="TotalPrice">Total Price</string>
+    <string name="Date">Date</string>
+    <string name="address2">Address 2</string>
+    <string name="Province">Province</string>
+    <string name="PhoneNumber">Phone Number</string>
+    <string name="Country">Country</string>
+    <string name="City">City</string>
+    <string name="Egypt">Egypt</string>
 
     <string-array name="provinces">
         <item>Select Province</item>

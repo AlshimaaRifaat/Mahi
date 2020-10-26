@@ -78,14 +78,14 @@
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilAddress_AddEditAddressActivity"
+                android:id="@+id/tilAddress1_AddEditAddressActivity"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
 
                 <EditText
-                    android:id="@+id/etAddress_AddEditAddressActivity"
+                    android:id="@+id/etAddress1_AddEditAddressActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/address"
@@ -95,38 +95,21 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAddress2_AddEditAddressActivity"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
 
                 <EditText
-                    android:id="@+id/etBuildingNo_AddEditAddressActivity"
+                    android:id="@+id/etAddress2_AddEditAddressActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/building_number_role_apartment"
+                    android:hint="@string/address2"
                     android:inputType="textEmailAddress"
                     tools:ignore="Autofill,LabelFor" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilEmail_RegisterActivity"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <EditText
-                    android:id="@+id/etCity_AddEditAddressActivity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/city_neighborhood"
-                    android:inputType="textEmailAddress"
-                    tools:ignore="Autofill,LabelFor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,12 +117,22 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <Spinner
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:id="@+id/spProvince_"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:entries="@array/provinces" />
+                    android:layout_weight="1">
+                    <EditText
+                        android:id="@+id/etZipCode_AddEditAddressActivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/zip_code"
+                        android:inputType="number"
+                        tools:ignore="Autofill,LabelFor" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -149,32 +142,74 @@
                     android:layout_weight="1">
 
                     <EditText
-                        android:id="@+id/etZipCode_AddEditAddressActivity"
+                        android:id="@+id/etPhone_AddEditAddressActivity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
-                        android:hint="@string/zip_code"
+                        android:hint="@string/PhoneNumber"
+                        android:inputType="phone"
+                        tools:ignore="Autofill,LabelFor" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:id="@+id/tInCountry"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <TextView
+                        android:id="@+id/etCountry_AddEditAddressActivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/Egypt"
+                        android:inputType="textAutoComplete"
+                        tools:ignore="Autofill,LabelFor" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1">
+
+                    <EditText
+                        android:id="@+id/etCity_AddEditAddressActivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/City"
                         android:inputType="textAutoComplete"
                         tools:ignore="Autofill,LabelFor" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
-
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilMobileNumber_AddEditAddressActivity"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
 
                 <EditText
-                    android:id="@+id/etMobileNumber_AddEditAddressActivity"
+                    android:id="@+id/etProvince_AddEditAddressActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/mobile_number"
-                    android:inputType="phone"
+                    android:hint="@string/Province"
+                    android:inputType="textEmailAddress"
                     tools:ignore="Autofill,LabelFor" />
 
             </com.google.android.material.textfield.TextInputLayout>

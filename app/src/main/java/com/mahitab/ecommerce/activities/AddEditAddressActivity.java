@@ -27,12 +27,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
     private EditText etFirstName;
     private EditText etLastName;
-    private EditText etAddress;
-    private EditText etBuildingNo;
-    private EditText etCity;
-    private Spinner spProvince;
-    private EditText etZipCode;
-    private EditText etMobileNumber;
+    private EditText etAddress1,etAddress2,etProvince,etCity,etZipCode,etPhone;
     private Button btnSave;
     private Button btnCancel;
 
@@ -80,12 +75,12 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private void initView() {
         etFirstName = findViewById(R.id.etFirstName_AddEditAddressActivity);
         etLastName = findViewById(R.id.etLastName_AddEditAddressActivity);
-        etAddress = findViewById(R.id.etAddress_AddEditAddressActivity);
-        etBuildingNo = findViewById(R.id.etBuildingNo_AddEditAddressActivity);
+        etAddress1 = findViewById(R.id.etAddress1_AddEditAddressActivity);
+        etAddress2 = findViewById(R.id.etAddress2_AddEditAddressActivity);
         etCity = findViewById(R.id.etCity_AddEditAddressActivity);
-        spProvince = findViewById(R.id.spProvince_);
         etZipCode = findViewById(R.id.etZipCode_AddEditAddressActivity);
-        etMobileNumber = findViewById(R.id.etMobileNumber_AddEditAddressActivity);
+        etPhone = findViewById(R.id.etPhone_AddEditAddressActivity);
+        etProvince = findViewById(R.id.etProvince_AddEditAddressActivity);
         btnSave = findViewById(R.id.btnSave_AddEditAddressActivity);
         btnCancel = findViewById(R.id.btnCancel_AddEditAddressActivity);
     }
@@ -95,13 +90,13 @@ public class AddEditAddressActivity extends AppCompatActivity {
         Storefront.MailingAddressInput input = new Storefront.MailingAddressInput()
                 .setFirstName(etFirstName.getText().toString())
                 .setLastName(etLastName.getText().toString())
-                .setPhone(etMobileNumber.getText().toString())
+                .setPhone(etPhone.getText().toString())
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
                 .setZip(etZipCode.getText().toString())
-                .setProvince(spProvince.getSelectedItem().toString())
-                .setAddress1(etAddress.getText().toString())
-                .setAddress2(etBuildingNo.getText().toString());
+                .setProvince(etProvince.getText().toString())
+                .setAddress1(etAddress1.getText().toString())
+                .setAddress2(etAddress2.getText().toString());
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
                 .customerAddressCreate(accessToken, input, query -> query
                         .customerAddress(customerAddress -> customerAddress
