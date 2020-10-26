@@ -19,15 +19,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.LoginActivity;
 import com.mahitab.ecommerce.activities.MyAddressesActivity;
 import com.mahitab.ecommerce.activities.MyOrdersActivity;
+import com.mahitab.ecommerce.activities.MyWishListActivity;
 import com.mahitab.ecommerce.activities.RegisterActivity;
 import com.mahitab.ecommerce.managers.GraphClientManager;
-import com.mahitab.ecommerce.models.CurrentUser;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
@@ -44,10 +43,11 @@ public class AccountFragment extends Fragment {
     private LinearLayout llLoginRegister, ll_customer_account_data;
     private Button btnSignOut;
 
+    private CardView cvMyOrders;
+    private CardView cvMyWishList;
     private CardView cvMyAddresses;
 
     private SharedPreferences defaultPreferences;
-    LinearLayout llMyOrders;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -80,8 +80,15 @@ public class AccountFragment extends Fragment {
         }
 
         btnLogin.setOnClickListener(v -> startActivity(new Intent(getContext(), LoginActivity.class)));
+
         btnRegister.setOnClickListener(v -> startActivity(new Intent(getContext(), RegisterActivity.class)));
+
+        cvMyOrders.setOnClickListener(v -> startActivity(new Intent(getActivity(), MyOrdersActivity.class)));
+
+        cvMyWishList.setOnClickListener(v -> startActivity(new Intent(getContext(), MyWishListActivity.class)));
+
         cvMyAddresses.setOnClickListener(v -> startActivity(new Intent(getContext(), MyAddressesActivity.class)));
+
         btnSignOut.setOnClickListener(onClickListener -> {
             defaultPreferences.edit().clear().apply();
             startActivity(new Intent(getActivity(), HomeActivity.class));
@@ -104,12 +111,6 @@ public class AccountFragment extends Fragment {
             llLoginRegister.setVisibility(View.GONE);
             btnSignOut.setVisibility(View.VISIBLE);
             ll_customer_account_data.setVisibility(View.VISIBLE);
-            llMyOrders.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(getActivity(), MyOrdersActivity.class));
-                }
-            });
         } else {
             llLoginRegister.setVisibility(View.VISIBLE);
             btnSignOut.setVisibility(View.GONE);
@@ -126,7 +127,8 @@ public class AccountFragment extends Fragment {
         btnSignOut = view.findViewById(R.id.btnSignOut_AccountFragment);
         ll_customer_account_data = view.findViewById(R.id.ll_customer_account_data);
         cvMyAddresses = view.findViewById(R.id.cvMyAddresses_CustomerAccountData);
-        llMyOrders= view.findViewById(R.id.llMyOrders);
+        cvMyOrders = view.findViewById(R.id.cvMyOrders_CustomerAccountData);
+        cvMyWishList = view.findViewById(R.id.cvMyWishList_CustomerAccountData);
     }
 
 

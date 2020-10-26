@@ -68,7 +68,7 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
                 itemView.getLayoutParams().width = sectionWidth / 3;
 
             itemView.setOnClickListener(v -> {
-                if (listener != null)
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
                     listener.onBannerClick(bannerList.get(getAdapterPosition()));
             });
         }

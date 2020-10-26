@@ -18,7 +18,9 @@ import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.ProductModel;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -51,17 +53,25 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         holder.tvProductTitle.setText(product.getTitle());
 
-        if (product.getVariants().get(0).getOldPrice() != null &&
-                product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
-                product.getVariants().get(0).isAvailableForSale()) {
-            holder.tvOldPrice.setText(product.getVariants().get(0).getOldPrice().toString() + ' ');
-            holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.tvPrice.setVisibility(View.VISIBLE);
-            holder.tvPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
-        } else {
-            holder.tvPrice.setVisibility(View.INVISIBLE);
-            holder.tvOldPrice.setVisibility(View.VISIBLE);
-            holder.tvOldPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
+        String price;
+        String oldPrice;
+        if (product.getVariants() != null) {
+            if (product.getVariants().get(0).getOldPrice() != null &&
+                    product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
+                    product.getVariants().get(0).isAvailableForSale()) {
+                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(oldPrice);
+                holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvPrice.setVisibility(View.VISIBLE);
+                holder.tvPrice.setText(price);
+            } else {
+                holder.tvPrice.setVisibility(View.INVISIBLE);
+                holder.tvOldPrice.setVisibility(View.VISIBLE);
+                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(price);
+            }
         }
 
         holder.tvQuantity.setText(String.valueOf(cartItemQuantities.get(position).getQuantity()));

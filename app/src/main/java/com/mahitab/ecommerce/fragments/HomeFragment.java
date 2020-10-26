@@ -28,7 +28,6 @@ import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
-import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.BannerList;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
@@ -141,7 +140,6 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             targetId = targetId.trim(); //remove spaces from end of string
             intent = new Intent(getContext(), ProductDetailsActivity.class);
             intent.putExtra("productId", targetId);
-            Log.e(TAG, "onBannerClick: " + targetId);
             startActivity(intent);
         } else if (banner.getType().startsWith("c")) {
             type = "Collection";

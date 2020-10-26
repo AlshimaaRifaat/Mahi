@@ -14,13 +14,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.ProductModel;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     private final List<ProductModel> productList;
+    private ProductClickListener listener;
 
     public ProductAdapter(List<ProductModel> productList) {
         this.productList = productList;
@@ -33,10 +37,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder viewHolder2, int position) {
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         ProductModel product = productList.get(position);
 
-        Glide.with(viewHolder2.itemView.getContext())
+        Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
@@ -44,22 +48,28 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 .fallback(R.drawable.ic_image_gray_24dp)
                 .dontTransform()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(viewHolder2.ivImage);
+                .into(holder.ivImage);
 
-        viewHolder2.tvTitle.setText(product.getTitle());
+        holder.tvTitle.setText(product.getTitle());
 
-        if (product.getVariants()!=null){
+        String price;
+        String oldPrice;
+        if (product.getVariants() != null) {
             if (product.getVariants().get(0).getOldPrice() != null &&
                     product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
                     product.getVariants().get(0).isAvailableForSale()) {
-                viewHolder2.tvOldPrice.setText(product.getVariants().get(0).getOldPrice().toString() + ' ');
-                viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                viewHolder2.tvPrice.setVisibility(View.VISIBLE);
-                viewHolder2.tvPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
+                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(oldPrice);
+                holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvPrice.setVisibility(View.VISIBLE);
+                holder.tvPrice.setText(price);
             } else {
-                viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
-                viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
-                viewHolder2.tvOldPrice.setText(product.getVariants().get(0).getPrice().toString() + " EGP");
+                holder.tvPrice.setVisibility(View.INVISIBLE);
+                holder.tvOldPrice.setVisibility(View.VISIBLE);
+                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(price);
             }
         }
     }
@@ -69,7 +79,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
-    public static class ProductViewHolder extends RecyclerView.ViewHolder {
+    public class ProductViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivImage;
         private final TextView tvTitle;
         private final TextView tvPrice;
@@ -81,6 +91,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvTitle = itemView.findViewById(R.id.tvTitle_ProductItem);
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
+            itemView.setOnClickListener(v -> {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                    listener.onProductClick(productList.get(getAdapterPosition()).getID().toString());
+            });
         }
     }
+
+    public interface ProductClickListener {
+        void onProductClick(String productId);
+    }
+
+    public void setProductClickListener(ProductClickListener listener) {
+        this.listener = listener;
+    }
+
 }

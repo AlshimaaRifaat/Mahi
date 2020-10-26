@@ -1,6 +1,8 @@
 package com.mahitab.ecommerce.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -16,7 +18,7 @@ import com.mahitab.ecommerce.models.CollectionModel;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
-public class CollectionProductsActivity extends AppCompatActivity {
+public class CollectionProductsActivity extends AppCompatActivity implements ProductAdapter.ProductClickListener {
 
     private static final String TAG = "CollectionProductsActiv";
 
@@ -45,12 +47,9 @@ public class CollectionProductsActivity extends AppCompatActivity {
                 rvCollectionProducts.setLayoutManager(new GridLayoutManager(this, 2));
                 ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
                 rvCollectionProducts.setAdapter(productAdapter);
+                productAdapter.setProductClickListener(this);
             }
         }
-    }
-
-    private void initView() {
-        rvCollectionProducts = findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);
     }
 
     @Override
@@ -65,4 +64,16 @@ public class CollectionProductsActivity extends AppCompatActivity {
             onBackPressed();
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
+        startActivity(intent);
+    }
+
+    private void initView() {
+        rvCollectionProducts = findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);
+    }
+
 }

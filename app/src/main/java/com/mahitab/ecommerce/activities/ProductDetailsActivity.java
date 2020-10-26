@@ -41,7 +41,7 @@ import java.util.stream.IntStream;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
-public class ProductDetailsActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class ProductDetailsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // badge text view
     TextView badgeCounter;
@@ -55,6 +55,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
     private TextView tvPrice;
     private TextView tvDescription;
     private ImageView ivDescription;
+
+    private ImageView ivWishProduct;
+    private List<String> wishListProducts;
+    private boolean isWishedBefore;
 
     private List<CartItemQuantity> cartProducts;
     private LinearLayout llCartQuantityControl;
@@ -93,6 +97,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
 
+        if (defaultPreferences.getString("wishListProducts", null) == null)
+            wishListProducts = new ArrayList<>();
+        else
+            wishListProducts = new Gson().fromJson(defaultPreferences.getString("wishListProducts", null), new TypeToken<List<String>>() {
+            }.getType());
+
         cartProductsCount = cartProducts.size();
 
         if (getIntent().getExtras() != null) {
@@ -101,6 +111,11 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                     .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
 
             displayQuantityControls(isAddedBefore);
+
+            isWishedBefore = wishListProducts.stream()
+                    .anyMatch(wishedProduct -> wishedProduct.equals(currentProductId));
+
+            displayIsWishedProduct(isWishedBefore);
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
@@ -146,12 +161,65 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
             }
         }
 
-        ivDescription.setOnClickListener(this);
-        btnAddToCart.setOnClickListener(this);
-        ivBuyByPhone.setOnClickListener(this);
-        ivIncreaseQuantity.setOnClickListener(this);
-        ivDecreaseQuantity.setOnClickListener(this);
-        btnBuy.setOnClickListener(this);
+        ivDescription.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
+            intent.putExtra("description", product.getDescription());
+            startActivity(intent);
+        });
+
+        btnAddToCart.setOnClickListener(v -> {
+            cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue()));
+            defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
+            tvCartQuantity.setText(String.valueOf(1));
+            cartProductsCount = cartProducts.size();
+            updateCartBadge(cartProductsCount); //update badge counter
+            displayQuantityControls(true);
+        });
+
+        ivBuyByPhone.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:+20 111 111 4512"));
+            startActivity(intent);
+        });
+
+        ivIncreaseQuantity.setOnClickListener(v -> {
+            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
+                    .findFirst().orElse(-1);
+            cartProducts.get(currentCartProductIndex).plusQuantity();
+            updateQuantitySharedPreferencesUI(currentCartProductIndex);
+        });
+
+        ivDecreaseQuantity.setOnClickListener(v -> {
+            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
+                    .findFirst().orElse(-1);
+            if (cartProducts.get(currentCartProductIndex).getQuantity() > 1) {
+                cartProducts.get(currentCartProductIndex).minQuantity();
+                updateQuantitySharedPreferencesUI(currentCartProductIndex);
+            } else {
+                cartProducts.remove(currentCartProductIndex);
+                defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply(); //update shared pref list after remove
+                llCartQuantityControl.setVisibility(View.GONE);
+                btnAddToCart.setVisibility(View.VISIBLE);
+                cartProductsCount = cartProducts.size();
+                updateCartBadge(cartProductsCount);
+            }
+        });
+
+        btnBuy.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), CartActivity.class)));
+
+        ivWishProduct.setOnClickListener(v -> {
+            if (isWishedBefore) {
+                isWishedBefore = false;
+                wishListProducts.remove(currentProductId);
+            } else {
+                isWishedBefore = true;
+                wishListProducts.add(currentProductId);
+            }
+            defaultPreferences.edit().putString("wishListProducts", new Gson().toJson(wishListProducts)).apply();
+            displayIsWishedProduct(isWishedBefore);
+        });
     }
 
     @Override
@@ -200,49 +268,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.ivDescription_ProductDetailsActivity) {
-            Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
-            intent.putExtra("description", product.getDescription());
-            startActivity(intent);
-        } else if (v.getId() == R.id.btnAddToCart_ProductDetailsActivity) {
-            cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue()));
-            defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
-            tvCartQuantity.setText(String.valueOf(1));
-            cartProductsCount = cartProducts.size();
-            updateCartBadge(cartProductsCount); //update badge counter
-            displayQuantityControls(true);
-        } else if (v.getId() == R.id.ivBuyByPhone_ProductDetailsActivity) {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:+20 111 111 4512"));
-            startActivity(intent);
-        } else if (v.getId() == R.id.ivIncreaseQuantity_ProductDetailsActivity) {
-            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
-                    .findFirst().orElse(-1);
-            cartProducts.get(currentCartProductIndex).plusQuantity();
-            updateQuantitySharedPreferencesUI(currentCartProductIndex);
-
-        } else if (v.getId() == R.id.ivDecreaseQuantity_ProductDetailsActivity) {
-            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
-                    .findFirst().orElse(-1);
-            if (cartProducts.get(currentCartProductIndex).getQuantity() > 1) {
-                cartProducts.get(currentCartProductIndex).minQuantity();
-                updateQuantitySharedPreferencesUI(currentCartProductIndex);
-            } else {
-                cartProducts.remove(currentCartProductIndex);
-                defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply(); //update shared pref list after remove
-                llCartQuantityControl.setVisibility(View.GONE);
-                btnAddToCart.setVisibility(View.VISIBLE);
-                cartProductsCount = cartProducts.size();
-                updateCartBadge(cartProductsCount);
-            }
-        } else if (v.getId() == R.id.btnBuy_ProductDetailsActivity)
-            startActivity(new Intent(getApplicationContext(), CartActivity.class));
-    }
-
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (sharedPreferences.contains("cartProducts")) {
             defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
@@ -265,6 +290,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
+        ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {
@@ -279,6 +305,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
             llCartQuantityControl.setVisibility(View.GONE);
             btnAddToCart.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void displayIsWishedProduct(boolean wished) {
+        if (wished)
+            ivWishProduct.setImageResource(R.drawable.ic_favorite_yellow_24dp);
+        else ivWishProduct.setImageResource(R.drawable.ic_favorite_border_yellow_24dp);
     }
 
     private void updateQuantitySharedPreferencesUI(int cartProductIndex) {

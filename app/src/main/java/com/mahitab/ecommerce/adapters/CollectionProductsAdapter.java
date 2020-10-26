@@ -19,7 +19,9 @@ import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ProductModel;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final CollectionModel collection;
@@ -70,10 +72,10 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
             case VIEW_TYPE_PRODUCTS:
                 ProductViewHolder viewHolder2 = (ProductViewHolder) holder;
 
-                ProductModel singleItem = productList.get(position - 1);
+                ProductModel product = productList.get(position - 1);
 
                 Glide.with(holder.itemView.getContext())
-                        .load(singleItem.getImages()[0])
+                        .load(product.getImages()[0])
                         .thumbnail(/*sizeMultiplier*/ 0.25f)
                         .apply(new RequestOptions())
                         .placeholder(R.drawable.ic_image_gray_24dp)
@@ -82,19 +84,27 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(viewHolder2.ivImage);
 
-                viewHolder2.tvTitle.setText(singleItem.getTitle());
+                viewHolder2.tvTitle.setText(product.getTitle());
 
-                if (singleItem.getVariants().get(0).getOldPrice() != null &&
-                        singleItem.getVariants().get(0).getOldPrice().compareTo(singleItem.getVariants().get(0).getPrice()) > 0 &&
-                        singleItem.getVariants().get(0).isAvailableForSale()) {
-                    viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getOldPrice().toString() + ' ');
-                    viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    viewHolder2.tvPrice.setVisibility(View.VISIBLE);
-                    viewHolder2.tvPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
-                } else {
-                    viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
-                    viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
-                    viewHolder2.tvOldPrice.setText(singleItem.getVariants().get(0).getPrice().toString() + " EGP");
+                String price;
+                String oldPrice;
+                if (product.getVariants() != null) {
+                    if (product.getVariants().get(0).getOldPrice() != null &&
+                            product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
+                            product.getVariants().get(0).isAvailableForSale()) {
+                        oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                        viewHolder2.tvOldPrice.setText(oldPrice);
+                        viewHolder2.tvOldPrice.setPaintFlags(viewHolder2.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                        price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                        viewHolder2.tvPrice.setVisibility(View.VISIBLE);
+                        viewHolder2.tvPrice.setText(price);
+                    } else {
+                        viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
+                        viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
+                        price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                        viewHolder2.tvOldPrice.setText(price);
+                    }
                 }
                 break;
         }
