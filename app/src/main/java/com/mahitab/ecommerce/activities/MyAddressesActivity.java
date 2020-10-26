@@ -33,7 +33,7 @@ import java.util.List;
 
 public class MyAddressesActivity extends AppCompatActivity
         implements AddressAdapter.DeleteFromAddressListInterface
-,AddressAdapter.EditAddressItemInterface{
+        , AddressAdapter.EditAddressItemInterface {
 
     private static final String TAG = "MyAddressesActivity";
     private RecyclerView rvAddresses;
@@ -47,7 +47,7 @@ public class MyAddressesActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setArDefaultLocale(this);
+        // setArDefaultLocale(this);
         setContentView(R.layout.activity_my_addresses);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,17 +58,14 @@ public class MyAddressesActivity extends AppCompatActivity
         }
 
         initView();
-        fab.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), AddEditAddressActivity.class)));
-        DataManager.getInstance().setClientManager(MyAddressesActivity.this);
-        addresses=new ArrayList<>();
-        getSavedAccessToken();
-
-
-
-
-    }
-    private void getSavedAccessToken() {
         sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        DataManager.getInstance().setClientManager(MyAddressesActivity.this);
+        addresses = new ArrayList<>();
+
+        fab.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), AddEditAddressActivity.class)));
+    }
+
+    private void getSavedAccessToken() {
         accessToken = sharedPreferences.getString("token", null);
         Log.d(TAG, "getSavedAccessToken: " + accessToken);
         queryAddressList(accessToken);
@@ -79,6 +76,8 @@ public class MyAddressesActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         overridePendingTransition(0, 0); // remove activity default transition
+
+        getSavedAccessToken();
     }
 
     @Override
@@ -129,32 +128,33 @@ public class MyAddressesActivity extends AppCompatActivity
         });
     }
 
-    private void getAddressList(Storefront.QueryRootQuery query,BaseCallback callback) {
+    private void getAddressList(Storefront.QueryRootQuery query, BaseCallback callback) {
         GraphClientManager.mClient.queryGraph(query).enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
 
                 if (!response.hasErrors()) {
+                    DataManagerHelper.getInstance().fetchAddresses().clear();
                     Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
                     for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
 
 
-                        AddressModel newAddressesModel= new AddressModel(edge);
-                        Log.d(TAG, "id: "+newAddressesModel.getmID().toString());
+                        AddressModel newAddressesModel = new AddressModel(edge);
+                        Log.d(TAG, "id: " + newAddressesModel.getmID().toString());
                         DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+                    }
+                    for (int i = 0; i < DataManager.getInstance().getAddresses().size(); i++) {
+                        Log.d(TAG, "cities: " + DataManager.getInstance().getAddresses().get(i).getCity().toString());
+                    }
 
-                    }
-                    for (int i=0;i<DataManager.getInstance().getAddresses().size();i++) {
-                        Log.d(TAG, "cities: " +DataManager.getInstance().getAddresses().get(i).getCity().toString());
-                    }
-                    addresses=DataManager.getInstance().getAddresses();
+                    addresses = DataManager.getInstance().getAddresses();
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d(TAG, "run: "+"success");
+                            Log.d(TAG, "run: " + "success");
 
-                            addressAdapter = new AddressAdapter(MyAddressesActivity.this,addresses);
+                            addressAdapter = new AddressAdapter(MyAddressesActivity.this, addresses);
                             addressAdapter.onClickDeleteFromAddressList(MyAddressesActivity.this);
                             addressAdapter.onClickEditAddressItem(MyAddressesActivity.this);
                             rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
@@ -174,11 +174,12 @@ public class MyAddressesActivity extends AppCompatActivity
 
             @Override
             public void onFailure(@NonNull GraphError error) {
-                Log.d(TAG, "onFailure: "+error.getMessage().toString());
+                Log.d(TAG, "onFailure: " + error.getMessage().toString());
 
             }
         });
     }
+
     @Override
     public void removeFromAddressList(ID addressId, int Position) {
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
@@ -192,19 +193,20 @@ public class MyAddressesActivity extends AppCompatActivity
         );
         deletefromAddressList(mutationQuery);
     }
-    private void deletefromAddressList( Storefront.MutationQuery mutationQuery) {
+
+    private void deletefromAddressList(Storefront.MutationQuery mutationQuery) {
         GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
 
-                Log.d("delete ", "onResponse: "+"success");
+                Log.d("delete ", "onResponse: " + "success");
 
 
             }
 
             @Override
             public void onFailure(@NonNull GraphError error) {
-                Log.d("edit ", "onFailure: "+error.getMessage());
+                Log.d("edit ", "onFailure: " + error.getMessage());
 
             }
         });

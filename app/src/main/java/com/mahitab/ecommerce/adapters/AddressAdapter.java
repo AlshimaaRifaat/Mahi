@@ -17,7 +17,7 @@ import com.shopify.graphql.support.ID;
 import java.util.List;
 
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressViewHolder> {
-    private final List<AddressModel> addressList;
+    private  List<AddressModel> addressList;
     Context context;
     DeleteFromAddressListInterface deleteFromAddressListInterface;
     EditAddressItemInterface editAddressItemInterface;
