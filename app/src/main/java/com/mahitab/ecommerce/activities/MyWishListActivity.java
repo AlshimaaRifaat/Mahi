@@ -77,6 +77,9 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
 
         if (wishListItems != null) {
             getWishedProducts(wishListItems);
+        } else {
+            wishedProducts.clear();
+            productAdapter.notifyDataSetChanged();
         }
     }
 
