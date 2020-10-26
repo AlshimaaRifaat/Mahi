@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -30,21 +31,15 @@ import com.mahitab.ecommerce.adapters.ColorAdapter;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
 import com.mahitab.ecommerce.adapters.ShapeAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
-import com.mahitab.ecommerce.models.BannerList;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CategoryModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ShapeModel;
-import com.mahitab.ecommerce.utils.OlgorClient;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SubCategoriesFragment extends Fragment implements BannerAdapter.BannerClickListener {
     private static final String TAG = "SubCategoriesFragment";
@@ -83,42 +78,55 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                 public void onReceive(Context context, Intent intent) {
                     if (intent.getExtras() != null) {
                         CategoryModel selectedCategory = intent.getExtras().getParcelable("category");
-                        String target = "gid://shopify/Collection/" + selectedCategory.getId();
-                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                        targetId = targetId.trim(); //remove spaces from end of string
-                        CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
-                        ((HomeActivity)getActivity()).getSupportActionBar().setTitle(collection.getTitle());
-                        if (selectedCategory.isHasColor())
-                            displayColors();
-                        else {
-                            cvColors.setVisibility(View.GONE);
-                            rvColors.setVisibility(View.GONE);
-                        }
-                        if (selectedCategory.isHasShape())
-                            displayShapes();
-                        else {
-                            cvShape.setVisibility(View.GONE);
-                            rvShapes.setVisibility(View.GONE);
-                        }
 
-                        rvCollectionProducts.setHasFixedSize(true);
-                        rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 3,GridLayoutManager.VERTICAL,false));
-                        ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
-                        rvCollectionProducts.setAdapter(productAdapter);
+                        if (selectedCategory != null) {
+
+                            if (selectedCategory.getId() != null) {
+                                String target = "gid://shopify/Collection/" + selectedCategory.getId();
+                                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                                targetId = targetId.trim(); //remove spaces from end of string
+                                CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
+
+                                if (((HomeActivity) requireActivity()).getSupportActionBar() != null) {
+                                    ActionBar actionBar = ((HomeActivity) requireActivity()).getSupportActionBar();
+                                    if (actionBar != null)
+                                        actionBar.setTitle(collection.getTitle());
+                                }
+
+                                rvCollectionProducts.setHasFixedSize(true);
+                                rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false));
+                                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                                rvCollectionProducts.setAdapter(productAdapter);
+                            }
+
+                            if (selectedCategory.getBanners() != null) {
+                                int subFragmentWidthPixels = Resources.getSystem().getDisplayMetrics().widthPixels;
+
+                                rvBanners.setHasFixedSize(true);
+                                rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+                                bannerAdapter = new BannerAdapter(subFragmentWidthPixels);
+                                rvBanners.setAdapter(bannerAdapter);
+                                bannerAdapter.setBannerClickListener(SubCategoriesFragment.this);
+                                bannerAdapter.setBannerList(selectedCategory.getBanners());
+                            }
+
+                            if (selectedCategory.isHasColor())
+                                displayColors();
+                            else {
+                                cvColors.setVisibility(View.GONE);
+                                rvColors.setVisibility(View.GONE);
+                            }
+                            if (selectedCategory.isHasShape())
+                                displayShapes();
+                            else {
+                                cvShape.setVisibility(View.GONE);
+                                rvShapes.setVisibility(View.GONE);
+                            }
+                        }
                     }
                 }
             }, new IntentFilter("mainCategoryAdapter"));
         }
-
-        getBanners();
-
-        int subFragmentWidthPixels = Resources.getSystem().getDisplayMetrics().widthPixels;
-
-        rvBanners.setHasFixedSize(true);
-        rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        bannerAdapter = new BannerAdapter(subFragmentWidthPixels);
-        rvBanners.setAdapter(bannerAdapter);
-        bannerAdapter.setBannerClickListener(this);
     }
 
     @Override
@@ -162,23 +170,6 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         rvColors.setLayoutManager(new GridLayoutManager(getContext(), 5, LinearLayoutManager.VERTICAL, false));
         ColorAdapter colorAdapter = new ColorAdapter(colors);
         rvColors.setAdapter(colorAdapter);
-    }
-
-    private void getBanners() {
-        OlgorClient.getInstance().getApi().getBanners().enqueue(new Callback<BannerList>() {
-            @Override
-            public void onResponse(@NonNull Call<BannerList> call, @NonNull Response<BannerList> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<BannerModel> banners = response.body().getBanners();
-                    bannerAdapter.setBannerList(banners);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BannerList> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage());
-            }
-        });
     }
 
     private void displayShapes() {

@@ -12,16 +12,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.MainCategoryAdapter;
+import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CategoryModel;
-import com.mahitab.ecommerce.utils.OlgorClient;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainCategoriesFragment extends Fragment {
 
@@ -47,30 +48,45 @@ public class MainCategoriesFragment extends Fragment {
 
         initView(view);
 
+        categories=new ArrayList<>();
+
         getCategories();
     }
 
     private void getCategories() {
-        OlgorClient.getInstance().getApi().getCategories().enqueue(new Callback<List<CategoryModel>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<CategoryModel>> call, @NonNull Response<List<CategoryModel>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    categories = response.body();
-                    rvMainCategories.setHasFixedSize(true);
-                    rvMainCategories.setLayoutManager(new LinearLayoutManager(getContext()));
-                    mainCategoryAdapter = new MainCategoryAdapter(categories);
-                    rvMainCategories.setAdapter(mainCategoryAdapter);
-                }
-            }
+        FirebaseDatabase.getInstance().getReference("Categories")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            CategoryModel category = snapshot.getValue(CategoryModel.class);
+                            if (category != null) {
+                                category.setBanners(getCategoryBanners(snapshot));
+                                categories.add(category);
+                            }
+                        }
+                        rvMainCategories.setHasFixedSize(true);
+                        rvMainCategories.setLayoutManager(new LinearLayoutManager(getContext()));
+                        mainCategoryAdapter = new MainCategoryAdapter(categories);
+                        rvMainCategories.setAdapter(mainCategoryAdapter);
+                    }
 
-            @Override
-            public void onFailure(@NonNull Call<List<CategoryModel>> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "onCancelled: " + error.getMessage());
+                    }
+                });
     }
 
     private void initView(View view) {
-        rvMainCategories=view.findViewById(R.id.rvMainCategories_MainCategoriesFragment);
+        rvMainCategories = view.findViewById(R.id.rvMainCategories_MainCategoriesFragment);
+    }
+
+    public List<BannerModel> getCategoryBanners(DataSnapshot dataSnapshot) {
+        List<BannerModel> list = new ArrayList<>();
+        for (DataSnapshot child : dataSnapshot.child("banners").getChildren()) {
+            list.add(child.getValue(BannerModel.class));
+        }
+        return list;
     }
 }

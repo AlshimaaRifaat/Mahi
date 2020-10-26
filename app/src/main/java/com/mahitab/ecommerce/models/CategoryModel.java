@@ -3,11 +3,17 @@ package com.mahitab.ecommerce.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class CategoryModel implements Parcelable {
+import com.google.firebase.database.Exclude;
+
+import java.util.List;
+
+public class CategoryModel implements Parcelable{
     private String id;
     private String image;
     private boolean hasColor;
     private boolean hasShape;
+    @Exclude
+    private List<BannerModel> banners;
 
     public CategoryModel() {
     }
@@ -17,6 +23,21 @@ public class CategoryModel implements Parcelable {
         image = in.readString();
         hasColor = in.readByte() != 0;
         hasShape = in.readByte() != 0;
+        banners = in.createTypedArrayList(BannerModel.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(image);
+        dest.writeByte((byte) (hasColor ? 1 : 0));
+        dest.writeByte((byte) (hasShape ? 1 : 0));
+        dest.writeTypedList(banners);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<CategoryModel> CREATOR = new Creator<CategoryModel>() {
@@ -47,16 +68,12 @@ public class CategoryModel implements Parcelable {
         return hasShape;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    @Exclude
+    public List<BannerModel> getBanners() {
+        return banners;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(image);
-        dest.writeByte((byte) (hasColor ? 1 : 0));
-        dest.writeByte((byte) (hasShape ? 1 : 0));
+    public void setBanners(List<BannerModel> banners) {
+        this.banners = banners;
     }
 }

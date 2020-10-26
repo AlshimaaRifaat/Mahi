@@ -21,6 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CollectionProductsActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
@@ -28,11 +32,9 @@ import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
-import com.mahitab.ecommerce.models.BannerList;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ImageSliderModel;
-import com.mahitab.ecommerce.utils.OlgorClient;
 import com.rd.PageIndicatorView;
 
 import java.nio.charset.StandardCharsets;
@@ -111,7 +113,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         });
 
         HomeActivity.setCollectionLoadListener(this);
-        
+
         rvCollectionProducts.setHasFixedSize(true);
         rvCollectionProducts.setLayoutManager(new LinearLayoutManager(getContext()));
         collectionsAdapter = new CollectionsAdapter(getContext());
@@ -166,20 +168,23 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
     }
 
     private void getBanners() {
-        OlgorClient.getInstance().getApi().getBanners().enqueue(new Callback<BannerList>() {
-            @Override
-            public void onResponse(@NonNull Call<BannerList> call, @NonNull Response<BannerList> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<BannerModel> banners = response.body().getBanners();
-                    bannerAdapter.setBannerList(banners);
-                }
-            }
+        FirebaseDatabase.getInstance().getReference("Banners")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<BannerModel> banners = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            BannerModel banner = snapshot.getValue(BannerModel.class);
+                            banners.add(banner);
+                        }
+                        bannerAdapter.setBannerList(banners);
+                    }
 
-            @Override
-            public void onFailure(@NonNull Call<BannerList> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "onCancelled: " + error.getMessage());
+                    }
+                });
     }
 
     private void getSliderImages() {
