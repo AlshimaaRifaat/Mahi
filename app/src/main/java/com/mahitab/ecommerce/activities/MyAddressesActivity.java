@@ -25,13 +25,14 @@ import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
+import com.shopify.graphql.support.ID;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
-public class MyAddressesActivity extends AppCompatActivity {
+public class MyAddressesActivity extends AppCompatActivity  implements AddressAdapter.DeleteFromAddressListInterface{
 
     private static final String TAG = "MyAddressesActivity";
     private RecyclerView rvAddresses;
@@ -153,7 +154,7 @@ public class MyAddressesActivity extends AppCompatActivity {
                             Log.d(TAG, "run: "+"success");
 
                             addressAdapter = new AddressAdapter(MyAddressesActivity.this,addresses);
-                          //  addressAdapter.onClickDeleteFromAddressList(AddressesActivity.this);
+                           addressAdapter.onClickDeleteFromAddressList(MyAddressesActivity.this);
                             rvAddresses.setLayoutManager(new LinearLayoutManager(MyAddressesActivity.this));
                             rvAddresses.setHasFixedSize(true);
                             rvAddresses.setAdapter(addressAdapter);
@@ -172,6 +173,36 @@ public class MyAddressesActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull GraphError error) {
                 Log.d(TAG, "onFailure: "+error.getMessage().toString());
+
+            }
+        });
+    }
+    @Override
+    public void removeFromAddressList(ID addressId, int Position) {
+        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
+                .customerAddressDelete(addressId, accessToken, query -> query
+                        .deletedCustomerAddressId()
+                        .userErrors(userErrorQuery -> userErrorQuery
+                                .field()
+                                .message()
+                        )
+                )
+        );
+        deletefromAddressList(mutationQuery);
+    }
+    private void deletefromAddressList( Storefront.MutationQuery mutationQuery) {
+        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+
+                Log.d("delete ", "onResponse: "+"success");
+
+
+            }
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                Log.d("edit ", "onFailure: "+error.getMessage());
 
             }
         });

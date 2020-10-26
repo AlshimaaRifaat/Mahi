@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.models.AddressModel;
+import com.shopify.graphql.support.ID;
 
 import java.util.List;
 
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressViewHolder> {
     private final List<AddressModel> addressList;
     Context context;
+    DeleteFromAddressListInterface deleteFromAddressListInterface;
     public AddressAdapter( Context context,List<AddressModel> addressList) {
         this.addressList = addressList;
         this.context=context;
@@ -28,6 +30,10 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     public AddressViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new AddressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.address_item, parent, false));
     }
+    public void onClickDeleteFromAddressList(DeleteFromAddressListInterface deleteFromAddressListInterface)
+    {
+        this.deleteFromAddressListInterface=deleteFromAddressListInterface;
+    }
 
     @Override
     public void onBindViewHolder(@NonNull AddressViewHolder holder, int position) {
@@ -36,6 +42,14 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
         holder.tvAddressLine1.setText(address.getAddress1());
         holder.tvAddressLine2.setText(address.getAddress2());
         holder.tvMobileNumber.setText(address.getPhone());
+        holder.ivDeleteAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteFromAddressListInterface.removeFromAddressList(addressList.get(position).getmID(),position);
+                addressList.remove(position);
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -62,5 +76,9 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
             ivDeleteAddress = itemView.findViewById(R.id.ivDeleteAddress_AddressItem);
 
         }
+    }
+    public interface DeleteFromAddressListInterface {
+        void removeFromAddressList(ID addressId, int Position);
+
     }
 }
