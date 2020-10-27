@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.adapters.ProvinceSpinnerAdapter;
 import com.mahitab.ecommerce.managers.GraphClientManager;
 import com.mahitab.ecommerce.models.AddressModel;
 import com.shopify.buy3.GraphCall;
@@ -30,7 +33,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
     private EditText etFirstName;
     private EditText etLastName;
-    private EditText etAddress1,etAddress2,etProvince,etCity,etZipCode,etPhone;
+    private EditText etAddress1,etAddress2,etCity,etZipCode,etPhone;
     private Button btnSave;
     private Button btnCancel;
 
@@ -38,6 +41,18 @@ public class AddEditAddressActivity extends AppCompatActivity {
     String addressId,firstName,lastName,phone,zipCode,city,province,address2,address1,accessToken;
     Intent intent;
     AddressModel addressModel;
+
+   String[] spinnerProvinceValue = {
+            "Aswan",
+            "6th of October"
+    };
+
+
+    public static String provinceSelectedItemSpinner;
+    String provinceId;
+
+    Context context;
+    Spinner spinnerProvince;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +71,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
             initView();
             getSupportActionBar().setTitle(getResources().getString(R.string.edit_address));
             getAddressData();
+
         } else {
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -66,13 +82,47 @@ public class AddEditAddressActivity extends AppCompatActivity {
             initView();
 
             getSupportActionBar().setTitle(getResources().getString(R.string.add_address));
-            btnSave.setOnClickListener(v -> {
+            getProvinceSpinnerItems();
 
-                    queryCreateAddress(accessToken);
-            });
         }
 
         btnCancel.setOnClickListener(v -> onBackPressed());
+    }
+
+    private void getProvinceSpinnerItems() {
+        ProvinceSpinnerAdapter genderSpinnerAdapter = new ProvinceSpinnerAdapter(this, R.layout.spinner_item);
+
+        genderSpinnerAdapter.addAll(spinnerProvinceValue);
+        genderSpinnerAdapter.add("Province");
+        spinnerProvince.setAdapter(genderSpinnerAdapter);
+        spinnerProvince.setPrompt("Aswan");
+
+        spinnerProvince.setSelection(genderSpinnerAdapter.getCount());
+
+        spinnerProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spinnerProvince.getSelectedItem() == "Province") {
+
+                } else {
+                    provinceSelectedItemSpinner = spinnerProvince.getSelectedItem().toString();
+                    btnSave.setOnClickListener(v -> {
+                        Log.d(TAG, "provinceSelectedItemSpinner: " + provinceSelectedItemSpinner);
+                        Log.d(TAG, "token: " + accessToken);
+                        queryCreateAddress(accessToken,provinceSelectedItemSpinner);
+
+                    });
+
+
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
@@ -86,33 +136,61 @@ public class AddEditAddressActivity extends AppCompatActivity {
         phone = addressModel.getPhone();
         zipCode = addressModel.getZipCode();
         city = addressModel.getCity();
-        province = addressModel.getProvince();
         address2 = addressModel.getAddress2();
         address1 = addressModel.getAddress1();
         Log.d(TAG, "edit int addressID: "+addressId);
-        setAddressData(addressId,firstName,lastName,phone,zipCode,city,province,address2,address1);
+        setAddressData(addressId,firstName,lastName,phone,zipCode,city,address2,address1);
+
+
+
     }
 
     private void setAddressData(String addressId,String firstName, String lastName, String phone, String zipCode,
-                                String city, String province, String address2, String address1) {
+                                String city, String address2, String address1) {
     etFirstName.setText(firstName);
     etLastName.setText(lastName);
     etPhone.setText(phone);
     etZipCode.setText(zipCode);
     etCity.setText(city);
-    etProvince.setText(province);
+   // etProvince.setText(province);
     etAddress1.setText(address1);
     etAddress2.setText(address2);
 
+        ProvinceSpinnerAdapter genderSpinnerAdapter = new ProvinceSpinnerAdapter(this, R.layout.spinner_item);
 
+        genderSpinnerAdapter.addAll(spinnerProvinceValue);
+        genderSpinnerAdapter.add("Province");
+        spinnerProvince.setAdapter(genderSpinnerAdapter);
+        spinnerProvince.setPrompt("Aswan");
+
+        spinnerProvince.setSelection(genderSpinnerAdapter.getCount());
+
+        spinnerProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spinnerProvince.getSelectedItem() == "Province") {
+
+                } else {
+                    provinceSelectedItemSpinner = spinnerProvince.getSelectedItem().toString();
+
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         btnSave.setOnClickListener(v -> {
-                queryEditAddress(accessToken,addressId);
+            queryEditAddress(accessToken,addressId,provinceSelectedItemSpinner);
+
 
         });
     }
 
-    private void queryEditAddress(String accessToken, String addressId) {
-
+    private void queryEditAddress(String accessToken, String addressId,String province) {
+        Log.d(TAG, "queryEditAddress: "+province);
         Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
                 .setFirstName(etFirstName.getText().toString())
                 .setLastName(etLastName.getText().toString())
@@ -120,7 +198,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
                 .setZip(etZipCode.getText().toString())
-                .setProvince(etProvince.getText().toString())
+                .setProvince(province)
                 .setAddress1(etAddress1.getText().toString())
                 .setAddress2(etAddress2.getText().toString());
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
@@ -183,13 +261,14 @@ public class AddEditAddressActivity extends AppCompatActivity {
         etCity = findViewById(R.id.etCity_AddEditAddressActivity);
         etZipCode = findViewById(R.id.etZipCode_AddEditAddressActivity);
         etPhone = findViewById(R.id.etPhone_AddEditAddressActivity);
-        etProvince = findViewById(R.id.etProvince_AddEditAddressActivity);
+        spinnerProvince = findViewById(R.id.spinnerProvince);
         btnSave = findViewById(R.id.btnSave_AddEditAddressActivity);
         btnCancel = findViewById(R.id.btnCancel_AddEditAddressActivity);
     }
 
-    private void queryCreateAddress(String accessToken) {
-        Log.d(TAG, "token: " + accessToken);
+    private void queryCreateAddress(String accessToken,String province) {
+
+        Log.d(TAG, "queryCreateAddress : "+province);
         Storefront.MailingAddressInput input = new Storefront.MailingAddressInput()
                 .setFirstName(etFirstName.getText().toString())
                 .setLastName(etLastName.getText().toString())
@@ -197,9 +276,10 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
                 .setZip(etZipCode.getText().toString())
-                .setProvince(etProvince.getText().toString())
+                .setProvince(province)
                 .setAddress1(etAddress1.getText().toString())
                 .setAddress2(etAddress2.getText().toString());
+
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
                 .customerAddressCreate(accessToken, input, query -> query
                         .customerAddress(customerAddress -> customerAddress
@@ -213,6 +293,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 )
         );
         createAddress(mutationQuery);
+
     }
 
     private void createAddress(Storefront.MutationQuery mutationQuery) {
