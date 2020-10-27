@@ -47,6 +47,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
         holder.tvAddressLine1.setText(address.getAddress1());
         holder.tvAddressLine2.setText(address.getAddress2());
         holder.tvMobileNumber.setText(address.getPhone());
+
+
         holder.ivDeleteAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -26,19 +26,19 @@ import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
+import com.shopify.graphql.support.Input;
 
 public class AddEditAddressActivity extends AppCompatActivity {
 
     private static final String TAG = "AddEditAddressActivity";
 
-    private EditText etFirstName;
-    private EditText etLastName;
-    private EditText etAddress1,etAddress2,etCity,etZipCode,etPhone;
+
+    private EditText etAddress1,etAddress2,etCity,etPhone,etNotes;
     private Button btnSave;
     private Button btnCancel;
 
     private SharedPreferences defaultPreferences;
-    String addressId,firstName,lastName,phone,zipCode,city,address2,address1,accessToken;
+    String addressId,phone,city,address2,address1,accessToken;
     Intent intent;
     AddressModel addressModel;
 
@@ -49,9 +49,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
 
     public static String provinceSelectedItemSpinner;
-    String provinceId;
 
-    Context context;
     Spinner spinnerProvince;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,28 +127,22 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private void getAddressData() {
 
         addressModel = (AddressModel) getIntent().getExtras().getSerializable("addressModel");
-
         addressId = addressModel.getmID().toString();
-        firstName = addressModel.getFirstName();
-        lastName = addressModel.getLastName();
         phone = addressModel.getPhone();
-        zipCode = addressModel.getZipCode();
         city = addressModel.getCity();
         address2 = addressModel.getAddress2();
         address1 = addressModel.getAddress1();
-        Log.d(TAG, "edit int addressID: "+addressId);
-        setAddressData(addressId,firstName,lastName,phone,zipCode,city,address2,address1);
+
+        setAddressData(addressId,phone,city,address2,address1);
 
 
 
     }
 
-    private void setAddressData(String addressId,String firstName, String lastName, String phone, String zipCode,
+    private void setAddressData(String addressId, String phone,
                                 String city, String address2, String address1) {
-    etFirstName.setText(firstName);
-    etLastName.setText(lastName);
+
     etPhone.setText(phone);
-    etZipCode.setText(zipCode);
     etCity.setText(city);
    // etProvince.setText(province);
     etAddress1.setText(address1);
@@ -192,12 +184,12 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private void queryEditAddress(String accessToken, String addressId,String province) {
         Log.d(TAG, "queryEditAddress: "+province);
         Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
-                .setFirstName(etFirstName.getText().toString())
-                .setLastName(etLastName.getText().toString())
+                .setFirstName("")
+                .setLastName("")
                 .setPhone(etPhone.getText().toString())
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
-                .setZip(etZipCode.getText().toString())
+                .setZip("")
                 .setProvince(province)
                 .setAddress1(etAddress1.getText().toString())
                 .setAddress2(etAddress2.getText().toString());
@@ -254,28 +246,28 @@ public class AddEditAddressActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        etFirstName = findViewById(R.id.etFirstName_AddEditAddressActivity);
-        etLastName = findViewById(R.id.etLastName_AddEditAddressActivity);
+
         etAddress1 = findViewById(R.id.etAddress1_AddEditAddressActivity);
         etAddress2 = findViewById(R.id.etAddress2_AddEditAddressActivity);
         etCity = findViewById(R.id.etCity_AddEditAddressActivity);
-        etZipCode = findViewById(R.id.etZipCode_AddEditAddressActivity);
         etPhone = findViewById(R.id.etPhone_AddEditAddressActivity);
         spinnerProvince = findViewById(R.id.spinnerProvince);
         btnSave = findViewById(R.id.btnSave_AddEditAddressActivity);
         btnCancel = findViewById(R.id.btnCancel_AddEditAddressActivity);
+        etNotes=findViewById(R.id.etNotes_AddEditAddressActivity);
     }
 
     private void queryCreateAddress(String accessToken,String province) {
 
         Log.d(TAG, "queryCreateAddress : "+province);
         Storefront.MailingAddressInput input = new Storefront.MailingAddressInput()
-                .setFirstName(etFirstName.getText().toString())
-                .setLastName(etLastName.getText().toString())
+                .setFirstName("")
+                .setLastName("")
                 .setPhone(etPhone.getText().toString())
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
-                .setZip(etZipCode.getText().toString())
+                .setCompany(etNotes.getText().toString())
+                .setZip("")
                 .setProvince(province)
                 .setAddress1(etAddress1.getText().toString())
                 .setAddress2(etAddress2.getText().toString());
@@ -285,6 +277,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                         .customerAddress(customerAddress -> customerAddress
                                 .address1()
                                 .address2()
+                                .company()
                         )
                         .userErrors(userError -> userError
                                 .field()

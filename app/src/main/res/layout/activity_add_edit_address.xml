@@ -31,51 +31,7 @@
             android:layout_margin="16dp"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilFirstName_AddEditAddressActivity"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1">
-
-                    <EditText
-                        android:id="@+id/etFirstName_AddEditAddressActivity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/first_name"
-                        android:inputType="textAutoComplete"
-                        tools:ignore="Autofill,LabelFor" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilLastName_AddEditAddressActivity"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1">
-
-                    <EditText
-                        android:id="@+id/etLastName_AddEditAddressActivity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/last_name"
-                        android:inputType="textAutoComplete"
-                        tools:ignore="Autofill,LabelFor" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilAddress1_AddEditAddressActivity"
@@ -117,22 +73,7 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/spProvince_"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-                    <EditText
-                        android:id="@+id/etZipCode_AddEditAddressActivity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/zip_code"
-                        android:inputType="number"
-                        tools:ignore="Autofill,LabelFor" />
-                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -161,22 +102,15 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:id="@+id/tInCountry"
+                <Spinner
+                    android:id="@+id/spinnerProvince"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-                    <TextView
-                        android:id="@+id/etCountry_AddEditAddressActivity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/Egypt"
-                        android:inputType="textAutoComplete"
-                        tools:ignore="Autofill,LabelFor" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="55dp"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    app:backgroundTint="#777575"
+                    android:prompt="@string/Province"
+                    android:layout_weight="1"
+                    ></Spinner>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -199,15 +133,24 @@
 
             </LinearLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/notes_AddEditAddressActivity"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
 
-                <Spinner
-                    android:id="@+id/spinnerProvince"
+                <EditText
+                    android:id="@+id/etNotes_AddEditAddressActivity"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"
-                    app:backgroundTint="#777575"
-                    android:prompt="@string/Province"
-                    ></Spinner>
+                    android:layout_height="140dp"
+                    android:hint="@string/Notes"
+                    android:gravity="start"
+
+                    tools:ignore="Autofill,LabelFor" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
 
 
         </LinearLayout>

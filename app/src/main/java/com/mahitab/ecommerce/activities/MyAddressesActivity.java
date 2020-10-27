@@ -146,13 +146,15 @@ public class MyAddressesActivity extends AppCompatActivity
 
 
                         AddressModel newAddressesModel = new AddressModel(edge);
-                        Log.d(TAG, "id: " + newAddressesModel.getmID().toString());
+                        Log.d(TAG, "zip: " +edge.getNode().getFirstName());
                         DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
                     }
+
                     for (int i = 0; i < DataManager.getInstance().getAddresses().size(); i++) {
                         Log.d(TAG, "cities: " + DataManager.getInstance().getAddresses().get(i).getCity().toString());
+                        if(DataManager.getInstance().getAddresses().get(i).getZipCode()!=null)
+                        Log.d(TAG, "g: " + DataManager.getInstance().getAddresses().get(i).getZipCode().toString());
                     }
-
                     addresses = DataManager.getInstance().getAddresses();
 
                     runOnUiThread(new Runnable() {
