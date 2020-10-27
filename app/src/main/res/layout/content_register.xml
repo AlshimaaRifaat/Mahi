@@ -108,19 +108,21 @@
                 android:id="@+id/etMobileNumber_RegisterActivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/mobile_number"
+                android:hint="@string/phone_number"
+                android:text="01118577202"
                 android:inputType="phone"
                 tools:ignore="Autofill,LabelFor" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/btnRegister_RegisterActivity"
+            android:id="@+id/btnRegister_VerifyPhoneActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:padding="16dp"
-            android:text="@string/register"
+            android:text="@string/_continue"
+            android:textAllCaps="false"
             android:textSize="17sp"
             android:textStyle="bold" />
     </LinearLayout>

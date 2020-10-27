@@ -9,9 +9,10 @@ import com.shopify.graphql.support.ID;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class CurrentUser {
+public final class CurrentUser implements Serializable {
 
     private static final CurrentUser mInstance = new CurrentUser();
 
@@ -77,6 +78,14 @@ public final class CurrentUser {
     }
 
     private CurrentUser() {
+    }
+
+    public CurrentUser(String firstName, String lastName, String email, String password, String phone) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
     }
 
     public synchronized ID getId() {

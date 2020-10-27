@@ -1,13 +1,10 @@
 package com.mahitab.ecommerce.activities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,15 +12,13 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.managers.DataManager;
-import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.CurrentUser;
 import com.mahitab.ecommerce.utils.CommonUtils;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final String TAG = "RegisterActivity";
     private TextInputLayout tilFirstName;
     private EditText etFirstName;
     private TextInputLayout tilLastName;
@@ -33,10 +28,8 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout tilPassword;
     private EditText etPassword;
     private TextInputLayout tilMobileNumber;
-    private EditText etMobileNumber;
+    private EditText etPhoneNumber;
     private Button btnRegister;
-
-    private SharedPreferences defaultPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +46,24 @@ public class RegisterActivity extends AppCompatActivity {
 
         initView();
 
-        defaultPreferences=getSharedPreferences(getPackageName(),Context.MODE_PRIVATE);
-
         btnRegister.setOnClickListener(v -> {
             String email = etEmail.getText().toString();
             String firstName = etFirstName.getText().toString();
             String lastName = etLastName.getText().toString();
             String password = etPassword.getText().toString();
-            String mobileNumber = etMobileNumber.getText().toString();
-            if (validateFields(email, password, firstName, lastName, mobileNumber))
-                sendRegisterRequest(email, password, firstName, lastName);
+            String phoneNumber = etPhoneNumber.getText().toString();
+            CurrentUser user = new CurrentUser(
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    phoneNumber
+            );
+            if (validateFields(email, password, firstName, lastName, phoneNumber)) {
+                Intent intent = new Intent(getApplicationContext(), VerifyPhoneActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+            }
         });
     }
 
@@ -89,37 +90,8 @@ public class RegisterActivity extends AppCompatActivity {
         tilPassword = findViewById(R.id.tilPassword_RegisterActivity);
         etPassword = findViewById(R.id.etPassword_RegisterActivity);
         tilMobileNumber = findViewById(R.id.tilMobileNumber_RegisterActivity);
-        etMobileNumber = findViewById(R.id.etMobileNumber_RegisterActivity);
-        btnRegister = findViewById(R.id.btnRegister_RegisterActivity);
-    }
-
-    private void sendRegisterRequest(String email, String password, String firstName, String lastName) {
-        DataManager.getInstance().register(
-                email,
-                password,
-                firstName,
-                lastName,
-                false,
-                new BaseCallback() {
-                    @Override
-                    public void onResponse(int status) {
-                        if (status == RESULT_OK) {
-                            runOnUiThread(new Thread(() -> {
-                                saveEmailAndPassword(email,password);
-                                onBackPressed();
-                                Toast.makeText(getApplicationContext(), "Account created successfully", Toast.LENGTH_SHORT).show();
-                            }));
-                        } else {
-                            onFailure("An unknown error occurred");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(final String message) {
-                        Log.e(TAG, "onFailure: " + message);
-                    }
-                }
-        );
+        etPhoneNumber = findViewById(R.id.etMobileNumber_RegisterActivity);
+        btnRegister = findViewById(R.id.btnRegister_VerifyPhoneActivity);
     }
 
     private boolean validateFields(String email, String password, String firstName, String lastName, String mobileNumber) {
@@ -172,10 +144,5 @@ public class RegisterActivity extends AppCompatActivity {
             isValid = false;
         }
         return isValid;
-    }
-
-    private void saveEmailAndPassword(String email,String password) {
-        defaultPreferences.edit().putString("email", email).apply();
-        defaultPreferences.edit().putString("password", password).apply();
     }
 }

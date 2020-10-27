@@ -33,7 +33,7 @@
     <string name="forget_your_password">نسيت كلمة المرور؟</string>
     <string name="first_name">الاسم الاول</string>
     <string name="last_name">الاسم الاخير</string>
-    <string name="mobile_number">رقم الموبايل</string>
+    <string name="phone_number">رقم الموبايل</string>
     <string name="empty_field_error_message">لا يمكن أن يكون الحقل فارغًا</string>
     <string name="sign_out">تسجيل الخروج</string>
     <string name="my_orders">طلباتي</string>
@@ -71,7 +71,13 @@
     <string name="submit_text">Submit</string>
     <string name="reset_your_password_text">Reset your password</string>
     <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
-    <string name="Notes">Notes</string>
+    <string name="verify_phone">التحقق من الهاتف</string>
+    <string name="we_have_sent_verification_code_to_your_number">لقد أرسلنا رمز التحقق إلى رقمك</string>
+    <string name="_continue">المتابعة</string>
+    <string name="resend_code">إعادة إرسال الرمز؟</string>
+    <string name="try_again_later">لقد حظرنا جميع الطلبات الواردة من هذا الجهاز بسبب نشاط غير عادي. حاول مرة أخرى في وقت لاحق</string>
+    <string name="account_created_successfully">الحساب اقيم بنجاح</string>
+    <string name="Notes">ملاحظات</string>
 
     <string-array name="provinces">
         <item>اختار المحافطة</item>
