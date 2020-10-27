@@ -38,7 +38,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private Button btnCancel;
 
     private SharedPreferences defaultPreferences;
-    String addressId,firstName,lastName,phone,zipCode,city,province,address2,address1,accessToken;
+    String addressId,firstName,lastName,phone,zipCode,city,address2,address1,accessToken;
     Intent intent;
     AddressModel addressModel;
 
