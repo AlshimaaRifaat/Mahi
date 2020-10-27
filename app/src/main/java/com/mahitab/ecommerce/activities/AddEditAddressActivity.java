@@ -189,6 +189,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 .setPhone(etPhone.getText().toString())
                 .setCity(etCity.getText().toString())
                 .setCountry("Egypt")
+                .setCompany(etNotes.getText().toString())
                 .setZip("")
                 .setProvince(province)
                 .setAddress1(etAddress1.getText().toString())
@@ -198,6 +199,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                         .customerAddress(customerAddress -> customerAddress
                                 .address1()
                                 .address2()
+                                .company()
                         )
                         .userErrors(userErrorQuery -> userErrorQuery
                                 .field()
