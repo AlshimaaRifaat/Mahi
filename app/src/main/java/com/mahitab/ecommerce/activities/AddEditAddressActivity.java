@@ -39,7 +39,6 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
     private SharedPreferences defaultPreferences;
     String addressId,phone,city,address2,address1,accessToken;
-    Intent intent;
     AddressModel addressModel;
 
    String[] spinnerProvinceValue = {
