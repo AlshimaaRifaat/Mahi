@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "17845533090",
+    "firebase_url": "https://mahitabfabrics.firebaseio.com",
+    "project_id": "mahitabfabrics",
+    "storage_bucket": "mahitabfabrics.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17845533090:android:3e984a7a9494a4d6391afb",
+        "android_client_info": {
+          "package_name": "com.mahitab.ecommerce"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "17845533090-lekr2nrdu405bqvs4mk7tqjalcf8tr35.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnE-sUvzCPzsyvT3UAZddQWqQaBdLYQ2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17845533090-lekr2nrdu405bqvs4mk7tqjalcf8tr35.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
