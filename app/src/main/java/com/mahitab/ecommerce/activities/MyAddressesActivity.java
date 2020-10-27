@@ -31,6 +31,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+
 public class MyAddressesActivity extends AppCompatActivity
         implements AddressAdapter.DeleteFromAddressListInterface
         , AddressAdapter.EditAddressItemInterface {
@@ -47,7 +49,7 @@ public class MyAddressesActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setArDefaultLocale(this);
+        setArDefaultLocale(this);
         setContentView(R.layout.activity_my_addresses);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

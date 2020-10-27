@@ -69,4 +69,5 @@
         android:text="@string/login"
         android:textSize="17sp"
         android:textStyle="bold" />
+
 </LinearLayout>

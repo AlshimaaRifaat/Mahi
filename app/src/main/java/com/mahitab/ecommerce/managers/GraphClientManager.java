@@ -31,12 +31,7 @@ public final class GraphClientManager {
                 .build();
     }
 
-    void getShop(GraphCall.Callback<Storefront.QueryRoot> callback) {
-        Storefront.QueryRootQuery query = ClientQuery.queryForShop();
-        mClient
-                .queryGraph(query)
-                .enqueue(callback);
-    }
+
 
     void getProducts(ID collectionID, GraphCall.Callback<Storefront.QueryRoot> callback) {
         Storefront.QueryRootQuery query = ClientQuery.queryProducts(collectionID);
@@ -44,7 +39,11 @@ public final class GraphClientManager {
 
         call.enqueue(callback);
     }
+    void resetUserPassword(String email, GraphCall.Callback<Storefront.Mutation> callback) {
+        Storefront.MutationQuery query = ClientMutation.mutationForRecoverPassword(email);
 
+        mClient.mutateGraph(query).enqueue(callback);
+    }
     void getCollections(GraphCall.Callback<Storefront.QueryRoot> callback) {
         Storefront.QueryRootQuery query = ClientQuery.queryCollections();
         QueryGraphCall call = mClient.queryGraph(query);

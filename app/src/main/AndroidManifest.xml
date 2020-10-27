@@ -13,8 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".activities.MyWishListActivity"/>
-        <activity android:name=".activities.MyOrdersActivity"/>
+        <activity android:name=".activities.ResetPasswordActivity"></activity>
+        <activity android:name=".activities.MyOrdersActivity" />
         <activity android:name=".activities.AddEditAddressActivity" />
         <activity
             android:name=".activities.MyAddressesActivity"

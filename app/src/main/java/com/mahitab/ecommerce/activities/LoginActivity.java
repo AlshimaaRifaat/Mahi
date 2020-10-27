@@ -1,6 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,9 @@ public class LoginActivity extends AppCompatActivity {
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
-        tvForgetPassword.setOnClickListener(v -> Log.e(TAG, "onClick: "));
+        tvForgetPassword.setOnClickListener(v ->
+                startActivity(new Intent(this,ResetPasswordActivity.class))
+                );
 
         btnLogin.setOnClickListener(v -> {
             email = etEmail.getText().toString();

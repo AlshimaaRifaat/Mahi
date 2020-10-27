@@ -43,7 +43,6 @@ public class AddEditAddressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_address);
 
-
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         accessToken = defaultPreferences.getString("token", null);
         Log.d(TAG, "onCreate: "+accessToken);

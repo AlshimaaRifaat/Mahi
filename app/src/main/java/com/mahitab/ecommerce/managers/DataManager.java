@@ -36,7 +36,36 @@ public final class DataManager extends Observable {
 
         private static final DataManager INSTANCE = new DataManager();
     }
+    public void resetPassword(String email, BaseCallback callback) {
+        mClientManager.resetUserPassword(email, new GraphCall.Callback<Storefront.Mutation>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+                if(response.hasErrors()) {
+                    callback.onFailure(response.errors().get(0).message());
+                    return;
+                }
 
+                if(response.data() == null) {
+                    callback.onFailure("Data is null");
+                    return;
+                }
+
+                assert response.data() != null;
+                Storefront.CustomerRecoverPayload payload = response.data().getCustomerRecover();
+                if(payload.getUserErrors().size() != 0) {
+                    callback.onFailure(payload.getUserErrors().get(0).getMessage());
+                    return;
+                }
+
+                callback.onResponse(BaseCallback.RESULT_OK);
+            }
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                callback.onFailure(error.getLocalizedMessage());
+            }
+        });
+    }
     public synchronized static DataManager getInstance() {
         return InstanceHelper.INSTANCE;
     }
@@ -483,124 +512,6 @@ public final class DataManager extends Observable {
 
 
 
-  /*  public void createCheckout(PaymentData paymentData, final BaseCallback callback) {
-        String token = paymentData.getPaymentMethodToken().getToken() != null ?
-                paymentData.getPaymentMethodToken().getToken() : "";
-
-        CardInfo cardInfo = paymentData.getCardInfo();
-
-        String email = paymentData.getEmail();
-        final UserAddress billingAddress = cardInfo.getBillingAddress();
-        final UserAddress shippingAddress = paymentData.getShippingAddress();
-
-        CurrentUser.getInstance().setEmail(email);
-
-        mClientManager.createCheckout(new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                if(response.hasErrors()) {
-                    callback.onFailure(response.errors().get(0).message());
-                    return;
-                }
-
-                if (response.data() == null) {
-                    callback.onFailure("Null body");
-                    return;
-                }
-
-                Storefront.CheckoutCreatePayload payload = response.data().getCheckoutCreate();
-                if(payload.getUserErrors().size() != 0) {
-                    callback.onFailure(payload.getUserErrors().get(0).getMessage());
-                    return;
-                }
-
-                mCheckout = payload.getCheckout();
-                DataManager.this.notifyObservers();
-
-                String name = shippingAddress.getName();
-                String firstName = name != null ? name.substring(0, name.indexOf(' ')): "";
-                String lastName = name != null ? name.substring(name.indexOf(' ') + 1): "";
-                Storefront.MailingAddress address = new Storefront.MailingAddress()
-                        .setFirstName(firstName)
-                        .setLastName(lastName)
-                        .setPhone(shippingAddress.getPhoneNumber())
-                        .setCompany(shippingAddress.getCompanyName())
-                        .setAddress1(shippingAddress.getAddress1())
-                        .setAddress2(shippingAddress.getAddress2())
-                        .setCity(shippingAddress.getLocality())
-                        .setCountryCode(shippingAddress.getCountryCode())
-                        .setProvince(shippingAddress.getAdministrativeArea())
-                        .setZip(shippingAddress.getPostalCode());
-
-                mClientManager.updateCheckoutAddress(mCheckout.getId(), address, new GraphCall.Callback<Storefront.Mutation>() {
-                    @Override
-                    public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                        if (response.hasErrors()) {
-                            callback.onFailure(response.errors().get(0).message());
-                            Log.e(TAG, "onResponse: UpdateChkAdd: " + response.errors().get(0).message());
-                            return;
-                        }
-
-                        if (response.data() == null) {
-                            callback.onFailure("Null body");
-                            return;
-                        }
-
-                        Storefront.CheckoutShippingAddressUpdatePayload payload = response.data().getCheckoutShippingAddressUpdate();
-                        if (payload.getUserErrors().size() != 0) {
-                            callback.onFailure(payload.getUserErrors().get(0).getMessage());
-                            Log.e(TAG, "onResponse: UpdateChkAdd: " + payload.getUserErrors().get(0).getMessage());
-                            return;
-                        }
-
-                        Storefront.Checkout checkout = payload.getCheckout();
-                        if (checkout == null) {
-                            callback.onFailure("Null checkout");
-                            return;
-                        }
-
-                        Storefront.MailingAddress address = checkout.getShippingAddress();
-                        if (address == null) {
-                            callback.onFailure("Null address");
-                            return;
-                        }
-
-                        mCheckout = checkout;
-                        DataManager.this.notifyObservers();
-
-                        mClientManager.placeOrder(token, GOOGLE_PAY, new GraphCall.Callback<Storefront.Mutation>() {
-                            @Override
-                            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                                if(response.hasErrors()) {
-                                    callback.onFailure(response.errors().get(0).message());
-                                    return;
-                                }
-
-                                mCheckout = null;
-                                DataManagerHelper.getInstance().resetCart();
-                                callback.onResponse(BaseCallback.RESULT_OK);
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull GraphError error) {
-                                callback.onFailure(error.getLocalizedMessage());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull GraphError error) {
-                        callback.onFailure(error.getLocalizedMessage());
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-                callback.onFailure(error.getLocalizedMessage());
-            }
-        });
-    }*/
 
     public void updateCheckoutEmail(ID checkoutId, String email, BaseCallback callback) {
         mClientManager.updateCheckoutEmail(checkoutId, email, new GraphCall.Callback<Storefront.Mutation>() {
@@ -821,52 +732,7 @@ public final class DataManager extends Observable {
         }
     }
 
-  /*   public ArrayList<CollectionModel> getCollectionsBySearchCriteria(String searchCriteria) {
-        ArrayList<CollectionModel> result = new ArrayList<CollectionModel>();
-        for(CollectionModel collectionModel: this.getCollections()) {
-            ArrayList<ProductModel> collectionProducts = this.getProducts(collectionModel.getID());
 
-            ArrayList<ProductModel> matchedProducts = new ArrayList<ProductModel>();
-            for(ProductModel p: collectionProducts) {
-                if(p.getTitle().toLowerCase().contains(searchCriteria.toLowerCase())) {
-                    matchedProducts.add(p);
-                }
-            }
-
-            if(matchedProducts.size() != 0) {
-                result.add(CollectionModel.buildCollection(collectionModel, matchedProducts));
-            }
-        }
-
-        return result;
-    }
-    //endregion
-
-    //region  Shop management calls
-    public String getShopName() {
-        return DataManagerHelper.getInstance().getShop().getName();
-    }
-
-    public String getShopDescription() {
-        return DataManagerHelper.getInstance().getShop().getDescription();
-    }*/
-
-   /* public String getShopCurrency() {
-        return DataManagerHelper.getInstance().getShop().getCurrencyCode().toString();
-    }*/
-
-   /* public String getShopCountryCode() {
-        return DataManagerHelper.getInstance().getShop().getCountryCode().toString();
-    }
-
-    public String getShopPrivacyUrl() {
-        return DataManagerHelper.getInstance().getShop().getPrivacyPolicyUrl();
-    }
-
-    public String getShopTermsUrl() {
-        return DataManagerHelper.getInstance().getShop().getTermsOfServiceUrl();
-    }*/
-    //endregion
 
     //region CART
     public double getProductsPrice() {

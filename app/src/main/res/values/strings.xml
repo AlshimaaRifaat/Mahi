@@ -79,6 +79,10 @@
     <string name="City">City</string>
     <string name="Egypt">Egypt</string>
     <string name="address_updated_successfully">Address updated successfully!</string>
+    <string name="email_text">Email</string>
+    <string name="submit_text">Submit</string>
+    <string name="reset_your_password_text">Reset your password</string>
+    <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
 
     <string-array name="provinces">
         <item>Select Province</item>
