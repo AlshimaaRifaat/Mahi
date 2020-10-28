@@ -31,6 +31,7 @@ public class DataManagerHelper {
         mProductsByCollection = new HashMap<String, ArrayList<ProductModel>>();
         mMyOrders = new HashMap<String, MyOrdersModel>();
         addresses = new HashMap<String, AddressModel>();
+      
     }
 
     public static DataManagerHelper getInstance() {
@@ -45,6 +46,7 @@ public class DataManagerHelper {
     private HashMap<String, ArrayList<ProductModel>> mProductsByCollection;
     private HashMap<String, AddressModel> addresses;
     private HashMap<String, MyOrdersModel> mMyOrders;
+
 
     public void setShop(Storefront.Shop shop) {
         synchronized (mLock) {

@@ -51,6 +51,7 @@ public final class GraphClientManager {
         call.enqueue(callback);
     }
 
+
     void updateCheckoutEmail(ID checkoutId, String email, GraphCall.Callback<Storefront.Mutation> callback) {
         Storefront.MutationQuery query = ClientMutation.createUpdateCheckoutEmail(checkoutId.toString(), email);
 

@@ -698,6 +698,8 @@ public final class DataManager extends Observable {
         });
     }
 
+
+
     public void products(String collectionID, BaseCallback callback) {
         if (DataManagerHelper.getInstance().getCollections().containsKey(collectionID)) {
             callback.onResponse(BaseCallback.RESULT_OK);
@@ -748,6 +750,8 @@ public final class DataManager extends Observable {
 
         return collections;
     }
+
+
 
     public CollectionModel getCollectionByID(String collectionId) {
         return DataManagerHelper.getInstance().getCollections().get(collectionId);

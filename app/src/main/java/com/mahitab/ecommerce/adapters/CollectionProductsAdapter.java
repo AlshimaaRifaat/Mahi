@@ -120,7 +120,15 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-        return productList.size() + 1;
+       // return productList.size() + 1;
+
+       if(productList.size()!=0)
+        {
+            if(productList.size()>6)
+            return 6;
+            return productList.size();
+        }
+        return 0;
     }
 
     public class CollectionViewHolder extends RecyclerView.ViewHolder {
