@@ -52,7 +52,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         String[] arr = date.split("T");
 
         holder.tDate.setText(context.getResources().getString(R.string.Date)+": "+arr[0].trim());
-        holder.tMoreDetails.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(singleItem.getStatutsUrl().toString()));

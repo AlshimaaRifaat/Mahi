@@ -1,5 +1,7 @@
 package com.mahitab.ecommerce.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +16,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.interfaces.NavigationInterface;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.ProductModel;
 
@@ -22,13 +26,14 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder>{
 
     private final List<CartItemQuantity> cartItemQuantities;
 
     private CartProductClickListener listener;
-
-    public CartAdapter(List<CartItemQuantity> cartItemQuantities) {
+    Context context;
+    public CartAdapter(Context context,List<CartItemQuantity> cartItemQuantities) {
+        this.context=context;
         this.cartItemQuantities = cartItemQuantities;
     }
 
@@ -74,7 +79,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             }
         }
 
+
         holder.tvQuantity.setText(String.valueOf(cartItemQuantities.get(position).getQuantity()));
+        holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getProductID()));
     }
 
     @Override
@@ -105,6 +112,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             ivDelete.setOnClickListener(this);
             ivIncreaseQuantity.setOnClickListener(this);
             ivDecreaseQuantity.setOnClickListener(this);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                        listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getProductID());
+                }
+            });
         }
 
         @Override
@@ -128,10 +142,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         void onDecreaseProductQuantityClick(int position);
 
         void onDeleteProductClick(int position);
+
+        void onProductClick(String productId);
     }
 
     public void setCartProductClickListener(CartProductClickListener listener) {
         this.listener = listener;
     }
-
 }

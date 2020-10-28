@@ -46,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener {
+public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener, CollectionsAdapter.CollectionClickListener {
 
     private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
@@ -118,6 +118,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         rvCollectionProducts.setLayoutManager(new LinearLayoutManager(getContext()));
         collectionsAdapter = new CollectionsAdapter(getContext());
         rvCollectionProducts.setAdapter(collectionsAdapter);
+        collectionsAdapter.setOnCollectionClickListener(this);
     }
 
     @Override
@@ -191,5 +192,12 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         sliderImages.add(new ImageSliderModel(" خصومات حتي 60%\n" + "علي مستلزمات الخياطة", "https://souqcms.s3-eu-west-1.amazonaws.com/cms/boxes/img/desktop/L_1602409788_GW-MB-BestDeals-ar.png"));
         sliderImages.add(new ImageSliderModel(" خصومات حتي 60%\n" + "علي مستلزمات الخياطة", "https://souqcms.s3-eu-west-1.amazonaws.com/cms/boxes/img/desktop/L_1602409788_GW-MB-Bundles-ar.png"));
         sliderAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCollectionClick(CollectionModel collection) {
+        Intent intent = new Intent(getContext(), CollectionProductsActivity.class);
+        intent.putExtra("collectionId", collection.getID().toString());
+        startActivity(intent);
     }
 }

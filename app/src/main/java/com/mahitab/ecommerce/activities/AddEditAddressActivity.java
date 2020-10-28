@@ -43,7 +43,34 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
    String[] spinnerProvinceValue = {
             "Aswan",
-            "6th of October"
+            "6th of October",
+           "Al Sharqia",
+           "Cairo",
+           "Alexandria",
+           "Asyut",
+           "Beheira",
+           "Beni Suef",
+           "Giza",
+           "Helwan",
+           "Dakahlia",
+           "Damietta",
+           "Faiyum",
+           "Gharbia",
+           "Ismailia",
+           "Kafr el-Sheikh",
+           "Luxor",
+           "Matrouh",
+           "Minya",
+           "Monufia",
+           "New Valley",
+           "North Sinai",
+           "Port Said",
+           "Qalyubia",
+           "Qena",
+           "Red Sea",
+           "Sohag",
+           "South Sinai",
+           "Suez"
     };
 
 

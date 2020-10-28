@@ -24,7 +24,9 @@
                 android:id="@+id/tvAddressLine1_AddressItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="fghhhjh"/>
 
             <TextView
                 android:id="@+id/tvEditAddress_AddressItem"
@@ -54,12 +56,15 @@
         <TextView
             android:id="@+id/tvAddressLine2_AddressItem"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="hffdss"
+            android:gravity="right"/>
 
         <TextView
             android:id="@+id/tvMobileNumber_AddressItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="phone"/>
+            android:text="phone"
+            android:gravity="right"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
