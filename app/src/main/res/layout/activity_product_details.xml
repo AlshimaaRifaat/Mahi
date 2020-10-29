@@ -72,7 +72,8 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="16dp"
-                android:src="@drawable/ic_remove_circle_outline_yellow_24dp" />
+                android:src="@drawable/ic_remove_circle_outline_yellow_24dp"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/tvQuantityType_ProductDetailsActivity"

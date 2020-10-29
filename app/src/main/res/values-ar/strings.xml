@@ -83,6 +83,9 @@
     <string name="something_went_wrong">هناك شئ خاطئ، يرجى المحاولة فى وقت لاحق</string>
     <string name="email_used_for_another_account">البريد الإلكتروني المستخدم لحساب آخر</string>
     <string name="invalid_code_message">رمز التحقق غير صحيح ، يرجى المحاولة مرة أخرى</string>
+    <string name="add_review">اضف تقيما</string>
+    <string name="review">التقييم</string>
+    <string name="reviews">التقييمات</string>
 
     <string-array name="provinces">
         <item>اختار المحافطة</item>

@@ -27,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/email"
+            android:text="alshimaa.rifaat71@gmail.com"
             android:inputType="textEmailAddress"
             tools:ignore="Autofill,LabelFor" />
 
@@ -48,6 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/password"
+            android:text="Shimaa12345"
             android:inputType="textPassword"
             tools:ignore="Autofill,LabelFor" />
     </com.google.android.material.textfield.TextInputLayout>

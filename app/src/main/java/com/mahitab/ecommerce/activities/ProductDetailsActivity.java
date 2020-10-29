@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +17,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
@@ -30,6 +36,7 @@ import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ProductModel;
+import com.mahitab.ecommerce.models.ProductReviewModel;
 import com.rd.PageIndicatorView;
 
 import java.text.NumberFormat;
@@ -43,6 +50,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class ProductDetailsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "ProductDetailsActivity";
     // badge text view
     TextView badgeCounter;
     // change the number to see badge in action
@@ -70,8 +78,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private ImageView ivDecreaseQuantity;
     private ImageView ivBuyByPhone;
     private Button btnBuy;
+    private CardView cvAddReview;
 
     private MenuItem cartMenuItem;
+
+    private RecyclerView rvProductReviews;
+    private List<ProductReviewModel> productReviews;
 
     private String currentProductId;
 
@@ -120,53 +132,56 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
-        }else
-        {
-            currentProductId= getIntent().getStringExtra("productId");
-            product = DataManager.getInstance().getProductByID(currentProductId);
-        }
-
-        if (product != null) {
-            tvTitle.setText(product.getTitle());
-            tvSKU.setText(product.getSKU());
-            String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
-            tvPrice.setText(price);
-
-            tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(product.getTitle());
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
-
-            if (product.getImages() != null) {
-                ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
-                viewPager.setAdapter(sliderAdapter);
-                //Tell the IndicatorView that how many indicators should it display:
-                indicatorView.setCount(viewPager.getIndicatorCount());
-            }
-
-            //Set IndicatorPageChangeListener on LoopingViewPager.
-            //When the methods are called, update the Indicator accordingly.
-            viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
-                @Override
-                public void onIndicatorProgress(int selectingPosition, float progress) {
+            if (product != null) {
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(product.getTitle());
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 }
 
-                @Override
-                public void onIndicatorPageChange(int newIndicatorPosition) {
-                    indicatorView.setSelection(newIndicatorPosition);
-                }
-            });
+                tvTitle.setText(product.getTitle());
+                tvSKU.setText(product.getSKU());
+                String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
+                tvPrice.setText(price);
 
-            CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
-            if (collection != null) {
-                rvRelatedProducts.setHasFixedSize(true);
-                rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
-                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
-                rvRelatedProducts.setAdapter(productAdapter);
+                tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+                getProductReviews(product.getID().toString());
+
+                if (product.getImages() != null) {
+                    ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
+                    viewPager.setAdapter(sliderAdapter);
+                    //Tell the IndicatorView that how many indicators should it display:
+                    indicatorView.setCount(viewPager.getIndicatorCount());
+                }
+
+                //Set IndicatorPageChangeListener on LoopingViewPager.
+                //When the methods are called, update the Indicator accordingly.
+                viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
+                    @Override
+                    public void onIndicatorProgress(int selectingPosition, float progress) {
+                    }
+
+                    @Override
+                    public void onIndicatorPageChange(int newIndicatorPosition) {
+                        indicatorView.setSelection(newIndicatorPosition);
+                    }
+                });
+
+                CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
+                if (collection != null) {
+                    rvRelatedProducts.setHasFixedSize(true);
+                    rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
+                    ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                    rvRelatedProducts.setAdapter(productAdapter);
+                }
             }
         }
+
+        cvAddReview.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), ReviewActivity.class);
+            intent.putExtra("productId", product.getID().toString());
+            startActivity(intent);
+        });
 
         ivDescription.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
@@ -238,9 +253,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             //start update quantity in ui in changed in cart fragment and back to details
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
-            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
-                    .findFirst().orElse(-1);
+            int currentCartProductIndex = 0;
+            if (cartProducts != null) {
+                currentCartProductIndex = IntStream.range(0, cartProducts.size())
+                        .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
+                        .findFirst().orElse(-1);
+            }
             if (currentCartProductIndex != -1)
                 updateQuantitySharedPreferencesUI(currentCartProductIndex);
             else
@@ -297,6 +315,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
+        cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
         tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
     }
@@ -338,5 +357,24 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             badgeCounter.setText(String.valueOf(cartProductsCount));
             cartMenuItem.getActionView().setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), CartActivity.class))); // handel custom view click
         }
+    }
+
+    private void getProductReviews(String productId){
+        FirebaseDatabase.getInstance()
+                .getReference()
+                .child(productId)
+                .getRef().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                    ProductReviewModel productReview=snapshot.getValue(ProductReviewModel.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, ""+error );
+            }
+        });
     }
 }
