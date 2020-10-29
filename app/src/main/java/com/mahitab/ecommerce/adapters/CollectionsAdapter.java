@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -26,6 +27,8 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
 
     private List<CollectionModel> collectionList;
     private final Context context;
+
+    private CollectionClickListener listener;
 
     public CollectionsAdapter(Context context) {
         this.collectionList = new ArrayList<>();
@@ -77,12 +80,28 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
         notifyDataSetChanged();
     }
 
-    public static class CollectionProductsViewHolder extends RecyclerView.ViewHolder {
+    public class CollectionProductsViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerView rvProducts;
+        private final TextView tvSeeAll;
 
         public CollectionProductsViewHolder(@NonNull View itemView) {
             super(itemView);
             rvProducts = itemView.findViewById(R.id.rvProducts_CollectionProductsItem);
+            tvSeeAll = itemView.findViewById(R.id.tvSeeAll_CollectionProducts_Item);
+            tvSeeAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener!=null&&getAdapterPosition()!=RecyclerView.NO_POSITION)
+                        listener.onCollectionClick(collectionList.get(getAdapterPosition()));
+                }
+            });
         }
+    }
+
+    public interface CollectionClickListener {
+        void onCollectionClick(CollectionModel collection);
+    }
+    public void setOnCollectionClickListener(CollectionClickListener collectionClickListener){
+        this.listener=collectionClickListener;
     }
 }

@@ -86,48 +86,51 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
                                 targetId = targetId.trim(); //remove spaces from end of string
                                 CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
+                                Log.e(TAG, "onReceive: "+selectedCategory.getId() );
+                                if (collection != null) {
+                                    if (((HomeActivity) requireActivity()).getSupportActionBar() != null) {
+                                        ActionBar actionBar = ((HomeActivity) requireActivity()).getSupportActionBar();
+                                        if (actionBar != null)
+                                            actionBar.setTitle(collection.getTitle());
+                                    }
 
-                                if (((HomeActivity) requireActivity()).getSupportActionBar() != null) {
-                                    ActionBar actionBar = ((HomeActivity) requireActivity()).getSupportActionBar();
-                                    if (actionBar != null)
-                                        actionBar.setTitle(collection.getTitle());
-                                }
-
-                                rvCollectionProducts.setHasFixedSize(true);
-                                rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false));
-                                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
-                                rvCollectionProducts.setAdapter(productAdapter);
+                                    rvCollectionProducts.setHasFixedSize(true);
+                                    rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false));
+                                    ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                                    rvCollectionProducts.setAdapter(productAdapter);
                             }
+                        }
 
-                            if (selectedCategory.getBanners() != null) {
-                                int subFragmentWidthPixels = Resources.getSystem().getDisplayMetrics().widthPixels;
+                        if (selectedCategory.getBanners() != null) {
+                            int subFragmentWidthPixels = Resources.getSystem().getDisplayMetrics().widthPixels;
 
-                                rvBanners.setHasFixedSize(true);
-                                rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-                                bannerAdapter = new BannerAdapter(subFragmentWidthPixels);
-                                rvBanners.setAdapter(bannerAdapter);
-                                bannerAdapter.setBannerClickListener(SubCategoriesFragment.this);
-                                bannerAdapter.setBannerList(selectedCategory.getBanners());
-                            }
+                            rvBanners.setHasFixedSize(true);
+                            rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+                            bannerAdapter = new BannerAdapter(subFragmentWidthPixels);
+                            rvBanners.setAdapter(bannerAdapter);
+                            bannerAdapter.setBannerClickListener(SubCategoriesFragment.this);
+                            bannerAdapter.setBannerList(selectedCategory.getBanners());
+                        }
 
-                            if (selectedCategory.isHasColor())
-                                displayColors();
-                            else {
-                                cvColors.setVisibility(View.GONE);
-                                rvColors.setVisibility(View.GONE);
-                            }
-                            if (selectedCategory.isHasShape())
-                                displayShapes();
-                            else {
-                                cvShape.setVisibility(View.GONE);
-                                rvShapes.setVisibility(View.GONE);
-                            }
+                        if (selectedCategory.isHasColor())
+                            displayColors();
+                        else {
+                            cvColors.setVisibility(View.GONE);
+                            rvColors.setVisibility(View.GONE);
+                        }
+                        if (selectedCategory.isHasShape())
+                            displayShapes();
+                        else {
+                            cvShape.setVisibility(View.GONE);
+                            rvShapes.setVisibility(View.GONE);
                         }
                     }
                 }
-            }, new IntentFilter("mainCategoryAdapter"));
-        }
+            }
+        },new IntentFilter("mainCategoryAdapter"));
     }
+
+}
 
     @Override
     public void onBannerClick(BannerModel banner) {

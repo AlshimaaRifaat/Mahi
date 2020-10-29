@@ -67,7 +67,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
         DataManager.getInstance().setClientManager(this); // init shopify sdk
 
-        geCollectionsWithProducts();
+        geCollectionsWithSomeProducts();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         return bnvHomeNavigation;
     }
 
-    private void geCollectionsWithProducts() {
+    private void geCollectionsWithSomeProducts() {
         DataManager.getInstance().collections(new BaseCallback() {
             @Override
             public void onResponse(int status) {

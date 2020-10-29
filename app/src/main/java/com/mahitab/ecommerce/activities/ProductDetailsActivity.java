@@ -78,6 +78,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private ProductModel product;
     private RecyclerView rvRelatedProducts;
     private SharedPreferences defaultPreferences;
+    private TextView tvSKU;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,45 +120,51 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
-            if (product != null) {
-                tvTitle.setText(product.getTitle());
-                String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
-                tvPrice.setText(price);
+        }else
+        {
+            currentProductId= getIntent().getStringExtra("productId");
+            product = DataManager.getInstance().getProductByID(currentProductId);
+        }
 
-                tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
+        if (product != null) {
+            tvTitle.setText(product.getTitle());
+            tvSKU.setText(product.getSKU());
+            String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
+            tvPrice.setText(price);
 
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle(product.getTitle());
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(product.getTitle());
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+
+            if (product.getImages() != null) {
+                ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
+                viewPager.setAdapter(sliderAdapter);
+                //Tell the IndicatorView that how many indicators should it display:
+                indicatorView.setCount(viewPager.getIndicatorCount());
+            }
+
+            //Set IndicatorPageChangeListener on LoopingViewPager.
+            //When the methods are called, update the Indicator accordingly.
+            viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
+                @Override
+                public void onIndicatorProgress(int selectingPosition, float progress) {
                 }
 
-                if (product.getImages() != null) {
-                    ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
-                    viewPager.setAdapter(sliderAdapter);
-                    //Tell the IndicatorView that how many indicators should it display:
-                    indicatorView.setCount(viewPager.getIndicatorCount());
+                @Override
+                public void onIndicatorPageChange(int newIndicatorPosition) {
+                    indicatorView.setSelection(newIndicatorPosition);
                 }
+            });
 
-                //Set IndicatorPageChangeListener on LoopingViewPager.
-                //When the methods are called, update the Indicator accordingly.
-                viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
-                    @Override
-                    public void onIndicatorProgress(int selectingPosition, float progress) {
-                    }
-
-                    @Override
-                    public void onIndicatorPageChange(int newIndicatorPosition) {
-                        indicatorView.setSelection(newIndicatorPosition);
-                    }
-                });
-
-                CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
-                if (collection != null) {
-                    rvRelatedProducts.setHasFixedSize(true);
-                    rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
-                    ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
-                    rvRelatedProducts.setAdapter(productAdapter);
-                }
+            CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
+            if (collection != null) {
+                rvRelatedProducts.setHasFixedSize(true);
+                rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
+                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                rvRelatedProducts.setAdapter(productAdapter);
             }
         }
 
@@ -291,6 +298,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
+        tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {

@@ -37,7 +37,7 @@ public class ClientQuery {
                         .shop(
                                 shopQuery -> shopQuery
                                         .collections(
-                                                arg -> arg.first(50),
+                                                arg -> arg.first(3),
                                                 collectionsQuery -> collectionsQuery
                                                         .pageInfo(
                                                                 colPageQuery -> colPageQuery
@@ -104,6 +104,7 @@ public class ClientQuery {
                         )
         );
     }
+
 
 
     static Storefront.QueryRootQuery queryProducts(ID collectionID) {

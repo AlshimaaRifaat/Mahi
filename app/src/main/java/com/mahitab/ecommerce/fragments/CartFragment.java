@@ -1,6 +1,7 @@
 package com.mahitab.ecommerce.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
+import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 
@@ -81,7 +83,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
         rvCartProducts.setHasFixedSize(true);
         rvCartProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-        cartAdapter = new CartAdapter(cartProducts);
+        cartAdapter = new CartAdapter(requireContext(),cartProducts);
         rvCartProducts.setAdapter(cartAdapter);
         cartAdapter.setCartProductClickListener(this);
 
@@ -141,6 +143,13 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             cartBadge.setNumber(cartProducts.size());
             cartBadge.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         } else cartBadge.setVisible(false);
+    }
+
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent=new Intent(getContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId",productId);
+        startActivity(intent);
     }
 
     private void calculateSubTotalUpdateUI() {

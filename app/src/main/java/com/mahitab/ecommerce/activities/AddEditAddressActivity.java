@@ -39,12 +39,38 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
     private SharedPreferences defaultPreferences;
     String addressId,phone,city,address2,address1,accessToken;
-    Intent intent;
     AddressModel addressModel;
 
    String[] spinnerProvinceValue = {
             "Aswan",
-            "6th of October"
+            "6th of October",
+           "Al Sharqia",
+           "Cairo",
+           "Alexandria",
+           "Asyut",
+           "Beheira",
+           "Beni Suef",
+           "Giza",
+           "Helwan",
+           "Dakahlia",
+           "Damietta",
+           "Faiyum",
+           "Gharbia",
+           "Ismailia",
+           "Kafr el-Sheikh",
+           "Luxor",
+           "Matrouh",
+           "Minya",
+           "Monufia",
+           "New Valley",
+           "North Sinai",
+           "Port Said",
+           "Qalyubia",
+           "Qena",
+           "Red Sea",
+           "Sohag",
+           "South Sinai",
+           "Suez"
     };
 
 
