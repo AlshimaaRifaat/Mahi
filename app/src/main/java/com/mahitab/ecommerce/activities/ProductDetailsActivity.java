@@ -78,6 +78,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private ProductModel product;
     private RecyclerView rvRelatedProducts;
     private SharedPreferences defaultPreferences;
+    private TextView tvSKU;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +128,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
         if (product != null) {
             tvTitle.setText(product.getTitle());
+            tvSKU.setText(product.getSKU());
             String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
             tvPrice.setText(price);
 
@@ -296,6 +298,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
+        tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {

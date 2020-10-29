@@ -37,6 +37,7 @@ public class ProductModel implements Parcelable {
         mPublishedAt = product.getPublishedAt();
         mUpdatedAt = product.getUpdatedAt();
 
+
         if (product.getTags() != null) {
             mTags = new String[product.getTags().size()];
             int index = 0;
@@ -155,6 +156,13 @@ public class ProductModel implements Parcelable {
             return mVariants.get(0).getPrice();
         }
     }
+    public String getSKU() {
+        if (mVariants == null || mVariants.size() == 0) {
+            return null;
+        } else {
+            return mVariants.get(0).getSku();
+        }
+    }
 
     public ProductVariantModel getVariantByID(String variantID) {
         ProductVariantModel variant = null;
@@ -271,6 +279,14 @@ public class ProductModel implements Parcelable {
 
         public HashMap<String, String> getSelectedOptions() {
             return mSelectedOptions;
+        }
+
+        public String getmSku() {
+            return mSku;
+        }
+
+        public void setmSku(String mSku) {
+            this.mSku = mSku;
         }
     }
 }

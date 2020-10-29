@@ -43,7 +43,15 @@
                 app:piv_unselectedColor="@color/colorAccent"
                 app:piv_viewPager="@id/viewPager"
                 attrs:piv_radius="3dp" />
-
+            <TextView
+                android:id="@+id/tvSKU_ProductDetailsActivity"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="#50000000"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="250dp"/>
         </RelativeLayout>
 
         <TextView

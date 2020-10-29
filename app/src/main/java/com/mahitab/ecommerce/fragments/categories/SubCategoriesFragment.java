@@ -86,7 +86,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
                                 targetId = targetId.trim(); //remove spaces from end of string
                                 CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
-
+                                Log.e(TAG, "onReceive: "+selectedCategory.getId() );
                                 if (collection != null) {
                                     if (((HomeActivity) requireActivity()).getSupportActionBar() != null) {
                                         ActionBar actionBar = ((HomeActivity) requireActivity()).getSupportActionBar();
