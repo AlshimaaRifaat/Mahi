@@ -86,10 +86,15 @@
     <string name="verify_phone">Verify Phone</string>
     <string name="we_have_sent_verification_code_to_your_number">We have sent verification code to your Number</string>
     <string name="_continue">Continue</string>
-    <string name="resend_code">Resend Code?</string>
+    <string name="resend_code">Resend Code?\u0020</string>
     <string name="try_again_later">We have blocked all requests from this device due to unusual activity. Try again later</string>
     <string name="account_created_successfully">Account created successfully</string>
     <string name="Notes">Notes</string>
+    <string name="loading">Loading…</string>
+    <string name="ok">OK</string>
+    <string name="something_went_wrong">Something went wrong please try again later</string>
+    <string name="email_used_for_another_account">The email used for another account</string>
+    <string name="invalid_code_message">Invalid verification code, please try again</string>
 
     <string-array name="provinces">
         <item>Select Province</item>

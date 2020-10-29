@@ -67,7 +67,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
-                    android:nextFocusDown="@+id/etCode2_VerifyPhoneActivity"
+                    android:imeOptions="actionNext"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
 
@@ -87,6 +87,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
+                    android:imeOptions="actionNext"
                     android:nextFocusDown="@+id/etCode3_VerifyPhoneActivity"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
@@ -107,6 +108,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
+                    android:imeOptions="actionNext"
                     android:nextFocusDown="@+id/etCode4_VerifyPhoneActivity"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
@@ -127,6 +129,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
+                    android:imeOptions="actionNext"
                     android:nextFocusDown="@+id/etCode5_VerifyPhoneActivity"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
@@ -147,6 +150,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
+                    android:imeOptions="actionNext"
                     android:nextFocusDown="@+id/etCode6_VerifyPhoneActivity"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
@@ -167,6 +171,7 @@
                     android:gravity="center"
                     android:inputType="numberDecimal"
                     android:maxLength="1"
+                    android:imeOptions="actionDone"
                     android:textSize="20sp"
                     tools:ignore="Autofill,LabelFor,TextFields" />
 
@@ -178,18 +183,8 @@
             android:id="@+id/tvResendCode_VerifyPhoneActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/resend_code"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnRegister_VerifyPhoneActivity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:padding="16dp"
-            android:text="@string/register"
-            android:textAllCaps="false"
             android:textSize="17sp"
             android:textStyle="bold" />
     </LinearLayout>

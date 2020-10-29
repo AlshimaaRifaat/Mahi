@@ -74,10 +74,15 @@
     <string name="verify_phone">التحقق من الهاتف</string>
     <string name="we_have_sent_verification_code_to_your_number">لقد أرسلنا رمز التحقق إلى رقمك</string>
     <string name="_continue">المتابعة</string>
-    <string name="resend_code">إعادة إرسال الرمز؟</string>
+    <string name="resend_code">إعادة إرسال الرمز؟\u0020</string>
     <string name="try_again_later">لقد حظرنا جميع الطلبات الواردة من هذا الجهاز بسبب نشاط غير عادي. حاول مرة أخرى في وقت لاحق</string>
     <string name="account_created_successfully">الحساب اقيم بنجاح</string>
     <string name="Notes">ملاحظات</string>
+    <string name="loading">جار التحميل…</string>
+    <string name="ok">حسنا</string>
+    <string name="something_went_wrong">هناك شئ خاطئ، يرجى المحاولة فى وقت لاحق</string>
+    <string name="email_used_for_another_account">البريد الإلكتروني المستخدم لحساب آخر</string>
+    <string name="invalid_code_message">رمز التحقق غير صحيح ، يرجى المحاولة مرة أخرى</string>
 
     <string-array name="provinces">
         <item>اختار المحافطة</item>

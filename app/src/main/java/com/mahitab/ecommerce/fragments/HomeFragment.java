@@ -24,6 +24,8 @@ import com.asksira.loopingviewpager.LoopingViewPager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CollectionProductsActivity;
@@ -42,11 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener, CollectionsAdapter.CollectionClickListener {
+public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener,CollectionsAdapter.CollectionClickListener {
 
     private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
@@ -153,6 +151,28 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             intent.putExtra("collectionId", targetId);
             startActivity(intent);
         }
+        FirebaseDatabase.getInstance().getReference("Banners").child(banner.getId()).runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                Long currentNumberOfClicks=(Long) currentData.child("numberOfClicks").getValue();
+                if (currentNumberOfClicks == null) {
+                    currentData.child("numberOfClicks").setValue(1);
+                } else {
+                    currentData.child("numberOfClicks").setValue(currentNumberOfClicks + 1);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                if (error != null) {
+                    Log.e(TAG,"Firebase counter increment failed.");
+                } else {
+                    Log.e(TAG,"Firebase counter increment succeeded.");
+                }
+            }
+        });
     }
 
     @Override

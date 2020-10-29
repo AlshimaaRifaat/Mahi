@@ -6,15 +6,20 @@ package com.mahitab.ecommerce.utils;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+
+import com.mahitab.ecommerce.R;
 import com.shopify.buy3.Storefront;
 
 import java.util.Locale;
@@ -46,6 +51,7 @@ public class CommonUtils {
     private static final String USER_ADDRESS_ZIP_KEY = "USER_ADDRESS_ZIP_KEY";
     private static final String USER_ADDRESS_PHONE_KEY = "USER_ADDRESS_PHONE_KEY";
 
+    private static ProgressDialog dialog;
 
     public static View createItemOptionView(String s, Context context) {
         TextView view = new TextView(context);
@@ -141,6 +147,39 @@ public class CommonUtils {
         config.setLocale(locale);
         context.getBaseContext().getResources().updateConfiguration(config,
                 context.getBaseContext().getResources().getDisplayMetrics());
+    }
+
+    public static void showProgressDialog(Context context) {
+        dialog = new ProgressDialog(context, R.style.ProgressDialog);
+        dialog.setCancelable(false);
+        dialog.setMessage(context.getResources().getString(R.string.loading));
+        dialog.show();
+    }
+
+    public static ProgressDialog getProgressDialog() {
+        return dialog;
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void showErrorDialog(Context context, String errorMessage) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        builder.setMessage(errorMessage);
+        builder.setPositiveButton(context.getResources().getString(R.string.ok), (dialog, which) -> {
+            dialog.dismiss();
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
 }
 

@@ -35,6 +35,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/first_name"
+                    android:text="Ahmed"
                     android:inputType="textAutoComplete"
                     tools:ignore="Autofill,LabelFor" />
 
@@ -52,6 +53,7 @@
                     android:id="@+id/etLastName_RegisterActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Abdelfattah"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:hint="@string/last_name"
@@ -74,6 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
+                android:text="ahmed.a.elfattah.ahmed@gmail.com"
                 android:inputType="textEmailAddress"
                 tools:ignore="Autofill,LabelFor" />
 
@@ -92,6 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
+                android:text="Ahmed00000000"
                 android:inputType="textPassword"
                 tools:ignore="Autofill,LabelFor" />
 
@@ -109,7 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/phone_number"
-                android:text="01118577202"
+                android:text="01000009924"
                 android:inputType="phone"
                 tools:ignore="Autofill,LabelFor" />
 

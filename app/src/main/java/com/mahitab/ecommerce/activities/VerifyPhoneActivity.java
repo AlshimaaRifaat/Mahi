@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.SingleLineTransformationMethod;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -30,11 +32,14 @@ import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.CurrentUser;
+import com.mahitab.ecommerce.utils.CommonUtils;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.getProgressDialog;
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+import static com.mahitab.ecommerce.utils.CommonUtils.showErrorDialog;
 
 public class VerifyPhoneActivity extends AppCompatActivity {
 
@@ -47,14 +52,13 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     private EditText etCode5;
     private EditText etCode6;
     private TextView tvResendCode;
-    private Button btnRegister;
 
     private CurrentUser user;
     private String phoneNumber;
-    // [START declare_auth]
-    private FirebaseAuth mAuth;
-    // [END declare_auth]
 
+    private CountDownTimer timer = null;
+
+    private FirebaseAuth mAuth;
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -98,13 +102,13 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                     etCode4.setText(codeNumbers[3]);
                     etCode5.setText(codeNumbers[4]);
                     etCode6.setText(codeNumbers[5]);
-                    signInWithPhoneAuthCredential(phoneAuthCredential);
                 }
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.try_again_later), Toast.LENGTH_SHORT).show();
+                if (e instanceof FirebaseTooManyRequestsException)
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.try_again_later), Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "onVerificationFailed: " + e.getMessage());
             }
         };
@@ -118,7 +122,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
             }
         }
 
-        etCode1.addTextChangedListener(new TextWatcher() {
+        TextWatcher watcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -127,8 +131,33 @@ public class VerifyPhoneActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (count == 1) {
-                    etCode2.requestFocus();
-                    etCode1.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    if (VerifyPhoneActivity.this.getCurrentFocus().getId() == etCode1.getId()) {
+                        etCode2.requestFocus();
+                        etCode1.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    } else if (VerifyPhoneActivity.this.getCurrentFocus().getId() == etCode2.getId()) {
+                        etCode3.requestFocus();
+                        etCode2.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    } else if (VerifyPhoneActivity.this.getCurrentFocus().getId() == etCode3.getId()) {
+                        etCode4.requestFocus();
+                        etCode3.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    } else if (VerifyPhoneActivity.this.getCurrentFocus().getId() == etCode4.getId()) {
+                        etCode5.requestFocus();
+                        etCode4.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    } else if (VerifyPhoneActivity.this.getCurrentFocus().getId() == etCode5.getId()) {
+                        etCode6.requestFocus();
+                        etCode5.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    }
+                }
+
+                if (isCodePartsCompleted()) {
+                    String code = etCode1.getText().toString() +
+                            etCode2.getText().toString() +
+                            etCode3.getText().toString() +
+                            etCode4.getText().toString() +
+                            etCode5.getText().toString() +
+                            etCode6.getText().toString();
+
+                    verifyCode(code);
                 }
             }
 
@@ -136,107 +165,32 @@ public class VerifyPhoneActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
             }
-        });
-        etCode2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        };
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 1) {
-                    etCode3.requestFocus();
-                    etCode2.setTransformationMethod(SingleLineTransformationMethod.getInstance());
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        etCode3.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 1) {
-                    etCode4.requestFocus();
-                    etCode3.setTransformationMethod(SingleLineTransformationMethod.getInstance());
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        etCode4.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 1) {
-                    etCode5.requestFocus();
-                    etCode4.setTransformationMethod(SingleLineTransformationMethod.getInstance());
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        etCode5.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 1) {
-                    etCode6.requestFocus();
-                    etCode5.setTransformationMethod(SingleLineTransformationMethod.getInstance());
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        etCode1.addTextChangedListener(watcher);
+        etCode2.addTextChangedListener(watcher);
+        etCode3.addTextChangedListener(watcher);
+        etCode4.addTextChangedListener(watcher);
+        etCode5.addTextChangedListener(watcher);
+        etCode6.addTextChangedListener(watcher);
 
         tvResendCode.setOnClickListener(v -> {
             if (phoneNumber != null && mResendToken != null)
                 resendVerificationCode(phoneNumber, mResendToken);
         });
 
-        btnRegister.setOnClickListener(v -> {
-            if (isCodePartsCompleted()) {
-                String code = etCode1.getText().toString() +
-                        etCode2.getText().toString() +
-                        etCode3.getText().toString() +
-                        etCode4.getText().toString() +
-                        etCode5.getText().toString() +
-                        etCode6.getText().toString();
-
-                verifyCode(code);
-            }else Log.e(TAG, "onClick: "+isCodePartsCompleted()  );
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         overridePendingTransition(0, 0); // remove activity default transition
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
     }
 
     @Override
@@ -255,15 +209,17 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         etCode5 = findViewById(R.id.etCode5_VerifyPhoneActivity);
         etCode6 = findViewById(R.id.etCode6_VerifyPhoneActivity);
         tvResendCode = findViewById(R.id.tvResendCode_VerifyPhoneActivity);
-        btnRegister = findViewById(R.id.btnRegister_VerifyPhoneActivity);
     }
 
     private void verifyCode(String code) {
+        CommonUtils.hideKeyboard(this);
+        CommonUtils.showProgressDialog(this);
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
         signInWithPhoneAuthCredential(credential);
     }
 
     private void sendCodeVerification(String phoneNumber) {
+        startTimer();
         // [START start_phone_auth]
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber,        // Phone number to verify
@@ -296,7 +252,18 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                             } else Log.e(TAG, "user not signed in: ");
                         }
                     } else {
-                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        if (task.getException() != null) {
+                            CommonUtils.getProgressDialog().dismiss();
+                            Exception e = task.getException();
+                            if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                runOnUiThread(() -> showErrorDialog(VerifyPhoneActivity.this, getResources().getString(R.string.invalid_code_message)));
+                                Log.e(TAG, "invalid code: ");
+                            } else {
+                                runOnUiThread(() -> showErrorDialog(VerifyPhoneActivity.this, getResources().getString(R.string.something_went_wrong)));
+                                Log.e(TAG, " " + e.getMessage());
+                            }
+                            clearPinCodeView();
+                        }
                     }
                 });
     }
@@ -321,25 +288,27 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(int status) {
                         if (status == RESULT_OK) {
+                            Log.e(TAG, "onResponse: ");
                             runOnUiThread(new Thread(() -> FirebaseInstanceId.getInstance()
                                     .getInstanceId().addOnSuccessListener(instanceIdResult -> { //get deviceToken
-                                String deviceToken = instanceIdResult.getToken();
-                                HashMap<String, Object> userInfo = new HashMap<>();
-                                userInfo.put("email", user.getEmail());
-                                userInfo.put("phoneNumber", user.getPhone());
-                                userInfo.put("token", deviceToken);
-                                FirebaseDatabase.getInstance()
-                                        .getReference("Users")
-                                        .child(firebaseUser.getUid())
-                                        .setValue(userInfo).addOnSuccessListener(aVoid -> { //save user data in realtime db
-                                    saveEmailAndPassword(email, password);
-                                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                    finish();
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.account_created_successfully), Toast.LENGTH_SHORT).show();
-                                });
-                            })));
+                                        String deviceToken = instanceIdResult.getToken();
+                                        HashMap<String, Object> userInfo = new HashMap<>();
+                                        userInfo.put("email", user.getEmail());
+                                        userInfo.put("phoneNumber", user.getPhone());
+                                        userInfo.put("token", deviceToken);
+                                        FirebaseDatabase.getInstance()
+                                                .getReference("Users")
+                                                .child(firebaseUser.getUid())
+                                                .setValue(userInfo).addOnSuccessListener(aVoid -> { //save user data in realtime db
+                                            CommonUtils.getProgressDialog().dismiss();
+                                            saveEmailAndPassword(email, password);
+                                            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.account_created_successfully), Toast.LENGTH_SHORT).show();
+                                        });
+                                    })));
                         } else {
                             onFailure("An unknown error occurred");
                         }
@@ -347,6 +316,12 @@ public class VerifyPhoneActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(final String message) {
+                        if (getProgressDialog() != null)
+                            getProgressDialog().dismiss();
+                        if (message.equals("has already been taken")) {
+                            runOnUiThread(() -> showErrorDialog(VerifyPhoneActivity.this, getResources().getString(R.string.email_used_for_another_account)));
+                        } else
+                            runOnUiThread(() -> showErrorDialog(VerifyPhoneActivity.this, getResources().getString(R.string.something_went_wrong)));
                         Log.e(TAG, "onFailure: " + message);
                     }
                 }
@@ -356,5 +331,36 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     private void saveEmailAndPassword(String email, String password) {
         defaultPreferences.edit().putString("email", email).apply();
         defaultPreferences.edit().putString("password", password).apply();
+    }
+
+    private void startTimer() {
+        timer = new CountDownTimer(60000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                tvResendCode.setEnabled(false);
+                String time = getResources().getString(R.string.resend_code) + millisUntilFinished / 1000;
+                tvResendCode.setText(time);
+            }
+
+            public void onFinish() {
+                tvResendCode.setText(getResources().getString(R.string.resend_code));
+                tvResendCode.setEnabled(true);
+                clearPinCodeView();
+            }
+        };
+        timer.start();
+    }
+
+    private void cancelTimer() {
+        if (timer != null)
+            timer.cancel();
+    }
+
+    private void clearPinCodeView() {
+        etCode1.setText("");
+        etCode2.setText("");
+        etCode3.setText("");
+        etCode4.setText("");
+        etCode5.setText("");
+        etCode6.setText("");
     }
 }

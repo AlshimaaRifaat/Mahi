@@ -9,4 +9,11 @@
         </item> <!--Disable dummy starting window of application -->
         <item name="android:statusBarColor">@null</item>  <!--Remove status bar color -->
     </style>
+
+    <style name="ProgressDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+
 </resources>
