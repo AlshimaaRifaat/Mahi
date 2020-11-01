@@ -89,10 +89,10 @@
                             android:layout_height="wrap_content" />
 
                         <RatingBar
+                            android:id="@+id/rbAverageRating_ProductDetailsActivity"
                             style="@style/Widget.AppCompat.RatingBar.Small"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:rating="2.5" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <ImageView
@@ -179,13 +179,14 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cvReviews_ProductDetailsActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:visibility="visible"
+            android:visibility="gone"
             app:cardCornerRadius="4dp"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">

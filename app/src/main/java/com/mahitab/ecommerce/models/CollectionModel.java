@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-public class CollectionModel implements Parcelable {
+public class CollectionModel {
     private ID mID;
     private String mTitle;
     private String mImage;
@@ -40,24 +40,6 @@ public class CollectionModel implements Parcelable {
             mPreviewProducts.add(newProduct);
         }
     }
-
-    protected CollectionModel(Parcel in) {
-        mTitle = in.readString();
-        mImage = in.readString();
-        mPreviewProducts = in.createTypedArrayList(ProductModel.CREATOR);
-    }
-
-    public static final Creator<CollectionModel> CREATOR = new Creator<CollectionModel>() {
-        @Override
-        public CollectionModel createFromParcel(Parcel in) {
-            return new CollectionModel(in);
-        }
-
-        @Override
-        public CollectionModel[] newArray(int size) {
-            return new CollectionModel[size];
-        }
-    };
 
     public ID getID() {
         return mID;
@@ -92,17 +74,5 @@ public class CollectionModel implements Parcelable {
         newCollection.setPreview(collectionProducts);
 
         return newCollection;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mTitle);
-        dest.writeString(mImage);
-        dest.writeTypedList(mPreviewProducts);
     }
 }

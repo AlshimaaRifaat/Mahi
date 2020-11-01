@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,11 +21,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
@@ -32,6 +35,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
 import com.mahitab.ecommerce.adapters.ProductImageSliderAdapter;
+import com.mahitab.ecommerce.adapters.ReviewAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CollectionModel;
@@ -82,8 +86,13 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
     private MenuItem cartMenuItem;
 
+    private RatingBar rbAverageRating;
+    private CardView cvReviews;
     private RecyclerView rvProductReviews;
-    private List<ProductReviewModel> productReviews;
+    private final List<ProductReviewModel> productReviews = new ArrayList<>();
+    private ReviewAdapter reviewAdapter;
+
+    private DatabaseReference productReviewsReference;
 
     private String currentProductId;
 
@@ -103,6 +112,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         initView();
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        productReviewsReference = FirebaseDatabase.getInstance().getReference("ProductReviews");
 
         if (defaultPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
@@ -145,7 +155,11 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
                 tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-                getProductReviews(product.getID().toString());
+                rvProductReviews.setHasFixedSize(true);
+                rvProductReviews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                reviewAdapter = new ReviewAdapter(productReviews);
+                rvProductReviews.setAdapter(reviewAdapter);
+
 
                 if (product.getImages() != null) {
                     ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
@@ -266,6 +280,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             //end update quantity in ui
         }
 
+        if (product != null)
+            getProductReviews(product.getID().toString());
+
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -315,9 +332,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
+        cvReviews = findViewById(R.id.cvReviews_ProductDetailsActivity);
+        rbAverageRating = findViewById(R.id.rbAverageRating_ProductDetailsActivity);
+        rvProductReviews = findViewById(R.id.rvProductReviews_ProductDetailsActivity);
         cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
-        tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
+        tvSKU = findViewById(R.id.tvSKU_ProductDetailsActivity);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {
@@ -359,22 +379,54 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         }
     }
 
-    private void getProductReviews(String productId){
-        FirebaseDatabase.getInstance()
-                .getReference()
-                .child(productId)
-                .getRef().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
-                    ProductReviewModel productReview=snapshot.getValue(ProductReviewModel.class);
-                }
-            }
+    private void getProductReviews(String productId) {
+        productReviewsReference.child(productId)
+                .orderByChild("accepted")
+                .equalTo(true)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            productReviews.clear();
+                            cvReviews.setVisibility(View.VISIBLE);
+                            rvProductReviews.setVisibility(View.VISIBLE);
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                ProductReviewModel productReview = snapshot.getValue(ProductReviewModel.class);
+                                productReviews.add(productReview);
+                                reviewAdapter.notifyDataSetChanged();
+                            }
+                            rbAverageRating.setRating(calculateAverageRatings(productReviews));
+                        } else {
+                            cvReviews.setVisibility(View.GONE);
+                            rvProductReviews.setVisibility(View.GONE);
+                        }
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, ""+error );
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "onCancelled: " + error.getMessage());
+                    }
+                });
+    }
+
+    private int calculateAverageRatings(List<ProductReviewModel> reviews) {
+        int customer5Stars = 0;
+        int customer4Stars = 0;
+        int customer3Stars = 0;
+        int customer2Stars = 0;
+        int customer1Stars = 0;
+        for (ProductReviewModel review : reviews) {
+            if (review.getRating() == 5)
+                customer5Stars += 1;
+            else if (review.getRating() == 4)
+                customer4Stars += 1;
+            else if (review.getRating() == 3)
+                customer3Stars += 1;
+            else if (review.getRating() == 2)
+                customer2Stars += 1;
+            else if (review.getRating() == 1)
+                customer1Stars += 1;
+        }
+        return (customer1Stars + (2 * customer2Stars) + (3 * customer3Stars)+ (4 * customer4Stars) + (5 * customer5Stars)) / (customer1Stars + customer2Stars + customer3Stars + customer4Stars + customer5Stars);
     }
 }

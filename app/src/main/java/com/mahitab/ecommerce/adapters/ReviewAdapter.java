@@ -1,5 +1,7 @@
 package com.mahitab.ecommerce.adapters;
 
+import android.app.Activity;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,12 @@ import com.mahitab.ecommerce.models.ProductReviewModel;
 import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
-    private List<ProductReviewModel> reviewList;
+    private final List<ProductReviewModel> reviewList;
+    private final DisplayMetrics displaymetrics = new DisplayMetrics();
+
+    public ReviewAdapter(List<ProductReviewModel> reviewList) {
+        this.reviewList = reviewList;
+    }
 
     @NonNull
     @Override
@@ -25,6 +32,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
+        ProductReviewModel review = reviewList.get(position);
+
+        String fullName = review.getFirstName() + " " + review.getLastName();
+        holder.tvFullName.setText(fullName);
+
+        holder.tvMessage.setText(review.getMessage());
+
+        holder.rbRating.setRating(review.getRating());
     }
 
     @Override
@@ -33,14 +48,20 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvFullName;
-        private TextView tvMessage;
-        private RatingBar rbRating;
+        private final TextView tvFullName;
+        private final TextView tvMessage;
+        private final RatingBar rbRating;
+
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
             tvFullName = itemView.findViewById(R.id.tvFullName_ReviewItem);
             tvMessage = itemView.findViewById(R.id.tvMessage_ReviewItem);
             rbRating = itemView.findViewById(R.id.rbRating_ReviewItem);
+            if (getAdapterPosition() > 1) {
+                ((Activity) itemView.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                //if you need three fix imageview in width
+                itemView.getLayoutParams().width = (int) (displaymetrics.widthPixels / 1.5);
+            }
         }
     }
 }

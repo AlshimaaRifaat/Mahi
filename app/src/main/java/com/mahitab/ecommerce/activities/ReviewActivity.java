@@ -62,7 +62,7 @@ public class ReviewActivity extends AppCompatActivity {
             if (accessToken != null)
                 fetchCustomerQuery(accessToken);
 
-            btnSave.setOnClickListener(v -> saveProductReview(productId, customer.getEmail(), new ProductReviewModel(customer.getFirstName(), customer.getLastName(), etMessage.getText().toString(), rbRating.getRating())));
+            btnSave.setOnClickListener(v -> saveProductReview(productId, customer.getEmail(), new ProductReviewModel(productId,customer.getFirstName(), customer.getLastName(), etMessage.getText().toString(), rbRating.getRating())));
         }
     }
 
