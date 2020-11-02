@@ -28,6 +28,7 @@ public class DataManagerHelper {
 
     private DataManagerHelper() {
         mCollections = new HashMap<String, CollectionModel>();
+        mAllCollections = new HashMap<String, CollectionModel>();
         mProductsByCollection = new HashMap<String, ArrayList<ProductModel>>();
         mMyOrders = new HashMap<String, MyOrdersModel>();
         addresses = new HashMap<String, AddressModel>();
@@ -43,6 +44,7 @@ public class DataManagerHelper {
     private ShopModel mShopModel = null;
     private CartModel mCart = new CartModel();
     private HashMap<String, CollectionModel> mCollections;
+    private HashMap<String, CollectionModel> mAllCollections;
     private HashMap<String, ArrayList<ProductModel>> mProductsByCollection;
     private HashMap<String, AddressModel> addresses;
     private HashMap<String, MyOrdersModel> mMyOrders;
@@ -63,7 +65,9 @@ public class DataManagerHelper {
     public HashMap<String, CollectionModel> getCollections() {
         return mCollections;
     }
-
+    public HashMap<String, CollectionModel> getAllCollections() {
+        return mAllCollections;
+    }
     public ArrayList<ProductModel> getProductsByCollectionID(String collectionID) {
         return mProductsByCollection.get(collectionID);
     }
@@ -115,9 +119,9 @@ public class DataManagerHelper {
     }
 
     //region Cart Management
-    public void addToCart(CartItemQuantity variantItem) {
-        mCart.add(new CartItemQuantity(variantItem.quantity, variantItem.productID,variantItem.getProductPrice()));
-    }
+//    public void addToCart(CartItemQuantity variantItem) {
+//        mCart.add(new CartItemQuantity(variantItem.quantity, variantItem.productId,variantItem.get()));
+//    }
 
     public void emptyCart() {
         mCart = new CartModel();

@@ -96,7 +96,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
 
                                     rvCollectionProducts.setHasFixedSize(true);
                                     rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false));
-                                    ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                                    ProductAdapter productAdapter = new ProductAdapter(getContext(),collection.getPreviewProducts());
                                     rvCollectionProducts.setAdapter(productAdapter);
                             }
                         }

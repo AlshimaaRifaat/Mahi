@@ -27,7 +27,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 public class MyWishListActivity extends AppCompatActivity implements ProductAdapter.ProductClickListener {
 
     private RecyclerView rvWishedProducts;
-    private List<ProductModel> wishedProducts;
+    private ArrayList<ProductModel> wishedProducts;
     private ProductAdapter productAdapter;
 
     private SharedPreferences defaultPreferences;
@@ -53,7 +53,7 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
 
         rvWishedProducts.setHasFixedSize(true);
         rvWishedProducts.setLayoutManager(new GridLayoutManager(this, 2));
-        productAdapter = new ProductAdapter(wishedProducts);
+        productAdapter = new ProductAdapter(this,wishedProducts);
         rvWishedProducts.setAdapter(productAdapter);
         productAdapter.setProductClickListener(this);
 

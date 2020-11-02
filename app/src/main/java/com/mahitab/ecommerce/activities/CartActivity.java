@@ -19,7 +19,7 @@ public class CartActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setArDefaultLocale(this);
+//        setArDefaultLocale(this);
         setContentView(R.layout.activity_cart);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

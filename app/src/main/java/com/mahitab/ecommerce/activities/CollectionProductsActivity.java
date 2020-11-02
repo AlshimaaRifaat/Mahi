@@ -45,7 +45,7 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
 
                 rvCollectionProducts.setHasFixedSize(true);
                 rvCollectionProducts.setLayoutManager(new GridLayoutManager(this, 2));
-                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                ProductAdapter productAdapter = new ProductAdapter(this,collection.getPreviewProducts());
                 rvCollectionProducts.setAdapter(productAdapter);
                 productAdapter.setProductClickListener(this);
             }

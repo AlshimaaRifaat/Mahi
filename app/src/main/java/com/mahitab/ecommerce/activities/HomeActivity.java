@@ -52,7 +52,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setArDefaultLocale(this);
+//        setArDefaultLocale(this);
         setContentView(R.layout.activity_home);
 
         initView();

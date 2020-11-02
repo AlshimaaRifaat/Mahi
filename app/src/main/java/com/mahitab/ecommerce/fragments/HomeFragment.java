@@ -12,11 +12,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,12 +37,18 @@ import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CollectionProductsActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
+import com.mahitab.ecommerce.activities.SearchResultActivity;
 import com.mahitab.ecommerce.adapters.BannerAdapter;
+import com.mahitab.ecommerce.adapters.CollectionProductsAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.ImageSliderAdapter;
+import com.mahitab.ecommerce.adapters.ProductAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ImageSliderModel;
+import com.mahitab.ecommerce.models.ProductModel;
+import com.mahitab.ecommerce.models.SelectedOptions;
 import com.rd.PageIndicatorView;
 
 import java.nio.charset.StandardCharsets;
@@ -44,7 +56,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener, HomeActivity.CollectionLoadListener,CollectionsAdapter.CollectionClickListener {
+public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener,
+        HomeActivity.CollectionLoadListener,CollectionsAdapter.CollectionClickListener {
 
     private static final String TAG = "HomeFragment";
     private Toolbar toolbar;
@@ -59,26 +72,35 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     private RecyclerView rvCollectionProducts;
     private CollectionsAdapter collectionsAdapter;
+    ImageView icSearch;
+
 
     public HomeFragment() {
         // Required empty public constructor
     }
-
+View view;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        view= inflater.inflate(R.layout.fragment_home, container, false);
+        initView(view);
+
+        icSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+           Intent intent =new Intent(requireContext(), SearchResultActivity.class);
+           startActivity(intent);
+            }
+        });
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initView(view);
-        ((HomeActivity) requireActivity()).setSupportActionBar(toolbar);
-        Objects.requireNonNull(((HomeActivity) requireActivity()).getSupportActionBar()).setTitle(getResources().getString(R.string.home));
-        setHasOptionsMenu(true);
+
 
         sliderImages = new ArrayList<>();
 
@@ -117,18 +139,19 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         collectionsAdapter = new CollectionsAdapter(getContext());
         rvCollectionProducts.setAdapter(collectionsAdapter);
         collectionsAdapter.setOnCollectionClickListener(this);
+
+
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.home_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
+
+
+
+
+
+
+
+
 
     @Override
     public void onBannerClick(BannerModel banner) {
@@ -186,6 +209,8 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         lvpImageSlider = view.findViewById(R.id.viewPager);
         indicatorView = view.findViewById(R.id.pageIndicatorView);
         rvCollectionProducts = view.findViewById(R.id.rvCollectionProducts);
+        icSearch=view.findViewById(R.id.icSearch);
+
     }
 
     private void getBanners() {
@@ -220,4 +245,5 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         intent.putExtra("collectionId", collection.getID().toString());
         startActivity(intent);
     }
+
 }

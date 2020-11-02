@@ -23,12 +23,13 @@ import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.ProductModel;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder>{
 
-    private final List<CartItemQuantity> cartItemQuantities;
+    private List<CartItemQuantity> cartItemQuantities;
 
     private CartProductClickListener listener;
     Context context;
@@ -45,7 +46,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID());
+        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getId().toString());
         Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)
@@ -64,8 +65,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             if (product.getVariants().get(0).getOldPrice() != null &&
                     product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
                     product.getVariants().get(0).isAvailableForSale()) {
-                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
-                holder.tvOldPrice.setText(oldPrice);
+//                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+//                holder.tvOldPrice.setText(oldPrice);
+                holder.tvOldPrice.setText(product.getVariants().get(0).getOldPrice()+"");
                 holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
@@ -74,14 +76,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             } else {
                 holder.tvPrice.setVisibility(View.INVISIBLE);
                 holder.tvOldPrice.setVisibility(View.VISIBLE);
-                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
-                holder.tvOldPrice.setText(price);
+//                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+//                holder.tvOldPrice.setText(price);
+                holder.tvOldPrice.setText(product.getVariants().get(0).getPrice()+"");
             }
         }
 
 
         holder.tvQuantity.setText(String.valueOf(cartItemQuantities.get(position).getQuantity()));
-        holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getProductID()));
+        holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getId().toString()));
     }
 
     @Override
@@ -116,7 +119,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 @Override
                 public void onClick(View v) {
                     if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
-                        listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getProductID());
+                        listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getId().toString());
                 }
             });
         }

@@ -698,6 +698,40 @@ public final class DataManager extends Observable {
         });
     }
 
+    //region Server calls
+    public void allCollections(BaseCallback callback) {
+        mClientManager.getAllCollections(new GraphCall.Callback<Storefront.QueryRoot>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
+                if (!response.hasErrors()) {
+                    Storefront.CollectionConnection connection = response.data().getShop().getCollections();
+                    for (Storefront.CollectionEdge edge : connection.getEdges()) {
+                        if (edge.getNode().getHandle().equalsIgnoreCase("frontpage")) {
+                            continue;
+                        }
+
+                        CollectionModel newCollectionModel = new CollectionModel(edge);
+
+                        DataManagerHelper.getInstance().getCollections().put(newCollectionModel.getID().toString(), newCollectionModel);
+                        DataManagerHelper.getInstance().createProductsListForCollectionId(newCollectionModel.getID().toString());
+                        for (ProductModel product : newCollectionModel.getPreviewProducts()) {
+                            DataManagerHelper.getInstance().getProductsByCollectionID(newCollectionModel.getID().toString()).add(product);
+                        }
+                    }
+
+                    callback.onResponse(BaseCallback.RESULT_OK);
+                    return;
+                }
+
+                callback.onFailure(response.errors().get(0).message());
+            }
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                callback.onFailure(error.getLocalizedMessage());
+            }
+        });
+    }
 
 
     public void products(String collectionID, BaseCallback callback) {
@@ -751,7 +785,12 @@ public final class DataManager extends Observable {
         return collections;
     }
 
+    public ArrayList<CollectionModel> getAllCollections() {
+        ArrayList<CollectionModel> collections = new ArrayList<CollectionModel>();
+        collections.addAll(DataManagerHelper.getInstance().getAllCollections().values());
 
+        return collections;
+    }
 
     public CollectionModel getCollectionByID(String collectionId) {
         return DataManagerHelper.getInstance().getCollections().get(collectionId);

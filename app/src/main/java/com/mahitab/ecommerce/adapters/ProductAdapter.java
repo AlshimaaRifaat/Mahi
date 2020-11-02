@@ -1,6 +1,8 @@
 package com.mahitab.ecommerce.adapters;
 
+import android.content.Context;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,20 +16,30 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.SearchResultActivity;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.ProductModel;
+import com.mahitab.ecommerce.models.SelectedOptions;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
-    private final List<ProductModel> productList;
+    private ArrayList<ProductModel> productList;
     private ProductClickListener listener;
 
-    public ProductAdapter(List<ProductModel> productList) {
+    private ArrayList<ProductModel> productsDataList;
+    private SelectedOptions selectedOptions = new SelectedOptions();
+Context context;
+    public ProductAdapter(Context context,ArrayList<ProductModel> productList) {
+        this.context=context;
         this.productList = productList;
+        updateList();
     }
 
     @NonNull
@@ -38,7 +50,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        ProductModel product = productList.get(position);
+        ProductModel product = productsDataList.get(position);
 
         Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
@@ -76,7 +88,44 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public int getItemCount() {
-        return productList.size();
+        return productsDataList.size();
+    }
+    public void updateList(){
+        productsDataList = new ArrayList<>();
+
+        ArrayList<ProductModel> aux = new ArrayList<>();
+        Log.d("mohamed", "onQueryTextChange: 2");
+        Log.d("mohamed", "onQueryTextChange: 2"+productList);
+
+        for(ProductModel p : productList){
+
+            if(
+                    p.containsSelectedOption("Color", selectedOptions.getColor()) &&
+                            p.containsSelectedOption("Size", selectedOptions.getSize()) &&
+                            p.containsSelectedOption("Material", selectedOptions.getMaterial())
+            ) {
+
+                if(selectedOptions.getLowerPrice() == selectedOptions.getHigherPrice() || p.between(p.getPrice().doubleValue(), selectedOptions.getLowerPrice(), selectedOptions.getHigherPrice())) {
+                    if (selectedOptions.getSearchCriteria().isEmpty()) {
+                        aux.add(p);
+                    } else if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
+                        aux.add(p);
+                    }
+                }
+            }
+        }
+        productsDataList.addAll(aux);
+        Log.d("ab", "updateList: "+productsDataList.toString());
+
+
+    }
+
+    @Override
+    public void update(Observable observable, Object arg) {
+        if(observable instanceof SelectedOptions) {
+            selectedOptions = (SelectedOptions) observable;
+            this.updateList();
+        }
     }
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
@@ -93,7 +142,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
-                    listener.onProductClick(productList.get(getAdapterPosition()).getID().toString());
+                    listener.onProductClick(productsDataList.get(getAdapterPosition()).getID().toString());
             });
         }
     }

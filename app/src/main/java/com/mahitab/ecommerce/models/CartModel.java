@@ -57,14 +57,14 @@ public class CartModel {
     }
 
     public synchronized void add(CartItemQuantity variantItem) {
-        ProductModel.ProductVariantModel variant = DataManagerHelper.getInstance().getVariantByID(variantItem.getProductID());
+        ProductModel.ProductVariantModel variant = DataManagerHelper.getInstance().getVariantByID(variantItem.getProductID().toString());
         ProductModel product = DataManagerHelper.getInstance().getProductByID(variant.getProductID());
 
         if (mVariants.containsKey(product.getID().toString())) {
-            mVariants.get(product.getID().toString()).add(variantItem.getProductID());
+            mVariants.get(product.getID().toString()).add(variantItem.getProductID().toString());
         } else {
             ArrayList<String> prodEntries = new ArrayList<String>();
-            prodEntries.add(variantItem.getProductID());
+            prodEntries.add(variantItem.getProductID().toString());
             mVariants.put(product.getID().toString(), prodEntries);
         }
     }

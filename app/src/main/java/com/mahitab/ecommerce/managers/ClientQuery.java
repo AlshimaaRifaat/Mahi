@@ -105,6 +105,80 @@ public class ClientQuery {
         );
     }
 
+    static Storefront.QueryRootQuery queryAllCollections() {
+        return Storefront.query(
+                rootQuery -> rootQuery
+                        .shop(
+                                shopQuery -> shopQuery
+                                        .collections(
+                                                arg -> arg.first(250),
+                                                collectionsQuery -> collectionsQuery
+                                                        .pageInfo(
+                                                                colPageQuery -> colPageQuery
+                                                                        .hasNextPage()
+                                                        )
+                                                        .edges(
+                                                                colEdgeQuery -> colEdgeQuery
+                                                                        .node(
+                                                                                colNodeQuery -> colNodeQuery
+                                                                                        .handle()
+                                                                                        .title()
+                                                                                        .updatedAt()
+                                                                                        .products(
+                                                                                                args -> args.first(250),
+                                                                                                prodQuery -> prodQuery
+                                                                                                        .edges(
+                                                                                                                prodEdge -> prodEdge
+                                                                                                                        .node(
+                                                                                                                                prodEdgeQuery -> prodEdgeQuery
+                                                                                                                                        .images(
+                                                                                                                                                args -> args.first(100),
+                                                                                                                                                productImgQuery -> productImgQuery
+                                                                                                                                                        .edges(
+                                                                                                                                                                pieq -> pieq
+                                                                                                                                                                        .node(
+                                                                                                                                                                                pienq -> pienq
+                                                                                                                                                                                        .src()
+                                                                                                                                                                        )
+                                                                                                                                                        )
+                                                                                                                                        )
+                                                                                                                                        .title()
+                                                                                                                                        .descriptionHtml()
+                                                                                                                                        .publishedAt()
+                                                                                                                                        .updatedAt()
+                                                                                                                                        .tags()
+                                                                                                                                        .variants(
+                                                                                                                                                args -> args.first(250),
+                                                                                                                                                productVariantQuery -> productVariantQuery
+                                                                                                                                                        .edges(
+                                                                                                                                                                variantEdge -> variantEdge
+                                                                                                                                                                        .node(
+                                                                                                                                                                                variantNode -> variantNode
+                                                                                                                                                                                        .title()
+                                                                                                                                                                                        .price()
+                                                                                                                                                                                        .compareAtPrice()
+                                                                                                                                                                                        .availableForSale()
+                                                                                                                                                                                        .weight()
+                                                                                                                                                                                        .weightUnit()
+                                                                                                                                                                                        .sku()
+                                                                                                                                                                                        .selectedOptions(
+                                                                                                                                                                                                optionQuery -> optionQuery
+                                                                                                                                                                                                        .name()
+                                                                                                                                                                                                        .value()
+                                                                                                                                                                                        )
+                                                                                                                                                                        )
+                                                                                                                                                        )
+                                                                                                                                        )
+                                                                                                                        )
+                                                                                                        )
+                                                                                        )
+                                                                        )
+                                                        )
+                                        )
+                        )
+        );
+    }
+
 
 
     static Storefront.QueryRootQuery queryProducts(ID collectionID) {

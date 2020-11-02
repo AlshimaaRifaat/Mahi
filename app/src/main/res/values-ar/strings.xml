@@ -83,6 +83,7 @@
     <string name="something_went_wrong">هناك شئ خاطئ، يرجى المحاولة فى وقت لاحق</string>
     <string name="email_used_for_another_account">البريد الإلكتروني المستخدم لحساب آخر</string>
     <string name="invalid_code_message">رمز التحقق غير صحيح ، يرجى المحاولة مرة أخرى</string>
+    <string name="Home">Home</string>
 
     <string-array name="provinces">
         <item>اختار المحافطة</item>

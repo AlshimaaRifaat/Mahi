@@ -1,5 +1,6 @@
 package com.mahitab.ecommerce.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,10 +25,20 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
+import com.mahitab.ecommerce.activities.PaymentWebViewActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.GraphClientManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
+import com.shopify.buy3.GraphCall;
+import com.shopify.buy3.GraphError;
+import com.shopify.buy3.GraphResponse;
+import com.shopify.buy3.Storefront;
+import com.shopify.graphql.support.ID;
+import com.shopify.graphql.support.Input;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;

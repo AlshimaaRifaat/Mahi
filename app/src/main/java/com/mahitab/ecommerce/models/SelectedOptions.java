@@ -15,12 +15,12 @@ import java.util.Observer;
  * Created by Ripan Andra on 3/23/2018.
  */
 
-public class SelectedOptions extends Observable {
+public class SelectedOptions extends Observable{
 
     private String size = "";
     private String color = "";
     private String material = "";
-    private double lowerPrice = 0.0;
+    private double lowerPrice =0.0;
     private double higherPrice = 0.0;
     private String searchCriteria = "";
 
@@ -72,7 +72,7 @@ public class SelectedOptions extends Observable {
 
     @Override
     public synchronized void addObserver(Observer o) {
-        if (!mObservers.contains(o)) {
+        if(!mObservers.contains(o)) {
             mObservers.add(o);
         }
         super.addObserver(o);
@@ -80,13 +80,15 @@ public class SelectedOptions extends Observable {
 
     @Override
     public synchronized void deleteObserver(Observer o) {
-        mObservers.remove(o);
+        if (mObservers.contains(o)){
+            mObservers.remove(o);
+        }
         super.deleteObserver(o);
     }
 
     @Override
     public void notifyObservers() {
-        for (Observer o : mObservers) {
+        for(Observer o: mObservers) {
             o.update(this, null);
         }
         super.notifyObservers();

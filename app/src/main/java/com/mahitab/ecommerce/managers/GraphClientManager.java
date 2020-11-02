@@ -2,17 +2,26 @@ package com.mahitab.ecommerce.managers;
 
 import android.content.Context;
 
+
+import com.mahitab.ecommerce.managers.ClientMutation;
+import com.mahitab.ecommerce.managers.ClientQuery;
 import com.mahitab.ecommerce.models.CurrentUser;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphClient;
 import com.shopify.buy3.HttpCachePolicy;
 import com.shopify.buy3.MutationGraphCall;
 import com.shopify.buy3.QueryGraphCall;
+import com.shopify.buy3.RetryHandler;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 import com.shopify.graphql.support.Nullable;
 
 import java.util.UUID;
+
+
+//import okhttp3url.OkHttpClient;
+//import okhttp3.logging.HttpLoggingInterceptor;
+
 
 public final class GraphClientManager {
     private static final String SHOP_DOMAIN = "mahitab.com";
@@ -23,6 +32,9 @@ public final class GraphClientManager {
 
     public static GraphClient mClient;
 
+
+
+
     GraphClientManager(Context context) {
         mClient = GraphClient.builder(context)
                 .shopDomain(SHOP_DOMAIN)
@@ -31,7 +43,12 @@ public final class GraphClientManager {
                 .build();
     }
 
-
+    void getShop(GraphCall.Callback<Storefront.QueryRoot> callback) {
+        Storefront.QueryRootQuery query = ClientQuery.queryForShop();
+        mClient
+                .queryGraph(query)
+                .enqueue(callback);
+    }
 
     void getProducts(ID collectionID, GraphCall.Callback<Storefront.QueryRoot> callback) {
         Storefront.QueryRootQuery query = ClientQuery.queryProducts(collectionID);
@@ -39,11 +56,7 @@ public final class GraphClientManager {
 
         call.enqueue(callback);
     }
-    void resetUserPassword(String email, GraphCall.Callback<Storefront.Mutation> callback) {
-        Storefront.MutationQuery query = ClientMutation.mutationForRecoverPassword(email);
 
-        mClient.mutateGraph(query).enqueue(callback);
-    }
     void getCollections(GraphCall.Callback<Storefront.QueryRoot> callback) {
         Storefront.QueryRootQuery query = ClientQuery.queryCollections();
         QueryGraphCall call = mClient.queryGraph(query);
@@ -51,6 +64,12 @@ public final class GraphClientManager {
         call.enqueue(callback);
     }
 
+    void getAllCollections(GraphCall.Callback<Storefront.QueryRoot> callback) {
+        Storefront.QueryRootQuery query = ClientQuery.queryAllCollections();
+        QueryGraphCall call = mClient.queryGraph(query);
+
+        call.enqueue(callback);
+    }
 
     void updateCheckoutEmail(ID checkoutId, String email, GraphCall.Callback<Storefront.Mutation> callback) {
         Storefront.MutationQuery query = ClientMutation.createUpdateCheckoutEmail(checkoutId.toString(), email);
@@ -58,22 +77,30 @@ public final class GraphClientManager {
         mClient.mutateGraph(query).enqueue(callback);
     }
 
+  /*  void updateCashCheckoutEmail(ID checkoutId, String email, GraphCall.Callback<Storefront.Mutation> callback) {
+        Storefront.MutationQuery query = ClientMutation.createUpdateCashCheckoutEmail(checkoutId.toString(), email);
+
+        mClient.mutateGraph(query).enqueue(callback);
+    }*/
     void updateCheckoutAddress(ID checkoutId, Storefront.MailingAddress address, GraphCall.Callback<Storefront.Mutation> callback) {
         Storefront.MutationQuery query = ClientMutation.createUpdateCheckoutAddress(
                 checkoutId.toString(), address.getAddress1(),
-                address.getAddress2(), address.getFirstName(),
+                address.getAddress2(),address.getFirstName(),
                 address.getLastName(), address.getPhone(),
                 address.getZip(), address.getCity(),
                 address.getCountry(), address.getProvince());
 
         mClient.mutateGraph(query).enqueue(callback);
     }
-
     void createCheckout(GraphCall.Callback<Storefront.Mutation> callback) {
         Storefront.MutationQuery query = ClientMutation.mutationForCreateCheckout(CurrentUser.getInstance().getEmail());
 
         mClient.mutateGraph(query).enqueue(callback);
     }
+
+
+
+
 
 
     void placeOrder(String token, PaymentMethod method, GraphCall.Callback<Storefront.Mutation> callback) {
@@ -90,7 +117,6 @@ public final class GraphClientManager {
 
         mClient.mutateGraph(query).enqueue(callback);
     }
-
     void register(String email, String password, String firstName, String lastName, @Nullable boolean acceptsMarketing,
                   GraphCall.Callback<Storefront.Mutation> callback) {
         Storefront.MutationQuery query = ClientQuery.mutationForCreateUser(
@@ -100,8 +126,14 @@ public final class GraphClientManager {
 
         call.enqueue(callback);
     }
-}
+    void resetUserPassword(String email, GraphCall.Callback<Storefront.Mutation> callback) {
+        Storefront.MutationQuery query = ClientMutation.mutationForRecoverPassword(email);
 
+        mClient.mutateGraph(query).enqueue(callback);
+    }
+
+
+}
 enum PaymentMethod {
     CARD_PAYMENT, GOOGLE_PAY
 }
