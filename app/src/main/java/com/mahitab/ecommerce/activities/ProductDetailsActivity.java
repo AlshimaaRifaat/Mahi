@@ -5,31 +5,42 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
 import com.mahitab.ecommerce.adapters.ProductImageSliderAdapter;
+import com.mahitab.ecommerce.adapters.ReviewAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ProductModel;
+import com.mahitab.ecommerce.models.ProductReviewModel;
 import com.rd.PageIndicatorView;
 
 import java.text.NumberFormat;
@@ -43,6 +54,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class ProductDetailsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "ProductDetailsActivity";
     // badge text view
     TextView badgeCounter;
     // change the number to see badge in action
@@ -173,7 +185,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             if (collection != null) {
                 rvRelatedProducts.setHasFixedSize(true);
                 rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
-                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
+                ProductAdapter productAdapter = new ProductAdapter(this,collection.getPreviewProducts());
                 rvRelatedProducts.setAdapter(productAdapter);
             }
         }
@@ -191,7 +203,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         });
 
         btnAddToCart.setOnClickListener(v -> {
-            cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue()));
+            cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue(),product.getVariants().get(0).getID()));
+            Log.e("Tango", product.getID().toString());
             defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
             tvCartQuantity.setText(String.valueOf(1));
             cartProductsCount = cartProducts.size();
@@ -207,7 +220,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
         ivIncreaseQuantity.setOnClickListener(v -> {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getId().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
                     .findFirst().orElse(-1);
             cartProducts.get(currentCartProductIndex).plusQuantity();
             updateQuantitySharedPreferencesUI(currentCartProductIndex);
@@ -215,7 +228,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
         ivDecreaseQuantity.setOnClickListener(v -> {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getId().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
                     .findFirst().orElse(-1);
             if (cartProducts.get(currentCartProductIndex).getQuantity() > 1) {
                 cartProducts.get(currentCartProductIndex).minQuantity();
@@ -244,6 +257,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             displayIsWishedProduct(isWishedBefore);
         });
     }
+    }
 
     @Override
     protected void onResume() {
@@ -255,7 +269,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getId().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
                     .findFirst().orElse(-1);
             if (currentCartProductIndex != -1)
                 updateQuantitySharedPreferencesUI(currentCartProductIndex);
@@ -327,7 +341,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private void displayQuantityControls(boolean isAddedToCart) {
         if (isAddedToCart) {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getId().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
                     .findFirst().orElse(-1);
             tvCartQuantity.setText(String.valueOf(cartProducts.get(currentCartProductIndex).getQuantity())); //update cart quantity in ui
             llCartQuantityControl.setVisibility(View.VISIBLE);

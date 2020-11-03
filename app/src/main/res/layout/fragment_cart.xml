@@ -67,7 +67,7 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/btnPaymentCashOnDelivery"
+                    android:id="@+id/checkoutButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/buy" />

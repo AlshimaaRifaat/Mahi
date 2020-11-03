@@ -46,7 +46,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getId().toString());
+        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID().toString());
         Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)

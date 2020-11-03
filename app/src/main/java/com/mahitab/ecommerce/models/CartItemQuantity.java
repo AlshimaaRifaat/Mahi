@@ -5,33 +5,28 @@ import com.shopify.graphql.support.ID;
 public class CartItemQuantity {
     public int quantity;
     public double productPrice;
-    public ID id = null;
     public String productID;
+    public ID id = null;
 
-    public CartItemQuantity(int quantity, ID id, double productPrice) {
-        this.quantity=quantity;
-        this.id=id;
-        this.productPrice=productPrice;
-    }
-
-    public void setProductPrice(double productPrice) {
+    public CartItemQuantity(int quantity, String productID,double productPrice, ID id) {
+        this.id = id;
+        this.quantity = quantity;
+        this.productID = productID;
         this.productPrice = productPrice;
     }
 
     public ID getId() {
         return id;
     }
-
     public void setId(ID id) {
         this.id = id;
+    }
+    public void setProductID(String productID) {
+        this.productID = productID;
     }
 
     public String getProductID() {
         return productID;
-    }
-
-    public void setProductID(String productID) {
-        this.productID = productID;
     }
 
     public void plusQuantity() {

@@ -3,9 +3,11 @@ package com.mahitab.ecommerce.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -39,6 +41,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG ="HomeActivity" ;
     private boolean doubleBackToExitPressedOnce = false;
     private BottomNavigationView bnvHomeNavigation;
     private SharedPreferences defaultPreferences;
@@ -48,7 +51,8 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     private List<CollectionModel> collections;
     private static CollectionLoadListener collectionLoadListener;
-
+ String sign;
+    List<CartItemQuantity> cartProducts=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +60,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         setContentView(R.layout.activity_home);
 
         initView();
-
+cartProducts=new ArrayList<>();
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
         //loading the home default fragment
@@ -74,12 +78,15 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     protected void onResume() {
         super.onResume();
 
-        List<CartItemQuantity> cartProducts;
+
         if (defaultPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
+
+
         else
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
+
 
         // change the number to see cartBadge in action
         int cartProductsCount = 0;
@@ -94,7 +101,24 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
             cartBadge.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         } else cartBadge.setVisible(false);
 
-        overridePendingTransition(0, 0); // remove activity default transition
+        overridePendingTransition(0, 0);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Intent intent = getIntent();
+        sign = intent.getStringExtra("from_payment");
+        Log.d(TAG, "getSignAfterPayment1: " + sign);
+        cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
+        }.getType());
+        Log.d(TAG, "onPause: "+cartProducts);
+
+        if (sign != null) {
+            cartProducts.clear();
+            defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
+        }
     }
 
     @Override
