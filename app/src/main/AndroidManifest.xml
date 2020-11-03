@@ -14,6 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity android:name=".activities.ReviewActivity"></activity>
+        <activity android:name=".activities.VerifyPhoneActivity" />
         <activity android:name=".activities.SearchResultActivity"></activity>
         <activity android:name=".activities.PaymentWebViewActivity" />
         <activity android:name=".activities.VerifyPhoneActivity" />

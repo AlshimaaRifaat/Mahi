@@ -156,7 +156,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
     private void saveEmailAndPassword(String email, String password) {
         defaultPreferences.edit().putString("email", email).apply();
         defaultPreferences.edit().putString("password", password).apply();

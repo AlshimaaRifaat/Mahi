@@ -70,8 +70,17 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private ImageView ivDecreaseQuantity;
     private ImageView ivBuyByPhone;
     private Button btnBuy;
+    private CardView cvAddReview;
 
     private MenuItem cartMenuItem;
+
+    private RatingBar rbAverageRating;
+    private CardView cvReviews;
+    private RecyclerView rvProductReviews;
+    private final List<ProductReviewModel> productReviews = new ArrayList<>();
+    private ReviewAdapter reviewAdapter;
+
+    private DatabaseReference productReviewsReference;
 
     private String currentProductId;
 
@@ -91,6 +100,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         initView();
 
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        productReviewsReference = FirebaseDatabase.getInstance().getReference("ProductReviews");
 
         if (defaultPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
@@ -120,53 +130,59 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
-        }else
-        {
-            currentProductId= getIntent().getStringExtra("productId");
-            product = DataManager.getInstance().getProductByID(currentProductId);
-        }
-
-        if (product != null) {
-            tvTitle.setText(product.getTitle());
-            tvSKU.setText(product.getSKU());
-            String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
-            tvPrice.setText(price);
-
-            tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(product.getTitle());
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
-
-            if (product.getImages() != null) {
-                ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
-                viewPager.setAdapter(sliderAdapter);
-                //Tell the IndicatorView that how many indicators should it display:
-                indicatorView.setCount(viewPager.getIndicatorCount());
-            }
-
-            //Set IndicatorPageChangeListener on LoopingViewPager.
-            //When the methods are called, update the Indicator accordingly.
-            viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
-                @Override
-                public void onIndicatorProgress(int selectingPosition, float progress) {
+            if (product != null) {
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(product.getTitle());
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 }
 
-                @Override
-                public void onIndicatorPageChange(int newIndicatorPosition) {
-                    indicatorView.setSelection(newIndicatorPosition);
+                tvTitle.setText(product.getTitle());
+                tvSKU.setText(product.getSKU());
+                String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
+                tvPrice.setText(price);
+
+                tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+                rvProductReviews.setHasFixedSize(true);
+                rvProductReviews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                reviewAdapter = new ReviewAdapter(productReviews);
+                rvProductReviews.setAdapter(reviewAdapter);
+
+
+                if (product.getImages() != null) {
+                    ProductImageSliderAdapter sliderAdapter = new ProductImageSliderAdapter(this, Arrays.asList(product.getImages()), true);
+                    viewPager.setAdapter(sliderAdapter);
+                    //Tell the IndicatorView that how many indicators should it display:
+                    indicatorView.setCount(viewPager.getIndicatorCount());
                 }
-            });
+
+                //Set IndicatorPageChangeListener on LoopingViewPager.
+                //When the methods are called, update the Indicator accordingly.
+                viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
+                    @Override
+                    public void onIndicatorProgress(int selectingPosition, float progress) {
+                    }
+
+                    @Override
+                    public void onIndicatorPageChange(int newIndicatorPosition) {
+                        indicatorView.setSelection(newIndicatorPosition);
+                    }
+                });
 
             CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
             if (collection != null) {
                 rvRelatedProducts.setHasFixedSize(true);
                 rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
-                ProductAdapter productAdapter = new ProductAdapter(this,collection.getPreviewProducts());
+                ProductAdapter productAdapter = new ProductAdapter(collection.getPreviewProducts());
                 rvRelatedProducts.setAdapter(productAdapter);
             }
         }
+
+        cvAddReview.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), ReviewActivity.class);
+            intent.putExtra("productId", product.getID().toString());
+            startActivity(intent);
+        });
 
         ivDescription.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
@@ -175,7 +191,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         });
 
         btnAddToCart.setOnClickListener(v -> {
-            cartProducts.add(new CartItemQuantity(1, product.getID(), product.getVariants().get(0).getPrice().doubleValue()));
+            cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue()));
             defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
             tvCartQuantity.setText(String.valueOf(1));
             cartProductsCount = cartProducts.size();
@@ -248,6 +264,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             //end update quantity in ui
         }
 
+        if (product != null)
+            getProductReviews(product.getID().toString());
+
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -297,6 +316,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
         ivDecreaseQuantity = findViewById(R.id.ivDecreaseQuantity_ProductDetailsActivity);
         btnBuy = findViewById(R.id.btnBuy_ProductDetailsActivity);
+        cvReviews = findViewById(R.id.cvReviews_ProductDetailsActivity);
+        rbAverageRating = findViewById(R.id.rbAverageRating_ProductDetailsActivity);
+        rvProductReviews = findViewById(R.id.rvProductReviews_ProductDetailsActivity);
+        cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
         tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
     }
@@ -338,5 +361,56 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             badgeCounter.setText(String.valueOf(cartProductsCount));
             cartMenuItem.getActionView().setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), CartActivity.class))); // handel custom view click
         }
+    }
+
+    private void getProductReviews(String productId) {
+        productReviewsReference.child(productId)
+                .orderByChild("accepted")
+                .equalTo(true)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            productReviews.clear();
+                            cvReviews.setVisibility(View.VISIBLE);
+                            rvProductReviews.setVisibility(View.VISIBLE);
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                ProductReviewModel productReview = snapshot.getValue(ProductReviewModel.class);
+                                productReviews.add(productReview);
+                                reviewAdapter.notifyDataSetChanged();
+                            }
+                            rbAverageRating.setRating(calculateAverageRatings(productReviews));
+                        } else {
+                            cvReviews.setVisibility(View.GONE);
+                            rvProductReviews.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "onCancelled: " + error.getMessage());
+                    }
+                });
+    }
+
+    private int calculateAverageRatings(List<ProductReviewModel> reviews) {
+        int customer5Stars = 0;
+        int customer4Stars = 0;
+        int customer3Stars = 0;
+        int customer2Stars = 0;
+        int customer1Stars = 0;
+        for (ProductReviewModel review : reviews) {
+            if (review.getRating() == 5)
+                customer5Stars += 1;
+            else if (review.getRating() == 4)
+                customer4Stars += 1;
+            else if (review.getRating() == 3)
+                customer3Stars += 1;
+            else if (review.getRating() == 2)
+                customer2Stars += 1;
+            else if (review.getRating() == 1)
+                customer1Stars += 1;
+        }
+        return (customer1Stars + (2 * customer2Stars) + (3 * customer3Stars)+ (4 * customer4Stars) + (5 * customer5Stars)) / (customer1Stars + customer2Stars + customer3Stars + customer4Stars + customer5Stars);
     }
 }
