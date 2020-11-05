@@ -79,10 +79,6 @@
     <string name="City">City</string>
     <string name="Egypt">Egypt</string>
     <string name="address_updated_successfully">Address updated successfully!</string>
-    <string name="email_text">Email</string>
-    <string name="submit_text">Submit</string>
-    <string name="reset_your_password_text">Reset your password</string>
-    <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
     <string name="verify_phone">Verify Phone</string>
     <string name="we_have_sent_verification_code_to_your_number">We have sent verification code to your Number</string>
     <string name="_continue">Continue</string>
@@ -100,6 +96,15 @@
     <string name="reviews">Reviews</string>
     <string name="Home">Home</string>
     <string name="discount_percentage">% Discount</string>
+
+    <!-- ResetPasswordActivity -->
+    <string name="reset_password">Reset Password</string>
+    <string name="submit">Submit</string>
+    <string name="field_cannot_be_empty">Field cannot be empty</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="check_your_email">A reset password email is on your way</string>
+    <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
+    <!-- ResetPasswordActivity -->
 
     <string-array name="provinces">
         <item>Select Province</item>

@@ -223,7 +223,7 @@
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
-                   android:id="@+id/rvProductReviews_ProductDetailsActivity"
+                    android:id="@+id/rvProductReviews_ProductDetailsActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:itemCount="1"

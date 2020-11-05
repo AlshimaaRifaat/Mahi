@@ -67,10 +67,6 @@
     <string name="City">City</string>
     <string name="Egypt">Egypt</string>
     <string name="address_updated_successfully">Address updated successfully!</string>
-    <string name="email_text">Email</string>
-    <string name="submit_text">Submit</string>
-    <string name="reset_your_password_text">Reset your password</string>
-    <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
     <string name="verify_phone">التحقق من الهاتف</string>
     <string name="we_have_sent_verification_code_to_your_number">لقد أرسلنا رمز التحقق إلى رقمك</string>
     <string name="_continue">المتابعة</string>
@@ -88,6 +84,16 @@
     <string name="review">التقييم</string>
     <string name="reviews">التقييمات</string>
     <string name="discount_percentage">٪ خصم</string>
+
+    <!-- ResetPasswordActivity -->
+    <string name="reset_password">إعادة تعيين كلمة المرور</string>
+    <string name="submit">إرسال</string>
+    <string name="field_cannot_be_empty">لا يمكن أن يكون الحقل فارغًا</string>
+    <string name="invalid_email">بريد إلكتروني خاطئ</string>
+    <string name="check_your_email">البريد الإلكتروني لإعادة تعيين كلمة المرور في طريقك إليك</string>
+    <string name="we_will_send_you_an_email_to_reset_your_password_text">سنرسل لك بريدًا إلكترونيًا لإعادة تعيين كلمة المرور الخاصة بك</string>
+    <!-- ResetPasswordActivity -->
+
     <string-array name="provinces">
         <item>اختار المحافطة</item>
         <item>القاهرة</item>

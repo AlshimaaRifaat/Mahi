@@ -14,15 +14,38 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".activities.ReviewActivity"></activity>
-        <activity android:name=".activities.VerifyPhoneActivity" />
-        <activity android:name=".activities.SearchResultActivity"></activity>
-        <activity android:name=".activities.PaymentWebViewActivity" />
-        <activity android:name=".activities.VerifyPhoneActivity" />
-        <activity android:name=".activities.ResetPasswordActivity" />
-        <activity android:name=".activities.MyWishListActivity" />
-        <activity android:name=".activities.MyOrdersActivity" />
-        <activity android:name=".activities.AddEditAddressActivity" />
+        <activity
+            android:name=".activities.ReviewActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.VerifyPhoneActivity"
+            android:label="@string/verify_phone"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.SearchResultActivity"
+            android:label="@string/search"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.PaymentWebViewActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ResetPasswordActivity"
+            android:label="@string/reset_password"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.MyWishListActivity"
+            android:label="@string/my_addresses"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.MyOrdersActivity"
+            android:label="@string/my_addresses"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.AddEditAddressActivity"
+            android:label="@string/my_addresses"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.MyAddressesActivity"
             android:label="@string/my_addresses"

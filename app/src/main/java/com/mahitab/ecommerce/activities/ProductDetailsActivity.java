@@ -131,7 +131,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
         if (getIntent().getExtras() != null) {
             currentProductId = getIntent().getExtras().getString("productId");
             boolean isAddedBefore = cartProducts.stream()
-                    .anyMatch(cartItemQuantity -> cartItemQuantity.getId().toString().equals(currentProductId));
+                    .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
 
             displayQuantityControls(isAddedBefore);
 
@@ -220,7 +220,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
         ivIncreaseQuantity.setOnClickListener(v -> {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
                     .findFirst().orElse(-1);
             cartProducts.get(currentCartProductIndex).plusQuantity();
             updateQuantitySharedPreferencesUI(currentCartProductIndex);
@@ -228,7 +228,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
 
         ivDecreaseQuantity.setOnClickListener(v -> {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
                     .findFirst().orElse(-1);
             if (cartProducts.get(currentCartProductIndex).getQuantity() > 1) {
                 cartProducts.get(currentCartProductIndex).minQuantity();
@@ -269,7 +269,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
                     .findFirst().orElse(-1);
             if (currentCartProductIndex != -1)
                 updateQuantitySharedPreferencesUI(currentCartProductIndex);
@@ -341,7 +341,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private void displayQuantityControls(boolean isAddedToCart) {
         if (isAddedToCart) {
             int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().toString().equals(currentProductId))
+                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
                     .findFirst().orElse(-1);
             tvCartQuantity.setText(String.valueOf(cartProducts.get(currentCartProductIndex).getQuantity())); //update cart quantity in ui
             llCartQuantityControl.setVisibility(View.VISIBLE);

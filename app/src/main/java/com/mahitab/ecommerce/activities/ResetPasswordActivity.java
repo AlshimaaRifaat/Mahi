@@ -1,90 +1,104 @@
 package com.mahitab.ecommerce.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.utils.CommonUtils;
 
-public class ResetPasswordActivity extends AbstractActivity {
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
-    private Button mSubmitButton;
+public class ResetPasswordActivity extends AppCompatActivity {
+
+    private TextInputLayout tilEmail;
+    private EditText etEmail;
+    private Button btnSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setArDefaultLocale(this);
         setContentView(R.layout.activity_reset_password);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        Toolbar mToolbar = findViewById(R.id.toolbar);
-        ((TextView) mToolbar.findViewById(R.id.title)).setText("");
-        ImageButton backBtn = mToolbar.findViewById(R.id.backButton);
-        backBtn.setVisibility(View.VISIBLE);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ResetPasswordActivity.this.setResult(Activity.RESULT_CANCELED);
-                ResetPasswordActivity.this.finish();
-            }
-        });
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(getResources().getString(R.string.reset_password));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-        EditText emailInput = findViewById(R.id.reset_email_input);
-        mSubmitButton = findViewById(R.id.reset_submit_button);
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleButton();
+        initView();
 
-                String email = emailInput.getText().toString();
-                if(!CommonUtils.isNotEmpty(email)) {
-                    emailInput.setError("Field cannot be empty");
-                } else if(!CommonUtils.isEmailValid(email)) {
-                    emailInput.setError("Invalid email");
-                } else {
-                    DataManager.getInstance().resetPassword(email, new BaseCallback() {
-                        @Override
-                        public void onResponse(int status) {
-                            showOnUiThread("A reset password email is on your way");
-                            runOnUiThread(() -> {
-                                Intent intent = new Intent();
-                                intent.putExtra("userEmail", email);
-                                ResetPasswordActivity.this.setResult(Activity.RESULT_OK, intent);
-                                ResetPasswordActivity.this.finish();
-                            });
+        btnSubmit.setOnClickListener(view -> {
+            toggleButton();
+            String email = etEmail.getText().toString();
+            if (!CommonUtils.isNotEmpty(email)) {
+                tilEmail.setError(getResources().getString(R.string.field_cannot_be_empty));
+            } else if (!CommonUtils.isEmailValid(email)) {
+                tilEmail.setError(getResources().getString(R.string.invalid_email));
+            } else {
+                DataManager.getInstance().resetPassword(email, new BaseCallback() {
+                    @Override
+                    public void onResponse(int status) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.check_your_email), Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("userEmail", email);
+                            setResult(Activity.RESULT_OK, intent);
+                            finish();
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(final String message) {
+                        String msg = message.toLowerCase();
+                        if (msg.contains("customer") || msg.contains("invalid")) {
+                            runOnUiThread(() -> tilEmail.setError(message));
+                        } else {
+                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show());
                         }
-
-                        @Override
-                        public void onFailure(final String message) {
-                            String msg = message.toLowerCase();
-                            if(msg.contains("customer") || msg.contains("invalid")) {
-                                ResetPasswordActivity.this.runOnUiThread(() -> {
-                                    emailInput.setError(message);
-                                });
-                            } else {
-                                showOnUiThread(message);
-                            }
-                            runOnUiThread(ResetPasswordActivity.this::toggleButton);
-                        }
-                    });
-                    return;
-                }
-
-                toggleButton();
+                        runOnUiThread(ResetPasswordActivity.this::toggleButton);
+                    }
+                });
+                return;
             }
+
+            toggleButton();
         });
     }
 
+    private void initView() {
+        tilEmail = findViewById(R.id.tilEmail_ResetPasswordActivity);
+        etEmail = findViewById(R.id.etEmail_ResetPasswordActivity);
+        btnSubmit = findViewById(R.id.btnSubmit_ResetPasswordActivity);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        overridePendingTransition(0, 0); // remove activity default transition
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+        return super.onOptionsItemSelected(item);
+    }
+
     private void toggleButton() {
-        mSubmitButton.setEnabled(!mSubmitButton.isEnabled());
+        btnSubmit.setEnabled(!btnSubmit.isEnabled());
     }
 }
