@@ -2,11 +2,10 @@ package com.mahitab.ecommerce.adapters;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -35,7 +34,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
         Drawable unwrappedDrawable = AppCompatResources.getDrawable(holder.itemView.getContext(), R.drawable.circle_shape_background);
         Drawable wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable);
         DrawableCompat.setTint(wrappedDrawable, Color.parseColor(colorList.get(position)));
-        holder.llColor.setBackground(wrappedDrawable);
+        holder.llColor.setImageDrawable(wrappedDrawable);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorViewHol
     }
 
     public static class ColorViewHolder extends RecyclerView.ViewHolder {
-        private final LinearLayout llColor;
+        private final ImageView llColor;
 
         public ColorViewHolder(@NonNull View itemView) {
             super(itemView);

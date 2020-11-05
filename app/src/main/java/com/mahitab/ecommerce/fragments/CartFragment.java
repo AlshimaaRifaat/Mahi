@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,6 +47,7 @@ import java.util.Locale;
 
 public class CartFragment extends Fragment implements CartAdapter.CartProductClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CartFragment";
+    private Toolbar toolbar;
     private RecyclerView rvCartProducts;
     public static List<CartItemQuantity> cartProducts;
     private CartAdapter cartAdapter;
@@ -60,17 +62,18 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
 
     String accessToken;
-    String firstName=" ";
-    String lastName="";
-    String phone="";
-    String city="";
-    String country="";
-    String zip="";
-    String province="";
-    String address1="";
-    String address2="";
-    String email="";
-    String strEmail,strPassword;
+    String firstName = " ";
+    String lastName = "";
+    String phone = "";
+    String city = "";
+    String country = "";
+    String zip = "";
+    String province = "";
+    String address1 = "";
+    String address2 = "";
+    String email = "";
+    String strEmail, strPassword;
+
     public CartFragment() {
         // Required empty public constructor
     }
@@ -91,13 +94,24 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         initView(view);
+
+        if (getActivity() != null && getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).setSupportActionBar(toolbar);
+            setHasOptionsMenu(true);
+        } else if (getActivity() != null && getActivity() instanceof CartActivity) {
+            toolbar.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        if (getActivity() != null && isResumed()) {
+            toolbar.setTitle(getResources().getString(R.string.cart));
+        }
+
         if (defaultPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
         else
@@ -109,13 +123,27 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
         rvCartProducts.setHasFixedSize(true);
         rvCartProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-        cartAdapter = new CartAdapter(requireContext(),cartProducts);
+        cartAdapter = new CartAdapter(requireContext(), cartProducts);
         rvCartProducts.setAdapter(cartAdapter);
         cartAdapter.setCartProductClickListener(this);
 
         calculateSubTotalUpdateUI();
 
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        if (defaultPreferences.getString("email", null) != null)
+            createAccessToken();
+
+        checkoutButton.setOnClickListener(view1 -> {
+            ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
+            for (int i = 0; i < cartProducts.size(); i++) {
+                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getId()));
+            }
+            Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
+                    .setLineItemsInput(Input.value(inputArrayList));
+            createCashOnDeliveryCheckOut(input);
+        });
+
     }
 
     @Override
@@ -132,30 +160,18 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     }
 
     private void initView(View view) {
+        toolbar = view.findViewById(R.id.toolbar);
         llEmptyCart = view.findViewById(R.id.llEmptyCart_CartFragment);
         llContentCart = view.findViewById(R.id.llContentCart_CartFragment);
         rvCartProducts = view.findViewById(R.id.rvCartProducts_CartFragment);
         tvSubTotalPrice = view.findViewById(R.id.tvSubTotalPrice_CartFragment);
         checkoutButton = view.findViewById(R.id.checkoutButton);
-
-        createAccessToken();
-        checkoutButton.setOnClickListener(view1 -> {
-            ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-            for (int i = 0; i < cartProducts.size(); i++) {
-                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getId()));
-                Log.e("Tango", cartProducts.get(i).getId().toString());
-            }
-            Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                    .setLineItemsInput(Input.value(inputArrayList));
-            createCashOnDeliveryCheckOut(input);
-        });
     }
-
 
     private void createAccessToken() {
         getSavedEmailAndPassword();
-        Log.d(TAG, "createAccessToken :e "+strEmail);
-        Log.d(TAG, "createAccessToken:p "+strPassword);
+        Log.d(TAG, "createAccessToken :e " + strEmail);
+        Log.d(TAG, "createAccessToken:p " + strPassword);
         Storefront.CustomerAccessTokenCreateInput tokenCreateInput = new Storefront.CustomerAccessTokenCreateInput(strEmail, strPassword);
 
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
@@ -175,9 +191,8 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     }
 
     private void getSavedEmailAndPassword() {
-        defaultPreferences =getActivity().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
         strEmail = defaultPreferences.getString("email", null);
-        strPassword= defaultPreferences.getString("password", null);
+        strPassword = defaultPreferences.getString("password", null);
     }
 
     private void getAccessTokenFromAPI(Storefront.MutationQuery mutationQuery) {
@@ -190,7 +205,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                         Log.e("TAG", "error is" + error.getMessage());
                     }
                 } else {
-                    accessToken=response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
+                    accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
                     Log.e("TAG", "login" + response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken());
                     // queryUserDetails(accessToken);
                     fetchCustomerQuery(accessToken);
@@ -201,7 +216,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
             @Override
             public void onFailure(@NonNull GraphError error) {
-                Log.d("TAG","Create customer Account API FAIL:"+error.getMessage());
+                Log.d("TAG", "Create customer Account API FAIL:" + error.getMessage());
             }
         });
     }
@@ -263,24 +278,21 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
 
-                if(response.data().getCustomer().getFirstName()!=null)
-                {
-                    firstName=response.data().getCustomer().getFirstName();
-                    Log.e("data", "user..." + response.data().getCustomer().getFirstName().toString());
+                if (response.data().getCustomer().getFirstName() != null) {
+                    firstName = response.data().getCustomer().getFirstName();
+                    Log.e("data", "user..." + response.data().getCustomer().getFirstName());
                 }
-                if(response.data().getCustomer().getLastName()!=null)
-                {
-                    lastName=response.data().getCustomer().getLastName();
-                    Log.e("data", "user..." + response.data().getCustomer().getLastName().toString());
+                if (response.data().getCustomer().getLastName() != null) {
+                    lastName = response.data().getCustomer().getLastName();
+                    Log.e("data", "user..." + response.data().getCustomer().getLastName());
                 }
-                if(response.data().getCustomer().getEmail()!=null)
-                {
-                    email=response.data().getCustomer().getEmail();
-                    Log.e("data", "user..." + response.data().getCustomer().getEmail().toString());
+                if (response.data().getCustomer().getEmail() != null) {
+                    email = response.data().getCustomer().getEmail();
+                    Log.e("data", "user..." + response.data().getCustomer().getEmail());
                 }
 
 
-                if (response.data().getCustomer().getDefaultAddress().getPhone()!= null) {
+                if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
                     phone = response.data().getCustomer().getDefaultAddress().getPhone();
                 }
 
@@ -302,8 +314,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                 if (response.data().getCustomer().getDefaultAddress().getAddress2() != null) {
                     address2 = response.data().getCustomer().getDefaultAddress().getAddress2();
                 }
-
-
 
 
             }
@@ -339,7 +349,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     // handle user friendly errors
                 } else {
                     ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
-                    Log.d(TAG, "ch id: "+checkoutId.toString());
+                    Log.d(TAG, "ch id: " + checkoutId.toString());
 
                     if (checkoutId.toString() != null) {
                         queryUpdateEmail(checkoutId);
@@ -398,7 +408,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
 
                 String strCheckoutId = response.data().getCheckoutEmailUpdate().getCheckout().getId().toString();
-                Log.d(TAG, "ch id email: "+strCheckoutId);
+                Log.d(TAG, "ch id email: " + strCheckoutId);
 
                 if (strCheckoutId != null) {
 
@@ -466,11 +476,11 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                String webUrl = response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl().toString();
-                Log.d(TAG, "web url: " + response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl().toString());
-                ID checkoutId=response.data().getCheckoutShippingAddressUpdate().getCheckout().getId();
+                String webUrl = response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl();
+                Log.d(TAG, "web url: " + response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl());
+                ID checkoutId = response.data().getCheckoutShippingAddressUpdate().getCheckout().getId();
 
-                Log.d(TAG, "id: "+checkoutId.toString());
+                Log.d(TAG, "id: " + checkoutId.toString());
 
 
                 Intent Getintent = new Intent(getContext(), PaymentWebViewActivity.class);
@@ -480,8 +490,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                 Getintent.putExtras(bundle);
                 startActivity(Getintent);
 
-                Log.d(TAG, "iddd: "+checkoutId.toString());
-
+                Log.d(TAG, "iddd: " + checkoutId.toString());
 
 
             }
@@ -492,8 +501,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             }
         });
     }
-
-
 
 
     @Override
@@ -531,8 +538,8 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
     @Override
     public void onProductClick(String productId) {
-        Intent intent=new Intent(getContext(), ProductDetailsActivity.class);
-        intent.putExtra("productId",productId);
+        Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
         startActivity(intent);
     }
 

@@ -3,7 +3,10 @@ package com.mahitab.ecommerce.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.DatabaseReference;
+
 public class BannerModel implements Parcelable {
+    private DatabaseReference reference;
     private String id;
     private String type;
     private String image;
@@ -30,6 +33,14 @@ public class BannerModel implements Parcelable {
             return new BannerModel[size];
         }
     };
+
+    public DatabaseReference getReference() {
+        return reference;
+    }
+
+    public void setReference(DatabaseReference reference) {
+        this.reference = reference;
+    }
 
     public String getId() {
         return id;

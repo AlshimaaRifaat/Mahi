@@ -1,7 +1,6 @@
 package com.mahitab.ecommerce.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,25 +15,22 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.managers.DataManager;
-import com.mahitab.ecommerce.managers.interfaces.NavigationInterface;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.ProductModel;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder>{
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
-    private List<CartItemQuantity> cartItemQuantities;
-
+    private final List<CartItemQuantity> cartItemQuantities;
+    private final Context context;
     private CartProductClickListener listener;
-    Context context;
-    public CartAdapter(Context context,List<CartItemQuantity> cartItemQuantities) {
-        this.context=context;
+
+    public CartAdapter(Context context, List<CartItemQuantity> cartItemQuantities) {
+        this.context = context;
         this.cartItemQuantities = cartItemQuantities;
     }
 
@@ -46,8 +42,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID().toString());
-        Glide.with(holder.itemView.getContext())
+        ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID());
+        Glide.with(context)
                 .load(product.getImages()[0])
                 .thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
@@ -65,9 +61,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             if (product.getVariants().get(0).getOldPrice() != null &&
                     product.getVariants().get(0).getOldPrice().compareTo(product.getVariants().get(0).getPrice()) > 0 &&
                     product.getVariants().get(0).isAvailableForSale()) {
-//                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
-//                holder.tvOldPrice.setText(oldPrice);
-                holder.tvOldPrice.setText(product.getVariants().get(0).getOldPrice()+"");
+                oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(oldPrice);
+                holder.tvOldPrice.setText(oldPrice);
                 holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
@@ -76,9 +72,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             } else {
                 holder.tvPrice.setVisibility(View.INVISIBLE);
                 holder.tvOldPrice.setVisibility(View.VISIBLE);
-//                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
-//                holder.tvOldPrice.setText(price);
-                holder.tvOldPrice.setText(product.getVariants().get(0).getPrice()+"");
+                price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
+                holder.tvOldPrice.setText(price);
+                holder.tvOldPrice.setText(price);
             }
         }
 
@@ -115,12 +111,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             ivDelete.setOnClickListener(this);
             ivIncreaseQuantity.setOnClickListener(this);
             ivDecreaseQuantity.setOnClickListener(this);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
-                        listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getId().toString());
-                }
+            itemView.setOnClickListener(v -> {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
+                    listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getId().toString());
             });
         }
 

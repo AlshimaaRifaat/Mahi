@@ -3,7 +3,6 @@ package com.mahitab.ecommerce.adapters;
 import android.app.Activity;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,40 +100,23 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
                         viewHolder2.tvPrice.setVisibility(View.VISIBLE);
                         viewHolder2.tvPrice.setText(price);
 
-                        if (price!=null&&oldPrice!=null)
-                        {
-                            float mPrice=product.getVariants().get(0).getPrice().floatValue();
-                            float mOldPrice=product.getVariants().get(0).getOldPrice().floatValue();
+                        float mPrice = product.getVariants().get(0).getPrice().floatValue();
+                        float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
 
-                        /*    double totalDiscount = (mPrice/mOldPrice) * 100;
-
-                            Log.d("DiscountLog", totalDiscount + "");
-                            Log.d("DiscountLog", mPrice + "");
-                            Log.d("DiscountLog", mOldPrice + "");*/
-
-                          //  Log.d("tag", "mPrice: "+mPrice.toString());
-                          //  Log.d("tag", "mOldPrice: "+mOldPrice.toString());
-                            float ratioDiscount=((mOldPrice-mPrice)/mOldPrice)*100;
-                            viewHolder2.tvDiscount.setText("خصم"+ (int) Math.ceil(ratioDiscount) + "%");
-                        }
+                        float ratioDiscount = ((mOldPrice - mPrice) / mOldPrice) * 100;
+                        String discountPercentage= (int) Math.ceil(ratioDiscount)+ viewHolder2.itemView.getContext().getResources().getString(R.string.discount_percentage);
+                        viewHolder2.tvDiscount.setText( discountPercentage);
+                        viewHolder2.tvDiscount.setVisibility(View.VISIBLE);
 
                     } else {
                         viewHolder2.tvPrice.setVisibility(View.INVISIBLE);
                         viewHolder2.tvOldPrice.setVisibility(View.VISIBLE);
                         price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                         viewHolder2.tvOldPrice.setText(price);
-
-                            viewHolder2.tvDiscount.setVisibility(View.GONE);
-
-
+                        viewHolder2.tvDiscount.setVisibility(View.GONE);
                     }
-
-
                 }
-
                 break;
-
-
         }
     }
 
@@ -148,13 +130,10 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-       // return productList.size() + 1;
+        // return productList.size() + 1;
 
-       if(productList.size()!=0)
-        {
-            if(productList.size()>6)
-            return 6;
-            return productList.size();
+        if (productList.size() != 0) {
+            return Math.min(productList.size(), 6);
         }
         return 0;
     }
@@ -193,7 +172,7 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
             tvTitle = itemView.findViewById(R.id.tvTitle_ProductItem);
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
-            tvDiscount=itemView.findViewById(R.id.tvDiscount_ProductItem);
+            tvDiscount = itemView.findViewById(R.id.tvDiscount_ProductItem);
 
             ((Activity) itemView.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             //if you need three fix imageview in width
@@ -201,7 +180,7 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
 
             itemView.setOnClickListener(v -> {
                 if (productClickListener != null) {
-                    productClickListener.onProductClick(productList.get(getAdapterPosition()-1));
+                    productClickListener.onProductClick(productList.get(getAdapterPosition() - 1));
                 }
             });
         }
@@ -220,7 +199,7 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
         this.productClickListener = productClickListener;
     }
 
-    public void setOnCollectionClickListener(CollectionClickListener collectionClickListener){
-        this.collectionClickListener=collectionClickListener;
+    public void setOnCollectionClickListener(CollectionClickListener collectionClickListener) {
+        this.collectionClickListener = collectionClickListener;
     }
 }

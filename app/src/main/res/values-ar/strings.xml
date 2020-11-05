@@ -87,7 +87,7 @@
     <string name="add_review">اضف تقيما</string>
     <string name="review">التقييم</string>
     <string name="reviews">التقييمات</string>
-
+    <string name="discount_percentage">٪ خصم</string>
     <string-array name="provinces">
         <item>اختار المحافطة</item>
         <item>القاهرة</item>

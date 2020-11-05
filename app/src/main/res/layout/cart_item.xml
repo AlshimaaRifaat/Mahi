@@ -35,6 +35,8 @@
                     android:id="@+id/tvProductTitle_CartItem"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
                     android:layout_weight="1" />
 
                 <ImageView
@@ -58,14 +60,18 @@
                     android:id="@+id/tvPrice_CartItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:textStyle="bold" />
+                    android:gravity="start"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/tvOldPrice_CartItem"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textSize="20sp" />
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"

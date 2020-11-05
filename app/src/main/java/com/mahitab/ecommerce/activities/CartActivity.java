@@ -1,16 +1,13 @@
 package com.mahitab.ecommerce.activities;
 
+import android.os.Bundle;
+import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.adapters.CartAdapter;
-import com.mahitab.ecommerce.managers.interfaces.NavigationInterface;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
@@ -19,7 +16,7 @@ public class CartActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setArDefaultLocale(this);
+        setArDefaultLocale(this);
         setContentView(R.layout.activity_cart);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

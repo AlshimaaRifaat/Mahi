@@ -14,7 +14,7 @@
         <ImageView
             android:id="@+id/ivCollectionImage_CollectionItem"
             android:layout_width="match_parent"
-            android:layout_height="228dp"
+            android:layout_height="231dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_image_gray_24dp"

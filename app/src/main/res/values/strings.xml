@@ -99,6 +99,7 @@
     <string name="review">Review</string>
     <string name="reviews">Reviews</string>
     <string name="Home">Home</string>
+    <string name="discount_percentage">% Discount</string>
 
     <string-array name="provinces">
         <item>Select Province</item>

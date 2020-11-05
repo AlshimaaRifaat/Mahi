@@ -86,5 +86,4 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
     public void setBannerClickListener(BannerClickListener listener) {
         this.listener = listener;
     }
-
 }

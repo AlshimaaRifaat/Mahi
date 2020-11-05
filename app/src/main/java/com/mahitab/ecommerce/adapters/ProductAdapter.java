@@ -16,14 +16,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.activities.SearchResultActivity;
-import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.SelectedOptions;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
@@ -35,9 +32,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private ArrayList<ProductModel> productsDataList;
     private SelectedOptions selectedOptions = new SelectedOptions();
-Context context;
-    public ProductAdapter(Context context,ArrayList<ProductModel> productList) {
-        this.context=context;
+    Context context;
+
+    public ProductAdapter(Context context, ArrayList<ProductModel> productList) {
+        this.context = context;
         this.productList = productList;
         updateList();
     }
@@ -90,22 +88,23 @@ Context context;
     public int getItemCount() {
         return productsDataList.size();
     }
-    public void updateList(){
+
+    public void updateList() {
         productsDataList = new ArrayList<>();
 
         ArrayList<ProductModel> aux = new ArrayList<>();
         Log.d("mohamed", "onQueryTextChange: 2");
-        Log.d("mohamed", "onQueryTextChange: 2"+productList);
+        Log.d("mohamed", "onQueryTextChange: 2" + productList);
 
-        for(ProductModel p : productList){
+        for (ProductModel p : productList) {
 
-            if(
+            if (
                     p.containsSelectedOption("Color", selectedOptions.getColor()) &&
                             p.containsSelectedOption("Size", selectedOptions.getSize()) &&
                             p.containsSelectedOption("Material", selectedOptions.getMaterial())
             ) {
 
-                if(selectedOptions.getLowerPrice() == selectedOptions.getHigherPrice() || p.between(p.getPrice().doubleValue(), selectedOptions.getLowerPrice(), selectedOptions.getHigherPrice())) {
+                if (selectedOptions.getLowerPrice() == selectedOptions.getHigherPrice() || p.between(p.getPrice().doubleValue(), selectedOptions.getLowerPrice(), selectedOptions.getHigherPrice())) {
                     if (selectedOptions.getSearchCriteria().isEmpty()) {
                         aux.add(p);
                     } else if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
@@ -115,14 +114,14 @@ Context context;
             }
         }
         productsDataList.addAll(aux);
-        Log.d("ab", "updateList: "+productsDataList.toString());
+        Log.d("ab", "updateList: " + productsDataList.toString());
 
 
     }
 
     @Override
     public void update(Observable observable, Object arg) {
-        if(observable instanceof SelectedOptions) {
+        if (observable instanceof SelectedOptions) {
             selectedOptions = (SelectedOptions) observable;
             this.updateList();
         }

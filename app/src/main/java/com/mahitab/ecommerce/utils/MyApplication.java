@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.managers.DataManager;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class MyApplication extends Application {
 //                getString(R.string.CHANNEL_DESCRIPTION));
 
         FirebaseMessaging.getInstance().isAutoInitEnabled();
+
+        DataManager.getInstance().setClientManager(this);
     }
 
     public void triggerNotification(Class targetNotificationActivity, String channelId, String title, String text, String bigText, int priority, boolean autoCancel, int notificationId, int pendingIntentFlag){
