@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.models.MyOrdersModel;
 import com.mahitab.ecommerce.models.SelectedOptions;
+import com.shopify.graphql.support.ID;
 
 import java.util.ArrayList;
 
@@ -24,6 +25,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
     private ArrayList<MyOrdersModel> myOrdersModelArrayList = new ArrayList<>();
 
     private SelectedOptions selectedOptions = new SelectedOptions();
+    MyOrderItemInterface myOrderItemInterface;
     public MyOrdersAdapter(Context context, ArrayList<MyOrdersModel> dataList) {
         this.context = context;
         this.myOrdersModelArrayList = dataList;
@@ -40,7 +42,10 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         return new MyOrdersAdapter.ViewHolder(view);
     }
 
-
+    public void onClickItemMyOrder(MyOrderItemInterface myOrderItemInterface)
+    {
+        this.myOrderItemInterface=myOrderItemInterface;
+    }
 
     @Override
     public void onBindViewHolder(@NonNull MyOrdersAdapter.ViewHolder holder, final int position) {
@@ -55,8 +60,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(singleItem.getStatutsUrl().toString()));
-                context.startActivity(intent);
+                myOrderItemInterface.goToMyOrderDetails(myOrdersModelArrayList.get(position),position);
 
             }
         });
@@ -87,6 +91,9 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
             tMoreDetails = itemView.findViewById(R.id.tMoreDetails);
 
         }
+    }
+    public interface MyOrderItemInterface {
+        void goToMyOrderDetails(MyOrdersModel myOrdersModel, int Position);
     }
 
 }

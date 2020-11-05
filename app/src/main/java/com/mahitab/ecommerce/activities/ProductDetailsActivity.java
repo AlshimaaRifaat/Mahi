@@ -101,6 +101,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
     private SharedPreferences defaultPreferences;
     private TextView tvSKU;
 
+    private ArrayList<String> viewedProductList;
+    public static boolean isProductViewed;
+    private ArrayList<String> savedViewedList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,10 +130,22 @@ public class ProductDetailsActivity extends AppCompatActivity implements SharedP
             wishListProducts = new Gson().fromJson(defaultPreferences.getString("wishListProducts", null), new TypeToken<List<String>>() {
             }.getType());
 
+        if (defaultPreferences.getString("viewedProductList", null) == null)
+            viewedProductList = new ArrayList<>();
+        else
+            viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<List<String>>() {
+            }.getType());
+
         cartProductsCount = cartProducts.size();
 
         if (getIntent().getExtras() != null) {
             currentProductId = getIntent().getExtras().getString("productId");
+            boolean isViewedBefore = viewedProductList.stream()
+                    .anyMatch(productId -> productId.equals(currentProductId));
+
+            if (!isProductViewed)
+                defaultPreferences.edit().putString("viewedProductList",new Gson().toJson(viewedProductList)).apply();
+
             boolean isAddedBefore = cartProducts.stream()
                     .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
 

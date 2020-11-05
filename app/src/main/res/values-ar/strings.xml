@@ -46,27 +46,62 @@
     <string name="order_status">حالة الطلب</string>
     <string name="edit">تعديل</string>
     <string name="sign_out_message">لقد تم تسجيل خروجك بنجاح!</string>
-    <string name="add_address">اضف عنوان</string>
-    <string name="edit_address">edit</string>
-    <string name="building_number_role_apartment">رقم المنزل, دور, شقة</string>
-    <string name="city_neighborhood">المدينة / الحي</string>
-    <string name="zip_code">رقم البريد</string>
-    <string name="city">المحافطة</string>
-    <string name="save">حفظ</string>
-    <string name="cancel">إلغاء</string>
-    <string name="address_added_successfully">تمت إضافة العنوان بنجاح</string>
     <string name="moreDetails">More details</string>
     <string name="OrderNumber">Order Number</string>
     <string name="TotalPrice">Total Price</string>
     <string name="Date">Date</string>
-    <string name="address2">Address 2</string>
-    <string name="address">Address 1</string>
+
+    <!-- AddEditAddressActivity -->
+
+    <string name="add_address">اضف عنوان</string>
+    <string name="edit_address">تعديل</string>
+    <string name="building_number_role_apartment">رقم المنزل, دور, شقة</string>
+    <string name="city">المحافطة</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="address_added_successfully">تمت إضافة العنوان بنجاح</string>
+    <string name="address">العنوان</string>
     <string name="Province">Province</string>
-    <string name="PhoneNumber">Phone Number</string>
-    <string name="Country">Country</string>
-    <string name="City">City</string>
-    <string name="Egypt">Egypt</string>
-    <string name="address_updated_successfully">Address updated successfully!</string>
+    <string name="PhoneNumber">رقم الهاتف</string>
+    <string name="Country">الدولة</string>
+    <string name="City">المدينة</string>
+    <string name="Egypt">مصر</string>
+    <string name="address_updated_successfully">تم تحديث العنوان بنجاح!</string>
+    <string-array name="provinces">
+        <item>اختار المحافظة</item>
+        <item>أسوان</item>
+        <item>السادس من اكتوبر</item>
+        <item>الشرقية</item>
+        <item>القاهرة</item>
+        <item>الإسكندرية</item>
+        <item>أسيوط</item>
+        <item>البحيرة</item>
+        <item>بني سويف</item>
+        <item>الجيزة</item>
+        <item>حلوان</item>
+        <item>الدقهلية</item>
+        <item>دمياط</item>
+        <item>الفيوم</item>
+        <item>الغربية</item>
+        <item>الإسماعيلية</item>
+        <item>كفر الشيخ</item>
+        <item>الأقصر</item>
+        <item>مرسى مطروح</item>
+        <item>المنيا</item>
+        <item>المنوفية</item>
+        <item>الوادي الجديد</item>
+        <item>شمال سيناء</item>
+        <item>بورسعيد</item>
+        <item>القليوبية</item>
+        <item>قنا</item>
+        <item>البحر الاحمر</item>
+        <item>سوهاج</item>
+        <item>جنوب سيناء</item>
+        <item>السويس</item>
+    </string-array>
+
+    <!-- AddEditAddressActivity -->
+
     <string name="verify_phone">التحقق من الهاتف</string>
     <string name="we_have_sent_verification_code_to_your_number">لقد أرسلنا رمز التحقق إلى رقمك</string>
     <string name="_continue">المتابعة</string>
@@ -94,8 +129,4 @@
     <string name="we_will_send_you_an_email_to_reset_your_password_text">سنرسل لك بريدًا إلكترونيًا لإعادة تعيين كلمة المرور الخاصة بك</string>
     <!-- ResetPasswordActivity -->
 
-    <string-array name="provinces">
-        <item>اختار المحافطة</item>
-        <item>القاهرة</item>
-    </string-array>
 </resources>

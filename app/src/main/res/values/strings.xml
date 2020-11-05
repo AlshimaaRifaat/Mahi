@@ -56,29 +56,63 @@
         <item>#87CEEB</item>
         <item>#000080</item>
     </string-array>
-
     <string name="sign_out_message">You are Logged Out Successfully!</string>
-    <string name="add_address">Add Address</string>
-    <string name="edit_address">Edit Address</string>
-    <string name="address">Address 1</string>
-    <string name="building_number_role_apartment">Building No. , Role, Apartment</string>
-    <string name="city_neighborhood">City / Neighborhood</string>
-    <string name="zip_code">Zip Code</string>
-    <string name="city">City</string>
-    <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-    <string name="address_added_successfully">Address Added Successfully</string>
     <string name="moreDetails">More details</string>
     <string name="OrderNumber">Order Number</string>
     <string name="TotalPrice">Total Price</string>
     <string name="Date">Date</string>
-    <string name="address2">Address 2</string>
+
+    <!-- AddEditAddressActivity -->
+
+    <string name="add_address">Add Address</string>
+    <string name="edit_address">Edit Address</string>
+    <string name="address">Address</string>
+    <string name="building_number_role_apartment">Building No. , Role, Apartment</string>
+    <string name="city">City</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="address_added_successfully">Address Added Successfully</string>
     <string name="Province">Province</string>
     <string name="PhoneNumber">Phone Number</string>
     <string name="Country">Country</string>
     <string name="City">City</string>
     <string name="Egypt">Egypt</string>
     <string name="address_updated_successfully">Address updated successfully!</string>
+    <string-array name="provinces">
+        <item>Select Province</item>
+        <item>Aswan</item>
+        <item>6th of October</item>
+        <item>Al Sharqia</item>
+        <item>Cairo</item>
+        <item>Alexandria</item>
+        <item>Asyut</item>
+        <item>Beheira</item>
+        <item>Beni Suef</item>
+        <item>Giza</item>
+        <item>Helwan</item>
+        <item>Dakahlia</item>
+        <item>Damietta</item>
+        <item>Faiyum</item>
+        <item>Gharbia</item>
+        <item>Ismailia</item>
+        <item>Kafr el-Sheikh</item>
+        <item>Luxor</item>
+        <item>Matrouh</item>
+        <item>Minya</item>
+        <item>Monufia</item>
+        <item>New Valley</item>
+        <item>North Sinai</item>
+        <item>Port Said</item>
+        <item>Qalyubia</item>
+        <item>Qena</item>
+        <item>Red Sea</item>
+        <item>Sohag</item>
+        <item>South Sinai</item>
+        <item>Suez</item>
+    </string-array>
+
+    <!-- AddEditAddressActivity -->
+
     <string name="verify_phone">Verify Phone</string>
     <string name="we_have_sent_verification_code_to_your_number">We have sent verification code to your Number</string>
     <string name="_continue">Continue</string>
@@ -106,8 +140,4 @@
     <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
     <!-- ResetPasswordActivity -->
 
-    <string-array name="provinces">
-        <item>Select Province</item>
-        <item>Cairo</item>
-    </string-array>
 </resources>

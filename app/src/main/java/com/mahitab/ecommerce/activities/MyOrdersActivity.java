@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,10 +25,11 @@ import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class MyOrdersActivity extends AppCompatActivity {
+public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapter.MyOrderItemInterface {
     private static final String TAG = "MyOrdersActivity";
     ArrayList<MyOrdersModel> myOrdersModelArrayList=null;
     MyOrdersAdapter myOrdersAdapter;
@@ -116,6 +118,7 @@ public class MyOrdersActivity extends AppCompatActivity {
 
                             myOrdersModelArrayList.sort((o1, o2) -> o2.getOrderNumber().compareTo(o1.getOrderNumber()));
                             myOrdersAdapter = new MyOrdersAdapter(MyOrdersActivity.this,myOrdersModelArrayList);
+                            myOrdersAdapter.onClickItemMyOrder(MyOrdersActivity.this::goToMyOrderDetails);
                             rvMyOrders.setLayoutManager(new LinearLayoutManager(MyOrdersActivity.this));
                             rvMyOrders.setHasFixedSize(true);
                             rvMyOrders.setAdapter(myOrdersAdapter);
@@ -145,4 +148,12 @@ public class MyOrdersActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void goToMyOrderDetails(MyOrdersModel myOrdersModel, int Position) {
+        Intent intent=new Intent(this,MyOrderDetailsActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("myOrdersModel", (Serializable) myOrdersModel);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 }
