@@ -9,6 +9,8 @@
         </item> <!--Disable dummy starting window of application -->
         <item name="android:statusBarColor">@null</item>  <!--Remove status bar color -->
         <item name="autoCompleteTextViewStyle">@style/cursorColor</item>
+        <item name="android:fontFamily">@font/almarai</item>
+        <item name="fontFamily">@font/almarai</item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
     </style>
 
     <style name="ProgressDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
