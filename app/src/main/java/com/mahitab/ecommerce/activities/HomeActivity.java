@@ -158,7 +158,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     public void onBackPressed() {
         if (bnvHomeNavigation.getSelectedItemId() != R.id.home_navigation)
             changeFragment(new HomeFragment(), HomeFragment.class
-                    .getSimpleName(), bnvHomeNavigation.getMenu().getItem(0));
+                    .getName(), bnvHomeNavigation.getMenu().getItem(0));
         else {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
@@ -190,7 +190,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private void changeFragment(Fragment fragment, String tagFragmentName, MenuItem item) {
-
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 
@@ -248,30 +247,38 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
                 for (DataSnapshot sliderSnapshot : dataSnapshot.child("Slider").getChildren()) {
                     BannerModel sliderBanner = sliderSnapshot.getValue(BannerModel.class);
-                    sliderBanner.setReference(sliderSnapshot.getRef());
-                    sliderBanners.add(sliderBanner);
-                    sliderBannersLoaded = true;
+                    if (sliderBanner != null) {
+                        sliderBanner.setReference(sliderSnapshot.getRef());
+                        sliderBanners.add(sliderBanner);
+                        sliderBannersLoaded = true;
+                    }
                 }
 
                 for (DataSnapshot topBannersSnapshot : dataSnapshot.child("Banners/Top").getChildren()) {
                     BannerModel banner = topBannersSnapshot.getValue(BannerModel.class);
-                    banner.setReference(topBannersSnapshot.getRef());
-                    topBanners.add(banner);
-                    topBannersLoaded = true;
+                    if (banner != null) {
+                        banner.setReference(topBannersSnapshot.getRef());
+                        topBanners.add(banner);
+                        topBannersLoaded = true;
+                    }
                 }
 
                 for (DataSnapshot midBannersSnapshot : dataSnapshot.child("Banners/Mid").getChildren()) {
                     BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
-                    banner.setReference(midBannersSnapshot.getRef());
-                    midBanners.add(banner);
-                    midBannersLoaded = true;
+                    if (banner != null) {
+                        banner.setReference(midBannersSnapshot.getRef());
+                        midBanners.add(banner);
+                        midBannersLoaded = true;
+                    }
                 }
 
                 for (DataSnapshot midBannersSnapshot : dataSnapshot.child("Banners/Bottom").getChildren()) {
                     BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
-                    banner.setReference(midBannersSnapshot.getRef());
-                    bottomBanners.add(banner);
-                    bottomBannersLoaded = true;
+                    if (banner != null) {
+                        banner.setReference(midBannersSnapshot.getRef());
+                        bottomBanners.add(banner);
+                        bottomBannersLoaded = true;
+                    }
                 }
 
                 DataManager.getInstance().collections(new BaseCallback() {
