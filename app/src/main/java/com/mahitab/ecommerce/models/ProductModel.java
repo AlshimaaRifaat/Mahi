@@ -24,7 +24,7 @@ public class ProductModel {
     private String[] mImages;
     private String[] mTags = null;
 
-    private ArrayList<ProductVariantModel> mVariants = new ArrayList<ProductVariantModel>();
+    private final ArrayList<ProductVariantModel> mVariants = new ArrayList<ProductVariantModel>();
     private String mCollectionID;
     private String mType;
 
@@ -104,6 +104,10 @@ public class ProductModel {
 
     public String getCollectionID() {
         return mCollectionID;
+    }
+
+    public String getType() {
+        return mType;
     }
 
     public boolean containsSelectedOption(String type, String value) {
@@ -195,7 +199,6 @@ public class ProductModel {
 
             mProductID = productID;
 
-
             for (Storefront.SelectedOption option : variant.getSelectedOptions()) {
                 mSelectedOptions.put(option.getName(), option.getValue());
             }
@@ -243,6 +246,10 @@ public class ProductModel {
 
         public String getProductID() {
             return mProductID;
+        }
+
+        public String getType() {
+            return mType;
         }
 
         public HashMap<String, String> getSelectedOptions() {

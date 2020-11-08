@@ -12,7 +12,7 @@
     <!-- Home Activity -->
 
     <string name="title_activity_product_details">تفاصيل المنتج</string>
-    <string name="egp">جنيه\u0020</string>
+    <string name="egp">\u0020جنيه</string>
 
     <string name="payment_upon_receipt">الدفع عند الاستلام</string>
     <string name="free_shipping">شحن مجاني</string>
@@ -128,5 +128,8 @@
     <string name="check_your_email">البريد الإلكتروني لإعادة تعيين كلمة المرور في طريقك إليك</string>
     <string name="we_will_send_you_an_email_to_reset_your_password_text">سنرسل لك بريدًا إلكترونيًا لإعادة تعيين كلمة المرور الخاصة بك</string>
     <!-- ResetPasswordActivity -->
+
+    <string name="meter">متر</string>
+    <string name="number">عدد</string>
 
 </resources>

@@ -140,4 +140,7 @@
     <string name="we_will_send_you_an_email_to_reset_your_password_text">We will send you an email to reset your password.</string>
     <!-- ResetPasswordActivity -->
 
+    <string name="meter">Meter</string>
+    <string name="number">Number</string>
+
 </resources>

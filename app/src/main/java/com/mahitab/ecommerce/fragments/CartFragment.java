@@ -502,7 +502,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         });
     }
 
-
     @Override
     public void onIncreaseProductQuantityClick(int position) {
         cartProducts.get(position).plusQuantity();
@@ -520,6 +519,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         cartAdapter.notifyDataSetChanged();
         defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
         calculateSubTotalUpdateUI();
+        changeBadge();
     }
 
     @Override
@@ -528,12 +528,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         cartAdapter.notifyDataSetChanged();
         defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
         calculateSubTotalUpdateUI();
-        BadgeDrawable cartBadge = ((HomeActivity) getActivity()).getBnvHomeNavigation().getOrCreateBadge(R.id.cart_navigation);
-        if (cartProducts.size() >= 1) {
-            cartBadge.setVisible(true);
-            cartBadge.setNumber(cartProducts.size());
-            cartBadge.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-        } else cartBadge.setVisible(false);
+        changeBadge();
     }
 
     @Override
@@ -560,5 +555,14 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             llEmptyCart.setVisibility(View.GONE);
             llContentCart.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void changeBadge(){
+        BadgeDrawable cartBadge = ((HomeActivity) getActivity()).getBnvHomeNavigation().getOrCreateBadge(R.id.cart_navigation);
+        if (cartProducts.size() >= 1) {
+            cartBadge.setVisible(true);
+            cartBadge.setNumber(cartProducts.size());
+            cartBadge.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
+        } else cartBadge.setVisible(false);
     }
 }

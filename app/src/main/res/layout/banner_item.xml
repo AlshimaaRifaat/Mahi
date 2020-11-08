@@ -14,7 +14,7 @@
         <ImageView
             android:id="@+id/ivImage_BannerItem"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="90dp"
             android:adjustViewBounds="true"
             android:src="@drawable/ic_image_gray_24dp"
             tools:ignore="ContentDescription" />

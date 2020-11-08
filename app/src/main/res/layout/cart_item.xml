@@ -9,20 +9,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:orientation="horizontal"
         android:weightSum="10">
 
-        <ImageView
-            android:id="@+id/ivProductImage_CartItem"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="7"
-            android:src="@drawable/ic_image_gray_24dp"
-            tools:ignore="ContentDescription" />
+            android:layout_weight="7">
+
+            <ImageView
+                android:id="@+id/ivProductImage_CartItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_image_gray_24dp"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tvDiscount_CartItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/percentage_background"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_weight="3"
             android:orientation="vertical">
 
@@ -35,9 +54,9 @@
                     android:id="@+id/tvProductTitle_CartItem"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1" />
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/ivDelete_CartItem"
@@ -60,6 +79,7 @@
                     android:id="@+id/tvPrice_CartItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:gravity="start"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="20sp" />
@@ -79,12 +99,11 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvQuantityType_CartItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="0dp" />
+                    android:text="@string/number"
+                    android:textSize="16sp" />
 
                 <ImageView
                     android:id="@+id/ivIncreaseQuantity_CartItem"
@@ -93,7 +112,7 @@
                     android:background="?android:attr/actionBarItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="16dp"
+                    android:padding="8dp"
                     android:src="@drawable/ic_add_circle_outline_yellow_24dp"
                     tools:ignore="ContentDescription" />
 
@@ -102,7 +121,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textSize="17sp" />
+                    android:textSize="20sp" />
 
                 <ImageView
                     android:id="@+id/ivDecreaseQuantity_CartItem"
@@ -111,9 +130,16 @@
                     android:background="?android:attr/actionBarItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="16dp"
+                    android:padding="8dp"
                     android:src="@drawable/ic_remove_circle_outline_yellow_24dp"
                     tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/tvQuantityType_CartItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 

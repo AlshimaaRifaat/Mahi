@@ -27,12 +27,12 @@ import java.util.Observer;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
-    private ArrayList<ProductModel> productList;
+    private final ArrayList<ProductModel> productList;
     private ProductClickListener listener;
 
     private ArrayList<ProductModel> productsDataList;
     private SelectedOptions selectedOptions = new SelectedOptions();
-    Context context;
+    private final Context context;
 
     public ProductAdapter(Context context, ArrayList<ProductModel> productList) {
         this.context = context;

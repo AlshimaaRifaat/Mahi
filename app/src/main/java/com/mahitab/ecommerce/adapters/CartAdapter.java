@@ -63,21 +63,36 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                     product.getVariants().get(0).isAvailableForSale()) {
                 oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvOldPrice.setText(oldPrice);
-                holder.tvOldPrice.setText(oldPrice);
                 holder.tvOldPrice.setPaintFlags(holder.tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvPrice.setVisibility(View.VISIBLE);
                 holder.tvPrice.setText(price);
+
+                float mPrice = product.getVariants().get(0).getPrice().floatValue();
+                float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
+
+                float ratioDiscount = ((mOldPrice - mPrice) / mOldPrice) * 100;
+                String discountPercentage = NumberFormat.getInstance(new Locale("ar")).format(Math.ceil(ratioDiscount)) + holder.itemView.getContext().getResources().getString(R.string.discount_percentage);
+                holder.tvDiscount.setText(discountPercentage);
+                holder.tvDiscount.setVisibility(View.VISIBLE);
+
             } else {
                 holder.tvPrice.setVisibility(View.INVISIBLE);
                 holder.tvOldPrice.setVisibility(View.VISIBLE);
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvOldPrice.setText(price);
-                holder.tvOldPrice.setText(price);
+                holder.tvDiscount.setVisibility(View.GONE);
             }
         }
 
+        if (product.getTitle().startsWith("قماش")) {
+            String type = context.getResources().getString(R.string.meter);
+            holder.tvQuantityType.setText(type);
+            holder.tvQuantityType.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvQuantityType.setVisibility(View.GONE);
+        }
 
         holder.tvQuantity.setText(String.valueOf(cartItemQuantities.get(position).getQuantity()));
         holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getId().toString()));
@@ -95,6 +110,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         private final TextView tvOldPrice;
         private final TextView tvQuantityType;
         private final TextView tvQuantity;
+        private final TextView tvDiscount;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -106,6 +122,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvQuantityType = itemView.findViewById(R.id.tvQuantityType_CartItem);
             ImageView ivIncreaseQuantity = itemView.findViewById(R.id.ivIncreaseQuantity_CartItem);
             tvQuantity = itemView.findViewById(R.id.tvQuantity_CartItem);
+            tvDiscount = itemView.findViewById(R.id.tvDiscount_CartItem);
             ImageView ivDecreaseQuantity = itemView.findViewById(R.id.ivDecreaseQuantity_CartItem);
 
             ivDelete.setOnClickListener(this);

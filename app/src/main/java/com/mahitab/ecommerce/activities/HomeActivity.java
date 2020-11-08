@@ -114,7 +114,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume() {
         super.onResume();
-
+        setArDefaultLocale(this);
         if (defaultPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
         else

@@ -82,18 +82,14 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
 
     public class CollectionProductsViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerView rvProducts;
-        private final TextView tvSeeAll;
 
         public CollectionProductsViewHolder(@NonNull View itemView) {
             super(itemView);
             rvProducts = itemView.findViewById(R.id.rvProducts_CollectionProductsItem);
-            tvSeeAll = itemView.findViewById(R.id.tvSeeAll_CollectionProducts_Item);
-            tvSeeAll.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener!=null&&getAdapterPosition()!=RecyclerView.NO_POSITION)
-                        listener.onCollectionClick(collectionList.get(getAdapterPosition()));
-                }
+            TextView tvSeeAll = itemView.findViewById(R.id.tvSeeAll_CollectionProducts_Item);
+            tvSeeAll.setOnClickListener(v -> {
+                if (listener!=null&&getAdapterPosition()!=RecyclerView.NO_POSITION)
+                    listener.onCollectionClick(collectionList.get(getAdapterPosition()));
             });
         }
     }
