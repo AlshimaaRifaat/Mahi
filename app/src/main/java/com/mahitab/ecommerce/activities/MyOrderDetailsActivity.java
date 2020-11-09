@@ -22,7 +22,6 @@ public class MyOrderDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_order_details);
         mywebview = findViewById(R.id.webView);
 
-        Intent intent = getIntent();
         myOrdersModel = (MyOrdersModel) getIntent().getSerializableExtra("myOrdersModel");
         Log.d(TAG, "onCreate: " + myOrdersModel.getStatutsUrl());
         mywebview.setWebViewClient(new MyBrowser());

@@ -3,9 +3,11 @@ package com.mahitab.ecommerce.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -52,12 +54,15 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
 
         MyOrdersModel singleItem = myOrdersModelArrayList.get(position);
         holder.tOrderNumber.setText(context.getResources().getString(R.string.OrderNumber)+": "+singleItem.getOrderNumber().toString());
-        holder.tTotalPrice.setText(context.getResources().getString(R.string.TotalPrice)+": "+singleItem.getTotalPrice().toString());
+        float price=Float.parseFloat(singleItem.getTotalPrice());
+        String totalPrice = (int) Math.ceil(price)+"";
+        Log.d("price", "onBindViewHolder: "+totalPrice+" ");
+        holder.tTotalPrice.setText(context.getResources().getString(R.string.TotalPrice)+": "+totalPrice +" EGP");
         String date = singleItem.getProcessedAt().toString();
         String[] arr = date.split("T");
 
         holder.tDate.setText(context.getResources().getString(R.string.Date)+": "+arr[0].trim());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.btnMoreDetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 myOrderItemInterface.goToMyOrderDetails(myOrdersModelArrayList.get(position),position);
@@ -81,14 +86,14 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         protected TextView tOrderNumber;
         protected TextView tTotalPrice;
         protected TextView tDate;
-        protected TextView tMoreDetails;
+        protected Button btnMoreDetails;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tOrderNumber = itemView.findViewById(R.id.tOrderNumber);
             tTotalPrice = itemView.findViewById(R.id.tTotalPrice);
             tDate = itemView.findViewById(R.id.tDate);
-            tMoreDetails = itemView.findViewById(R.id.tMoreDetails);
+            btnMoreDetails = itemView.findViewById(R.id.btnMoreDetails);
 
         }
     }

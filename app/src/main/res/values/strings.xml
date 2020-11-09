@@ -142,5 +142,7 @@
 
     <string name="meter">Meter</string>
     <string name="number">Number</string>
+    <string name="OrderState">Order State</string>
+    <string name="RecentlyViewed">Recently Viewed</string>
 
 </resources>

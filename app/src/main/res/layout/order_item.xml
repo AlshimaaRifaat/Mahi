@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
@@ -32,7 +33,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/order_no"
                     android:textColor="@android:color/black"
-                    android:textSize="17sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -54,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/grand_total"
                     android:textColor="@android:color/black"
-                    android:textSize="17sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -74,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/order_date"
                     android:textColor="@android:color/black"
-                    android:textSize="17sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -85,30 +86,20 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="6"
-            android:orientation="vertical"
-            android:paddingBottom="16dp">
 
-            <TextView
-                android:id="@+id/tMoreDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/moreDetails"
-                android:textSize="17sp"
-                android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="17sp"
-                android:textStyle="bold" />
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/btnMoreDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/OrderState"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:ignore="ButtonStyle" />
+
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

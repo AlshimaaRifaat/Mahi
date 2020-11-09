@@ -46,10 +46,10 @@
     <string name="order_status">حالة الطلب</string>
     <string name="edit">تعديل</string>
     <string name="sign_out_message">لقد تم تسجيل خروجك بنجاح!</string>
-    <string name="moreDetails">More details</string>
-    <string name="OrderNumber">Order Number</string>
-    <string name="TotalPrice">Total Price</string>
-    <string name="Date">Date</string>
+    <string name="moreDetails">المزيد من التفاصيل</string>
+    <string name="OrderNumber">رقم الطلب</string>
+    <string name="TotalPrice">السعر الكلى</string>
+    <string name="Date">التاريخ</string>
 
     <!-- AddEditAddressActivity -->
 
@@ -131,5 +131,8 @@
 
     <string name="meter">متر</string>
     <string name="number">عدد</string>
+
+    <string name="OrderState">حالة الطلب</string>
+    <string name="RecentlyViewed">شوهد مؤخرا</string>
 
 </resources>

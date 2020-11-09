@@ -16,9 +16,9 @@ import com.mahitab.ecommerce.R;
 import java.util.List;
 
 public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
-    private final List<String> imageList;
-    private final Context context;
-
+    private  List<String> imageList;
+    private  Context context;
+    private ImageSliderItemClickInterface imageSliderItemClickInterface;
     public ProductImageSliderAdapter(Context context, List<String> itemList, boolean isInfinite) {
         super(context, itemList, isInfinite);
         imageList = itemList;
@@ -32,9 +32,9 @@ public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
     }
 
     @Override
-    protected void bindView(View convertView, final int listPosition, int viewType) {
+    protected void bindView(View convertView,  int listPosition, int viewType) {
 
-        final ImageView ivSlideImage = convertView.findViewById(R.id.ivSlideImage_ProductImageSlide);
+        ImageView ivSlideImage = convertView.findViewById(R.id.ivSlideImage_ProductImageSlide);
 
         Glide.with(context)
                 .load(imageList.get(listPosition))
@@ -43,6 +43,21 @@ public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
                 .dontTransform()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(ivSlideImage);
+        ivSlideImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageSliderItemClickInterface.imageSliderItemClick(convertView,listPosition,imageList);
+            }
+        });
 
     }
+
+    public interface ImageSliderItemClickInterface {
+        void imageSliderItemClick(View view,int position,List<String> imageList);
+    }
+
+    public void setImageSliderItemClickListener(ImageSliderItemClickInterface imageSliderItemClickInterface) {
+        this.imageSliderItemClickInterface = imageSliderItemClickInterface;
+    }
+
 }
