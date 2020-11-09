@@ -134,5 +134,6 @@
 
     <string name="OrderState">حالة الطلب</string>
     <string name="RecentlyViewed">شوهد مؤخرا</string>
+    <string name="Please_enter_all_fields">الرجاء إدخال كافة الحقول!</string>
 
 </resources>

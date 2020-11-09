@@ -76,7 +76,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_weight="1">
@@ -103,15 +103,13 @@
                 android:orientation="horizontal">
 
                 <Spinner
-                    android:id="@+id/spProvinces_AddEditAddressActivity"
-                    style="@android:style/Widget.Material.Spinner"
+                    android:id="@+id/spinnerProvince"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="55dp"
                     android:layout_weight="1"
-                    android:drawSelectorOnTop="false"
-                    android:entries="@array/provinces"
                     android:prompt="@string/Province"
-                    android:scrollbars="none" />
+                    app:backgroundTint="#777575"></Spinner>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -147,7 +145,7 @@
                     android:layout_height="140dp"
                     android:gravity="start"
                     android:hint="@string/Notes"
-                    android:inputType="textAutoComplete"
+
                     tools:ignore="Autofill,LabelFor" />
 
             </com.google.android.material.textfield.TextInputLayout>

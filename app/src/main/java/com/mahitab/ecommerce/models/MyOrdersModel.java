@@ -5,7 +5,9 @@ import com.shopify.graphql.support.ID;
 
 import org.joda.time.DateTime;
 
-public class MyOrdersModel {
+import java.io.Serializable;
+
+public class MyOrdersModel implements Serializable {
     private Integer orderNumber;
     private String totalPrice;
     private String statutsUrl;

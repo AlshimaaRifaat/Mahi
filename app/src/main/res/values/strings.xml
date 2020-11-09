@@ -144,5 +144,6 @@
     <string name="number">Number</string>
     <string name="OrderState">Order State</string>
     <string name="RecentlyViewed">Recently Viewed</string>
+    <string name="Please_enter_all_fields">Please enter all fields!</string>
 
 </resources>
