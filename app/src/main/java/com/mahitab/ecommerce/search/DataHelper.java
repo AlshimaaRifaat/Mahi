@@ -1,6 +1,7 @@
 package com.mahitab.ecommerce.search;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.widget.Filter;
 
 import com.google.gson.Gson;
@@ -24,7 +25,7 @@ public class DataHelper {
 
 
 
-    private static ArrayList<ColorSuggestion> sColorSuggestions = SearchResultActivity.recentlySearchedList;
+    private static ArrayList<ColorSuggestion> sColorSuggestions;
     public interface OnFindColorsListener {
         void onResults(ArrayList<ProductModel> results);
     }
@@ -33,9 +34,14 @@ public class DataHelper {
         void onResults(List<ColorSuggestion> results);
     }
 
-    public static List<ColorSuggestion> getHistory(Context context, int count) {
+    public static List<ColorSuggestion> getHistory(SharedPreferences defaultPreferences, Context context, int count) {
+        if (defaultPreferences.getString("recentlySearchedList", null) == null)
+            sColorSuggestions = new ArrayList<>();
+        else
+            sColorSuggestions = new Gson().fromJson(defaultPreferences.getString("recentlySearchedList", null), new TypeToken<List<ColorSuggestion>>() {
+            }.getType());
 
-        ArrayList<ColorSuggestion> suggestionList = new ArrayList<>();
+        ArrayList<ColorSuggestion> suggestionList=new ArrayList<>();
         ColorSuggestion colorSuggestion;
         for (int i = 0; i < sColorSuggestions.size(); i++) {
             colorSuggestion = sColorSuggestions.get(i);
@@ -122,11 +128,11 @@ public class DataHelper {
                 if (!(constraint == null || constraint.length() == 0)) {
 
                     for (ProductModel color : sColorWrappers) {
-                       if (color.getTitle()
+                        if (color.getTitle()
                                 .startsWith(constraint.toString().toUpperCase())) {
 
                             suggestionList.add(color);
-                       }
+                        }
                     }
 
                 }

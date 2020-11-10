@@ -3,6 +3,7 @@ package com.mahitab.ecommerce.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -34,6 +35,7 @@ import com.mahitab.ecommerce.search.DataHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 
 public class SearchResultActivity extends AppCompatActivity {
@@ -51,19 +53,19 @@ public class SearchResultActivity extends AppCompatActivity {
     public static int x=0;
     ArrayList<CollectionModel> allCollectionList=null;
     public static ArrayList<ColorSuggestion> recentlySearchedList;
-    SharedPreferences.Editor shEditor;
     private SharedPreferences defaultPreferences;
     FloatingSearchView mSearchView;
     public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
     private String mLastQuery = "";
-    String newQuery;
+    SharedPreferences.Editor shEditor;
+
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
         initView();
-
+        setArDefaultLocale(this);
         mSearchView.setSearchFocused(true);
         mSearchView.setSearchFocusable(true);
         //setSupportActionBar(toolbar);
@@ -90,8 +92,6 @@ public class SearchResultActivity extends AppCompatActivity {
 
 
 
-
-
     }
 
     private void setupFloatingSearch() {
@@ -110,15 +110,6 @@ public class SearchResultActivity extends AppCompatActivity {
                     selectedOptions.setSearchCriteria(newQuery);
 
 
-               /* recentlySearchedList.add(new ColorSuggestion(newQuery));
-
-                if (!recentlySearchedList.isEmpty()) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(recentlySearchedList);
-                    shEditor.remove("recentlySearchedList").apply();
-                    shEditor.putString("recentlySearchedList", json);
-                    shEditor.apply();
-                }*/
                 }
                 Log.d(TAG, "list: " + recentlySearchedList.toString());
 
@@ -143,6 +134,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
                                     //this will swap the data and
                                     //render the collapse/expand animations as necessary
+
                                     mSearchView.swapSuggestions(results);
 
                                     //let the users know that the background
@@ -161,13 +153,17 @@ public class SearchResultActivity extends AppCompatActivity {
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
 
                 ColorSuggestion colorSuggestion = (ColorSuggestion) searchSuggestion;
+                Log.d(TAG, "onSuggestionClicked: "+colorSuggestion.getBody().toString());
                 DataHelper.findColors(SearchResultActivity.this, colorSuggestion.getBody(),
                         new DataHelper.OnFindColorsListener() {
 
                             @Override
-                            public void onResults(ArrayList<ProductModel> results) {
+                            public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
-
+                                getSearchResult(searchResultList);
+                                selectedOptions.setSearchCriteria(colorSuggestion.getBody());
+                                mSearchView.clearSuggestions();
+                                mSearchView.setSearchFocusable(false);
 
                             }
 
@@ -187,11 +183,7 @@ public class SearchResultActivity extends AppCompatActivity {
                             @Override
                             public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
-                                Toast.makeText(SearchResultActivity.this, "ok", Toast.LENGTH_SHORT).show();
 
-
-
-                                //  Log.d(TAG, "size list: "+searchResultList.size()+"");
                                 getSearchResult(searchResultList);
                                 selectedOptions.setSearchCriteria(mLastQuery.toString());
 
@@ -206,8 +198,6 @@ public class SearchResultActivity extends AppCompatActivity {
                                     shEditor.apply();
                                 }
                                 Log.d(TAG, "list: " + recentlySearchedList.toString());
-
-
                             }
 
                         });
@@ -216,12 +206,14 @@ public class SearchResultActivity extends AppCompatActivity {
         });
 
 
+
+
         mSearchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
 
                 //show suggestions when search bar gains focus (typically history suggestions)
-                mSearchView.swapSuggestions(DataHelper.getHistory(SearchResultActivity.this, 6));
+                mSearchView.swapSuggestions(DataHelper.getHistory(defaultPreferences,SearchResultActivity.this, 6));
 
                 Log.d(TAG, "onFocus()");
 
@@ -243,30 +235,15 @@ public class SearchResultActivity extends AppCompatActivity {
 
         //handle menu clicks the same way as you would
         //in a regular activity
+
+
         mSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
+                //just print action
+                Log.d(TAG, "onActionMenuItemSelected: "+item.getItemId()+" ");
 
-          /*      if (item.getItemId() == R.id.action_change_colors) {
 
-                    mIsDarkSearchTheme = true;
-
-                    //demonstrate setting colors for items
-                    mSearchView.setBackgroundColor(Color.parseColor("#787878"));
-                    mSearchView.setViewTextColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setHintTextColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setActionMenuOverflowColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setMenuItemIconColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setLeftActionIconColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setClearBtnColor(Color.parseColor("#e9e9e9"));
-                    mSearchView.setDividerColor(Color.parseColor("#BEBEBE"));
-                    mSearchView.setLeftActionIconColor(Color.parseColor("#e9e9e9"));
-                } else {
-
-                    //just print action
-                    Toast.makeText(getActivity().getApplicationContext(), item.getTitle(),
-                            Toast.LENGTH_SHORT).show();
-                }*/
 
             }
         });
@@ -345,85 +322,6 @@ public class SearchResultActivity extends AppCompatActivity {
 
 
     }
-
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (recentlySearchedList!=null) {
-            Gson gson = new Gson();
-            String json = gson.toJson(recentlySearchedList);
-            shEditor.remove("recentlySearchedList").apply();
-            shEditor.putString("recentlySearchedList", json);
-            shEditor.apply();
-        }else{
-            recentlySearchedList = new ArrayList<>();
-        }
-
-    }
-
-
-/* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_menu, menu);
-        searchMenuItem = menu.findItem(R.id.action_search);
-
-        SearchView searchView = (SearchView) searchMenuItem.getActionView();
-        searchView.setIconified(false);
-
-
-        EditText searchEditText = (EditText) searchView.findViewById(R.id.search_src_text);
-        searchEditText.setTextColor(getResources().getColor(R.color.primary_color_light));
-        searchEditText.setHintTextColor(getResources().getColor(R.color.primary_color_light));
-
-        searchCloseIcon = searchView.findViewById(R.id.search_close_btn);
-        searchCloseIcon.setImageResource(R.drawable.ic_clear_black_24dp);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                x=1;
-                getSearchResult();
-                Log.d(TAG, "onQueryTextSubmit: "+x);
-                selectedOptions.setSearchCriteria(query);
-
-
-                recentlySearchedList.add(query);
-
-                if (!recentlySearchedList.isEmpty()) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(recentlySearchedList);
-                    shEditor.remove("recentlySearchedList").apply();
-                    shEditor.putString("recentlySearchedList", json);
-                    shEditor.apply();
-                }
-
-
-
-
-
-                return false;
-
-
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                x=1;
-                getSearchResult();
-                Log.d(TAG, "onQueryTextChange: "+x);
-                selectedOptions.setSearchCriteria(newText);
-                return true;
-            }
-        });
-        return true;
-
-    }*/
-
-
-
-
-
 
     private void getSearchResult(ArrayList<ProductModel> searchResultList) {
 
