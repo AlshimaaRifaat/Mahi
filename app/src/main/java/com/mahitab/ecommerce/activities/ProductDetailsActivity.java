@@ -27,8 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,9 +46,7 @@ import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.ProductReviewModel;
 import com.rd.PageIndicatorView;
 import com.stfalcon.imageviewer.StfalconImageViewer;
-import com.stfalcon.imageviewer.loader.ImageLoader;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,6 +82,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private LinearLayout llCartQuantityControl;
     private Button btnAddToCart;
 
+    private TextView tvWidth2;
     private TextView tvQuantityType;
     private ImageView ivIncreaseQuantity;
     private TextView tvCartQuantity,tvOldPrice;
@@ -113,8 +110,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
     public ArrayList<String> viewedProductList;
     public ArrayList<ProductModel> recentlyViewedProductList;
-    public static boolean isProductViewed;
-    String oldPrice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,13 +179,25 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 }
 
                 tvTitle.setText(product.getTitle());
-                tvSKU.setText("#"+product.getSKU());
+
+                if (product.getTitle().startsWith("قماش")) {
+                    String type = getResources().getString(R.string.meter);
+                    tvWidth2.setVisibility(View.VISIBLE);
+                    tvQuantityType.setText(type);
+                    tvQuantityType.setVisibility(View.VISIBLE);
+                } else {
+                    tvWidth2.setVisibility(View.GONE);
+                    tvQuantityType.setVisibility(View.GONE);
+                }
+
+                String sku="#"+product.getSKU();
+                tvSKU.setText(sku);
                 String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
 
                 tvPrice.setText(price);
 
                 if (product.getVariants().get(0).getOldPrice()!=null) {
-                    oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + getString(R.string.egp);
+                    String oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + getString(R.string.egp);
                     tvOldPrice.setText(oldPrice);
                     tvOldPrice.setPaintFlags(tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
@@ -398,6 +406,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         llCartQuantityControl = findViewById(R.id.llCartQuantityControl_ProductDetailsActivity);
         btnAddToCart = findViewById(R.id.btnAddToCart_ProductDetailsActivity);
         ivBuyByPhone = findViewById(R.id.ivBuyByPhone_ProductDetailsActivity);
+        tvWidth2 = findViewById(R.id.tvWidth2__ProductDetailsActivity);
         tvQuantityType = findViewById(R.id.tvQuantityType_ProductDetailsActivity);
         tvCartQuantity = findViewById(R.id.tvCartQuantity_ProductDetailsActivity);
         ivIncreaseQuantity = findViewById(R.id.ivIncreaseQuantity_ProductDetailsActivity);
@@ -508,16 +517,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     @Override
     public void imageSliderItemClick(View view, int position, List<String> imageList) {
 
-        new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, new ImageLoader<String >() {
-            @Override
-            public void loadImage(ImageView imageView, String image) {
-                Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView);
-            }
-        })
+        new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, (imageView, image) -> Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView))
                 .withStartPosition(position).show();
-
-
-
-
     }
 }

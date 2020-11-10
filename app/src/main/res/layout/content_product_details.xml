@@ -43,34 +43,34 @@
                 app:piv_unselectedColor="@color/colorAccent"
                 app:piv_viewPager="@id/viewPager"
                 attrs:piv_radius="3dp" />
+
             <TextView
                 android:id="@+id/tvDiscount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="12dp"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp"
                 android:background="@drawable/percentage_background"
                 android:gravity="center"
-                android:layout_alignParentRight="true"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                />
+                tools:ignore="RelativeOverlap" />
 
             <TextView
                 android:id="@+id/tvSKU_ProductDetailsActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="2dp"
                 android:layout_marginTop="250dp"
                 android:background="@drawable/percentage_background"
                 android:gravity="center"
                 android:paddingStart="7dp"
                 android:paddingEnd="7dp"
-                android:layout_marginLeft="2dp"
-                android:layout_alignParentLeft="true"
-                android:textColor="@android:color/white"
-                />
+                android:textColor="@android:color/white" />
         </RelativeLayout>
 
         <androidx.cardview.widget.CardView
@@ -100,6 +100,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -110,19 +111,24 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimaryDark"
-                                android:text="4567"
-                                android:textSize="15sp"
-                                />
+                                android:textSize="15sp" />
+
                             <TextView
                                 android:id="@+id/tvOldPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="20dp"
                                 android:layout_marginRight="20dp"
-                                android:textSize="15sp"
-                                android:text=""/>
+                                android:textSize="15sp" />
 
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvWidth2__ProductDetailsActivity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/width_2_widths_150_cm"/>
+
                         <RatingBar
                             android:id="@+id/rbAverageRating_ProductDetailsActivity"
                             style="@style/Widget.AppCompat.RatingBar.Small"
@@ -313,19 +319,20 @@
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"
-            tools:listitem="@layout/product_item"
-            />
+            tools:listitem="@layout/product_item" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/RecentlyViewed"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:background="?android:attr/actionBarItemBackground"
             android:focusable="true"
+            android:text="@string/RecentlyViewed"
             android:textColor="@color/colorPrimary"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
             android:textSize="15sp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRecentlyViewed"
             android:layout_width="match_parent"
@@ -334,7 +341,6 @@
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 
-            tools:listitem="@layout/product_item"
-            />
+            tools:listitem="@layout/product_item" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

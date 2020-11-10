@@ -82,7 +82,6 @@
                 android:layout_gravity="center"
                 android:paddingStart="16dp"
                 android:paddingEnd="0dp"
-                android:text="متر"
                 android:textSize="17sp" />
 
             <Button
