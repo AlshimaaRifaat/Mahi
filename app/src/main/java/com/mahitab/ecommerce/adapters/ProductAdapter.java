@@ -85,8 +85,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 holder.tvDiscount.setVisibility(View.VISIBLE);
 
             } else {
-                holder.tvPrice.setVisibility(View.INVISIBLE);
+                holder.tvPrice.setVisibility(View.GONE);
                 holder.tvOldPrice.setVisibility(View.VISIBLE);
+                holder.tvOldPrice.setPaintFlags(0);
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvOldPrice.setText(price);
                 holder.tvDiscount.setVisibility(View.GONE);
