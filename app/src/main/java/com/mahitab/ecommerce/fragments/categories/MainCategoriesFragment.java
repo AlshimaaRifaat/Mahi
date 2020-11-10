@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.MainCategoryAdapter;
-import com.mahitab.ecommerce.models.BannerModel;
+import com.mahitab.ecommerce.managers.FirebaseManager;
 import com.mahitab.ecommerce.models.CategoryModel;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class MainCategoriesFragment extends Fragment {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             CategoryModel category = snapshot.getValue(CategoryModel.class);
                             if (category != null) {
-                                category.setBanners(getCategoryBanners(snapshot));
+                                category.setBanners(FirebaseManager.getBanners(snapshot));
                                 categories.add(category);
                             }
                         }
@@ -80,13 +80,5 @@ public class MainCategoriesFragment extends Fragment {
 
     private void initView(View view) {
         rvMainCategories = view.findViewById(R.id.rvMainCategories_MainCategoriesFragment);
-    }
-
-    public List<BannerModel> getCategoryBanners(DataSnapshot dataSnapshot) {
-        List<BannerModel> list = new ArrayList<>();
-        for (DataSnapshot child : dataSnapshot.child("banners").getChildren()) {
-            list.add(child.getValue(BannerModel.class));
-        }
-        return list;
     }
 }

@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,11 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CollectionProductsActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
@@ -35,6 +29,7 @@ import com.mahitab.ecommerce.activities.SearchResultActivity;
 import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.SliderBannersAdapter;
+import com.mahitab.ecommerce.managers.FirebaseManager;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.rd.PageIndicatorView;
@@ -45,8 +40,6 @@ import java.util.List;
 
 public class HomeFragment extends Fragment implements BannerAdapter.BannerClickListener,
         HomeActivity.HomePageLoadedListener, CollectionsAdapter.CollectionClickListener, SliderBannersAdapter.SliderBannerClickListener {
-
-    private static final String TAG = "HomeFragment";
 
     private Toolbar toolbar;
     private RecyclerView rvTopBanners;
@@ -178,6 +171,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     @Override
     public void onBannerClick(BannerModel banner) {
+        FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
         String type;
         Intent intent;
         if (banner.getType().startsWith("p")) {
@@ -197,7 +191,6 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
             intent.putExtra("collectionId", targetId);
             startActivity(intent);
         }
-        incrementBannerNoOfClicks(banner.getReference());
     }
 
     @Override
@@ -241,7 +234,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     @Override
     public void onSliderBannerClick(BannerModel banner) {
-        incrementBannerNoOfClicks(banner.getReference());
+        FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
     }
 
     private void initView(View view) {
@@ -263,28 +256,4 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         startActivity(intent);
     }
 
-    private void incrementBannerNoOfClicks(DatabaseReference bannerReference) {
-        bannerReference.runTransaction(new Transaction.Handler() {
-            @NonNull
-            @Override
-            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                Long currentNumberOfClicks = (Long) currentData.child("numberOfClicks").getValue();
-                if (currentNumberOfClicks == null) {
-                    currentData.child("numberOfClicks").setValue(1);
-                } else {
-                    currentData.child("numberOfClicks").setValue(currentNumberOfClicks + 1);
-                }
-                return Transaction.success(currentData);
-            }
-
-            @Override
-            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-                if (error != null) {
-                    Log.e(TAG, "Firebase counter increment failed.");
-                } else {
-                    Log.e(TAG, "Firebase counter increment succeeded.");
-                }
-            }
-        });
-    }
 }

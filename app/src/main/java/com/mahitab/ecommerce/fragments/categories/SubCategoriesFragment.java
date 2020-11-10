@@ -32,6 +32,7 @@ import com.mahitab.ecommerce.adapters.ColorAdapter;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
 import com.mahitab.ecommerce.adapters.ShapeAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.FirebaseManager;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CategoryModel;
 import com.mahitab.ecommerce.models.CollectionModel;
@@ -140,6 +141,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
 
     @Override
     public void onBannerClick(BannerModel banner) {
+        FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
         String type;
         Intent intent;
         if (banner.getType().startsWith("p")) {

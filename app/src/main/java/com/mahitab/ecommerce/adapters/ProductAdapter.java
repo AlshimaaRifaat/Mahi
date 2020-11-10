@@ -75,11 +75,21 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvPrice.setVisibility(View.VISIBLE);
                 holder.tvPrice.setText(price);
+
+                float mPrice = product.getVariants().get(0).getPrice().floatValue();
+                float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
+
+                float ratioDiscount = ((mOldPrice - mPrice) / mOldPrice) * 100;
+                String discountPercentage= (int) Math.ceil(ratioDiscount)+ holder.itemView.getContext().getResources().getString(R.string.discount_percentage);
+                holder.tvDiscount.setText( discountPercentage);
+                holder.tvDiscount.setVisibility(View.VISIBLE);
+
             } else {
                 holder.tvPrice.setVisibility(View.INVISIBLE);
                 holder.tvOldPrice.setVisibility(View.VISIBLE);
                 price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + holder.itemView.getContext().getResources().getString(R.string.egp);
                 holder.tvOldPrice.setText(price);
+                holder.tvDiscount.setVisibility(View.GONE);
             }
         }
     }
@@ -132,6 +142,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         private final TextView tvTitle;
         private final TextView tvPrice;
         private final TextView tvOldPrice;
+        private final TextView tvDiscount;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -139,6 +150,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvTitle = itemView.findViewById(R.id.tvTitle_ProductItem);
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
+            tvDiscount = itemView.findViewById(R.id.tvDiscount_ProductItem);
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
                     listener.onProductClick(productsDataList.get(getAdapterPosition()).getID().toString());
