@@ -134,7 +134,11 @@
 
     <string name="OrderState">حالة الطلب</string>
     <string name="RecentlyViewed">شوهد مؤخرا</string>
-    <string name="Please_enter_all_fields">الرجاء إدخال كافة الحقول!</string>
+    <string name="Please_enter_all_fields">الرجاء إدخال كافة البيانات!</string>
     <string name="width_2_widths_150_cm">~ العرض عرضين ≈ 150سم ~</string>
+    <string name="Delete">مسح</string>
+    <string name="Do_you_want_to_Delete">هل تريدي مسح العنوان؟</string>
+    <string name="Cancel">إلغاء</string>
+
 
 </resources>

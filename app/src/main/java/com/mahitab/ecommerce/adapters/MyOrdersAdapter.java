@@ -57,7 +57,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         float price=Float.parseFloat(singleItem.getTotalPrice());
         String totalPrice = (int) Math.ceil(price)+"";
         Log.d("price", "onBindViewHolder: "+totalPrice+" ");
-        holder.tTotalPrice.setText(context.getResources().getString(R.string.TotalPrice)+": "+totalPrice +" EGP");
+        holder.tTotalPrice.setText(context.getResources().getString(R.string.TotalPrice)+": "+totalPrice +context.getResources().getString(R.string.egp));
         String date = singleItem.getProcessedAt().toString();
         String[] arr = date.split("T");
 

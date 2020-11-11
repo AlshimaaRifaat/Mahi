@@ -2,6 +2,8 @@ package com.mahitab.ecommerce.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,7 +40,7 @@ import java.util.List;
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 
-public class SearchResultActivity extends AppCompatActivity {
+public class SearchResultActivity extends AppCompatActivity implements ProductAdapter.ProductClickListener {
     private static final String TAG ="SearchResultActivity" ;
     SelectedOptions selectedOptions;
     private MenuItem searchMenuItem = null;
@@ -107,7 +109,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
                 /*   */
                 if(newQuery!=null) {
-                    getSearchResult(searchResultList);
+                    getSearchResult();
                     selectedOptions.setSearchCriteria(newQuery);
 
 
@@ -161,7 +163,7 @@ public class SearchResultActivity extends AppCompatActivity {
                             @Override
                             public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
-                                getSearchResult(searchResultList);
+                                getSearchResult();
                                 selectedOptions.setSearchCriteria(colorSuggestion.getBody());
                                 mSearchView.clearSuggestions();
                                 mSearchView.setSearchFocusable(false);
@@ -185,7 +187,7 @@ public class SearchResultActivity extends AppCompatActivity {
                             public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
                                 x = 1;
-                                getSearchResult(searchResultList);
+                                getSearchResult();
                                 selectedOptions.setSearchCriteria(mLastQuery.toString());
 
 
@@ -242,7 +244,16 @@ public class SearchResultActivity extends AppCompatActivity {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
                 //just print action
-                Log.d(TAG, "onActionMenuItemSelected: "+item.getItemId()+" ");
+
+               if(item.getItemId()==R.id.action_search){
+                   x = 1;
+
+                   Log.d(TAG, "query: "+mSearchView.getQuery());
+                   getSearchResult();
+                   selectedOptions.setSearchCriteria(mSearchView.getQuery());
+                   mSearchView.clearSuggestions();
+                   mSearchView.setSearchFocusable(false);
+               }
 
 
 
@@ -272,6 +283,8 @@ public class SearchResultActivity extends AppCompatActivity {
 
 
     }
+
+
 
 
     private void initView() {
@@ -326,11 +339,10 @@ public class SearchResultActivity extends AppCompatActivity {
 
     }
 
-    private void getSearchResult(ArrayList<ProductModel> searchResultList) {
-
+    private void getSearchResult() {
         searchResultList=DataManager.getInstance().getAllProducts();
-        Log.d(TAG, "getSearchResult: "+searchResultList.size()+"");
         productAdapter = new ProductAdapter(this,searchResultList);
+        productAdapter.setProductClickListener(this::onProductClick);
         selectedOptions.addObserver(productAdapter);
         rvProducts.setLayoutManager( new GridLayoutManager(this,2 ) );
         rvProducts.setHasFixedSize(true);
@@ -338,4 +350,10 @@ public class SearchResultActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
+        startActivity(intent);
+    }
 }

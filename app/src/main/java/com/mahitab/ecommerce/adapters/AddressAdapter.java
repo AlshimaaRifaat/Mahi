@@ -53,8 +53,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
             @Override
             public void onClick(View v) {
                 deleteFromAddressListInterface.removeFromAddressList(addressList.get(position).getmID(),position);
-                addressList.remove(position);
-                notifyDataSetChanged();
+
             }
         });
         holder.tvEditAddress.setOnClickListener(new View.OnClickListener() {

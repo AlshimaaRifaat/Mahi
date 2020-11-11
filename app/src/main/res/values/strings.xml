@@ -146,5 +146,9 @@
     <string name="RecentlyViewed">Recently Viewed</string>
     <string name="Please_enter_all_fields">Please enter all fields!</string>
     <string name="width_2_widths_150_cm">Width ~ 2 widths ≈ 150 cm ~</string>
+    <string name="Delete">Delete</string>
+    <string name="Do_you_want_to_Delete">Do you want to Delete?</string>
+    <string name="Cancel">Cancel</string>
+
 
 </resources>

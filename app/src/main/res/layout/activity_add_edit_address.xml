@@ -106,10 +106,12 @@
                     android:id="@+id/spinnerProvince"
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
+                    android:layout_marginTop="7dp"
                     android:layout_height="55dp"
                     android:layout_weight="1"
-                    android:prompt="@string/Province"
-                    app:backgroundTint="#777575"></Spinner>
+
+                    android:background="@drawable/spinner_background"
+                    ></Spinner>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

@@ -1,6 +1,7 @@
 package com.mahitab.ecommerce.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -190,25 +192,57 @@ public class MyAddressesActivity extends AppCompatActivity
 
     @Override
     public void removeFromAddressList(ID addressId, int Position) {
-        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                .customerAddressDelete(addressId, accessToken, query -> query
-                        .deletedCustomerAddressId()
-                        .userErrors(userErrorQuery -> userErrorQuery
-                                .field()
-                                .message()
-                        )
-                )
-        );
-        deletefromAddressList(mutationQuery);
+        AlertDialog diaBox = AskOption(addressId,Position);
+        diaBox.show();
     }
 
-    private void deletefromAddressList(Storefront.MutationQuery mutationQuery) {
+    private AlertDialog AskOption(ID addressId,int Position)
+    {
+        AlertDialog myQuittingDialogBox = new AlertDialog.Builder(this)
+                // set message, title, and icon
+                .setTitle(getResources().getString(R.string.Delete))
+                .setMessage(getResources().getString(R.string.Do_you_want_to_Delete))
+                //.setIcon(R.drawable.delete)
+
+                .setPositiveButton(getResources().getString(R.string.Delete), new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //your deleting code
+
+                        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
+                                .customerAddressDelete(addressId, accessToken, query -> query
+                                        .deletedCustomerAddressId()
+                                        .userErrors(userErrorQuery -> userErrorQuery
+                                                .field()
+                                                .message()
+                                        )
+                                )
+                        );
+                        deletefromAddressList(mutationQuery,Position);
+
+                        dialog.dismiss();
+                    }
+
+                })
+                .setNegativeButton(getResources().getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+
+        return myQuittingDialogBox;
+    }
+
+    private void deletefromAddressList(Storefront.MutationQuery mutationQuery, int Position) {
         GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-
+                addresses.remove(Position);
+                addressAdapter.notifyItemRemoved(Position);
                 Log.d("delete ", "onResponse: " + "success");
-
 
             }
 

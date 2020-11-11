@@ -100,7 +100,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
 
         for (ProductModel p : productList) {
 
-            if (
+            if (  //TODO
                     p.containsSelectedOption("Color", selectedOptions.getColor()) &&
                             p.containsSelectedOption("Size", selectedOptions.getSize()) &&
                             p.containsSelectedOption("Material", selectedOptions.getMaterial())
