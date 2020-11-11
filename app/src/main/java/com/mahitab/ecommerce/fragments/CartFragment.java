@@ -3,7 +3,6 @@ package com.mahitab.ecommerce.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -137,7 +136,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         checkoutButton.setOnClickListener(view1 -> {
             ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
             for (int i = 0; i < cartProducts.size(); i++) {
-                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getId()));
+                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
             }
             Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
                     .setLineItemsInput(Input.value(inputArrayList));
@@ -209,8 +208,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     Log.e("TAG", "login" + response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken());
                     // queryUserDetails(accessToken);
                     fetchCustomerQuery(accessToken);
-
-
                 }
             }
 
@@ -533,6 +530,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
     @Override
     public void onProductClick(String productId) {
+        Log.e(TAG, "onProductClick: "+productId );
         Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
         intent.putExtra("productId", productId);
         startActivity(intent);

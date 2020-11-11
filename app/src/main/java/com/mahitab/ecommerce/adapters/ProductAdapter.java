@@ -27,15 +27,17 @@ import java.util.Observer;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
-    private final ArrayList<ProductModel> productList;
+    private ArrayList<ProductModel> productList;
     private ProductClickListener listener;
 
     private ArrayList<ProductModel> productsDataList;
     private SelectedOptions selectedOptions = new SelectedOptions();
-    private final Context context;
+
+    public ProductAdapter(ArrayList<ProductModel> productList) {
+        this.productsDataList = productList;
+    }
 
     public ProductAdapter(Context context, ArrayList<ProductModel> productList) {
-        this.context = context;
         this.productList = productList;
         updateList();
     }
@@ -80,8 +82,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
 
                 float ratioDiscount = ((mOldPrice - mPrice) / mOldPrice) * 100;
-                String discountPercentage= (int) Math.ceil(ratioDiscount)+ holder.itemView.getContext().getResources().getString(R.string.discount_percentage);
-                holder.tvDiscount.setText( discountPercentage);
+                String discountPercentage = (int) Math.ceil(ratioDiscount) + holder.itemView.getContext().getResources().getString(R.string.discount_percentage);
+                holder.tvDiscount.setText(discountPercentage);
                 holder.tvDiscount.setVisibility(View.VISIBLE);
 
             } else {
@@ -108,26 +110,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Log.d("mohamed", "onQueryTextChange: 2" + productList);
 
         for (ProductModel p : productList) {
-
-            if (
-                    p.containsSelectedOption("Color", selectedOptions.getColor()) &&
-                            p.containsSelectedOption("Size", selectedOptions.getSize()) &&
-                            p.containsSelectedOption("Material", selectedOptions.getMaterial())
-            ) {
-
-                if (selectedOptions.getLowerPrice() == selectedOptions.getHigherPrice() || p.between(p.getPrice().doubleValue(), selectedOptions.getLowerPrice(), selectedOptions.getHigherPrice())) {
-                    if (selectedOptions.getSearchCriteria().isEmpty()) {
-                        aux.add(p);
-                    } else if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
-                        aux.add(p);
-                    }
-                }
+            if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
+                aux.add(p);
             }
         }
         productsDataList.addAll(aux);
         Log.d("ab", "updateList: " + productsDataList.toString());
-
-
     }
 
     @Override

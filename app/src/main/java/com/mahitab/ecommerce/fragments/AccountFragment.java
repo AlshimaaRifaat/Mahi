@@ -3,6 +3,7 @@ package com.mahitab.ecommerce.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ public class AccountFragment extends Fragment {
     private CardView cvMyOrders;
     private CardView cvMyWishList;
     private CardView cvMyAddresses;
+    private CardView cvHelp;
 
     private SharedPreferences defaultPreferences;
 
@@ -95,6 +97,13 @@ public class AccountFragment extends Fragment {
             getActivity().finish();
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getResources().getString(R.string.sign_out_message), Toast.LENGTH_SHORT).show());
         });
+
+        cvHelp.setOnClickListener(v -> {
+            String url = "https://api.whatsapp.com/send?phone=+201111112426";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        });
     }
 
     @Override
@@ -129,6 +138,7 @@ public class AccountFragment extends Fragment {
         cvMyAddresses = view.findViewById(R.id.cvMyAddresses_CustomerAccountData);
         cvMyOrders = view.findViewById(R.id.cvMyOrders_CustomerAccountData);
         cvMyWishList = view.findViewById(R.id.cvMyWishList_CustomerAccountData);
+        cvHelp = view.findViewById(R.id.cvHelp_CustomerAccountData);
     }
 
 

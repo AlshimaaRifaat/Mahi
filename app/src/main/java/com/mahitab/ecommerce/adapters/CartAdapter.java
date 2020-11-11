@@ -95,7 +95,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         }
 
         holder.tvQuantity.setText(String.valueOf(cartItemQuantities.get(position).getQuantity()));
-        holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getId().toString()));
+        holder.itemView.setOnClickListener(v -> listener.onProductClick(cartItemQuantities.get(position).getProductID()));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             ivDecreaseQuantity.setOnClickListener(this);
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
-                    listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getId().toString());
+                    listener.onProductClick(cartItemQuantities.get(getAdapterPosition()).getVariantId().toString());
             });
         }
 

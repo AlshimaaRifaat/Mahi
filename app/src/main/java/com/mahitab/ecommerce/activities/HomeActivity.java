@@ -246,38 +246,62 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                 }
 
                 for (DataSnapshot sliderSnapshot : dataSnapshot.child("Slider").getChildren()) {
-                    BannerModel sliderBanner = sliderSnapshot.getValue(BannerModel.class);
-                    if (sliderBanner != null) {
-                        sliderBanner.setReference(sliderSnapshot.getRef());
-                        sliderBanners.add(sliderBanner);
-                        sliderBannersLoaded = true;
+                    if (sliderSnapshot.child("id").getValue() instanceof String
+                            && sliderSnapshot.child("type").getValue() instanceof String
+                            && sliderSnapshot.child("image").getValue() instanceof String
+                            && sliderSnapshot.child("numberOfClicks").getValue() instanceof Long){ // validate data types before add in model
+
+                        BannerModel sliderBanner = sliderSnapshot.getValue(BannerModel.class);
+                        if (sliderBanner != null) {
+                            sliderBanner.setReference(sliderSnapshot.getRef());
+                            sliderBanners.add(sliderBanner);
+                            sliderBannersLoaded = true;
+                        }
                     }
                 }
 
                 for (DataSnapshot topBannersSnapshot : dataSnapshot.child("Banners/Top").getChildren()) {
-                    BannerModel banner = topBannersSnapshot.getValue(BannerModel.class);
-                    if (banner != null) {
-                        banner.setReference(topBannersSnapshot.getRef());
-                        topBanners.add(banner);
-                        topBannersLoaded = true;
+                    if (topBannersSnapshot.child("id").getValue() instanceof String
+                            && topBannersSnapshot.child("type").getValue() instanceof String
+                            && topBannersSnapshot.child("image").getValue() instanceof String
+                            && topBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+
+                        BannerModel banner = topBannersSnapshot.getValue(BannerModel.class);
+                        if (banner != null) {
+                            banner.setReference(topBannersSnapshot.getRef());
+                            topBanners.add(banner);
+                            topBannersLoaded = true;
+                        }
                     }
                 }
 
                 for (DataSnapshot midBannersSnapshot : dataSnapshot.child("Banners/Mid").getChildren()) {
-                    BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
-                    if (banner != null) {
-                        banner.setReference(midBannersSnapshot.getRef());
-                        midBanners.add(banner);
-                        midBannersLoaded = true;
+                    if (midBannersSnapshot.child("id").getValue() instanceof String
+                            && midBannersSnapshot.child("type").getValue() instanceof String
+                            && midBannersSnapshot.child("image").getValue() instanceof String
+                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+
+                        BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
+                        if (banner != null) {
+                            banner.setReference(midBannersSnapshot.getRef());
+                            midBanners.add(banner);
+                            midBannersLoaded = true;
+                        }
                     }
                 }
 
                 for (DataSnapshot midBannersSnapshot : dataSnapshot.child("Banners/Bottom").getChildren()) {
-                    BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
-                    if (banner != null) {
-                        banner.setReference(midBannersSnapshot.getRef());
-                        bottomBanners.add(banner);
-                        bottomBannersLoaded = true;
+                    if (midBannersSnapshot.child("id").getValue() instanceof String
+                            && midBannersSnapshot.child("type").getValue() instanceof String
+                            && midBannersSnapshot.child("image").getValue() instanceof String
+                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+
+                        BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
+                        if (banner != null) {
+                            banner.setReference(midBannersSnapshot.getRef());
+                            bottomBanners.add(banner);
+                            bottomBannersLoaded = true;
+                        }
                     }
                 }
 

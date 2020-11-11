@@ -9,6 +9,7 @@
         android:actionLayout="@layout/cart_badge_layout"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="@string/search"
         app:showAsAction="always" />

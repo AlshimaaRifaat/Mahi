@@ -6,20 +6,20 @@ public class CartItemQuantity {
     public int quantity;
     public double productPrice;
     public String productID;
-    public ID id = null;
+    public ID variantId;
 
-    public CartItemQuantity(int quantity, String productID,double productPrice, ID id) {
-        this.id = id;
+    public CartItemQuantity(int quantity, String productID,double productPrice, ID variantId) {
+        this.variantId = variantId;
         this.quantity = quantity;
         this.productID = productID;
         this.productPrice = productPrice;
     }
 
-    public ID getId() {
-        return id;
+    public ID getVariantId() {
+        return variantId;
     }
-    public void setId(ID id) {
-        this.id = id;
+    public void setVariantId(ID variantId) {
+        this.variantId = variantId;
     }
     public void setProductID(String productID) {
         this.productID = productID;

@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,10 +60,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         ProductImageSliderAdapter.ImageSliderItemClickInterface {
 
     private static final String TAG = "ProductDetailsActivity";
-    // badge text view
-    TextView badgeCounter;
     // change the number to see badge in action
-    int cartProductsCount = 0;
+    private int cartProductsCount = 0;
 
     private LoopingViewPager viewPager;
     private PageIndicatorView indicatorView;
@@ -73,6 +70,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private TextView tvPrice;
     private TextView tvDescription;
     private ImageView ivDescription;
+
+    private ImageView ivShareProduct;
 
     private ImageView ivWishProduct;
     private List<String> wishListProducts;
@@ -138,19 +137,18 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             }.getType());
 
 
+        if (defaultPreferences.getString("viewedProductList", null) == null)
+            viewedProductList = new ArrayList<>();
+        else
+            viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<ArrayList<String>>() {
+            }.getType());
+
+        getRecentlyViewedProducts(viewedProductList);
+
         cartProductsCount = cartProducts.size();
 
         if (getIntent().getExtras() != null) {
             currentProductId = getIntent().getExtras().getString("productId");
-            if (defaultPreferences.getString("viewedProductList", null) == null)
-                viewedProductList = new ArrayList<>();
-            else {
-                viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<ArrayList<String>>() {
-                }.getType());
-
-                getRecentlyViewedProducts(viewedProductList);
-            }
-
 
             boolean isViewedBefore = viewedProductList.stream()
                     .anyMatch(productId -> productId.equals(currentProductId));
@@ -158,7 +156,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 viewedProductList.add(currentProductId);
                 defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductList)).apply();
             }
-
 
             boolean isAddedBefore = cartProducts.stream()
                     .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
@@ -211,7 +208,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     String discountPercentage = (int) Math.ceil(ratioDiscount) + getResources().getString(R.string.discount_percentage);
 
                     tvDiscount.setText(discountPercentage);
-                }
+                }else tvDiscount.setVisibility(View.GONE);
 
                 tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
 
@@ -246,7 +243,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
                 if (collection != null) {
                     rvRelatedProducts.setHasFixedSize(true);
-                    rvRelatedProducts.setLayoutManager(new GridLayoutManager(this, 3));
+                    rvRelatedProducts.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
                     ProductAdapter productAdapter = new ProductAdapter(this,collection.getPreviewProducts());
                     rvRelatedProducts.setAdapter(productAdapter);
                 }
@@ -307,6 +304,19 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
             btnBuy.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), CartActivity.class)));
 
+            ivShareProduct.setOnClickListener(v -> {
+                /*Create an ACTION_SEND Intent*/
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                String urlTitle=product.getTitle().replace(" ","-");
+                String productLink="https://mahitab.com/products/"+urlTitle;
+                intent.setType("text/plain");
+                /*Applying information Subject and Body.*/
+                intent.putExtra(Intent.EXTRA_SUBJECT, product.getTitle());
+                intent.putExtra(Intent.EXTRA_TEXT, productLink);
+                /*Fire!*/
+                startActivity(Intent.createChooser(intent, getString(R.string.complete_action_using)));
+            });
+
             ivWishProduct.setOnClickListener(v -> {
                 if (isWishedBefore) {
                     isWishedBefore = false;
@@ -316,6 +326,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     wishListProducts.add(currentProductId);
                 }
                 defaultPreferences.edit().putString("wishListProducts", new Gson().toJson(wishListProducts)).apply();
+                Log.e(TAG, "onCreate: "+wishListProducts.size() );
                 displayIsWishedProduct(isWishedBefore);
             });
         }
@@ -385,6 +396,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             onBackPressed();
         else if (item.getItemId() == R.id.action_open_cart)
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
+        else if (item.getItemId() == R.id.action_search)
+            startActivity(new Intent(getApplicationContext(), SearchResultActivity.class));
         return super.onOptionsItemSelected(item);
     }
 
@@ -416,6 +429,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         rbAverageRating = findViewById(R.id.rbAverageRating_ProductDetailsActivity);
         rvProductReviews = findViewById(R.id.rvProductReviews_ProductDetailsActivity);
         cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
+        ivShareProduct = findViewById(R.id.ivShareProduct_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
         tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
         tvOldPrice=findViewById(R.id.tvOldPrice);
@@ -455,7 +469,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             // if notification than set the badge icon layout
             cartMenuItem.setActionView(R.layout.cart_badge_layout);
             // get the text view of the action view for the nav item
-            badgeCounter = cartMenuItem.getActionView().findViewById(R.id.badge_counter);
+            // badge text view
+            TextView badgeCounter = cartMenuItem.getActionView().findViewById(R.id.badge_counter);
             // set the pending notifications value
             badgeCounter.setText(String.valueOf(cartProductsCount));
             cartMenuItem.getActionView().setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), CartActivity.class))); // handel custom view click

@@ -81,7 +81,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                     if (intent.getExtras() != null) {
                         CategoryModel selectedCategory = intent.getExtras().getParcelable("category");
 
-                        if (selectedCategory != null) {
+                        if (isAdded()&&selectedCategory != null) {
 
                             if (selectedCategory.getId() != null) {
                                 String target = "gid://shopify/Collection/" + selectedCategory.getId();
