@@ -41,36 +41,37 @@ public class AddEditAddressActivity extends AppCompatActivity {
     String addressId,phone,city,address2,address1,accessToken;
     AddressModel addressModel;
     String itemProvinceSpinner;
+
     String[] spinnerProvinceValue = {
-            "Aswan",
-            "6th of October",
-            "Al Sharqia",
-            "Cairo",
-            "Alexandria",
-            "Asyut",
-            "Beheira",
-            "Beni Suef",
-            "Giza",
-            "Helwan",
-            "Dakahlia",
-            "Damietta",
-            "Faiyum",
-            "Gharbia",
-            "Ismailia",
-            "Kafr el-Sheikh",
-            "Luxor",
-            "Matrouh",
-            "Minya",
-            "Monufia",
-            "New Valley",
-            "North Sinai",
-            "Port Said",
-            "Qalyubia",
-            "Qena",
-            "Red Sea",
-            "Sohag",
-            "South Sinai",
-            "Suez"
+            "اسوان",
+            "السادس من اكتوبر",
+            "الشرقيه",
+            "القاهره",
+            "الأسكندريه",
+            "اسيوط",
+            "البحيره",
+            "بني سويف",
+            "الجيزه",
+            "حلوان",
+            "الدقهليه",
+            "دمياط",
+            "الفيوم",
+            "الغربيه",
+            "الاسماعليه",
+            "كفر الشيخ",
+            "الأقصر",
+            "مطروح",
+            "المنيا",
+            "المنوفيه",
+            "الوادي الجديد",
+            "شمال سيناء",
+            "بورسعيد",
+            "القليوبيه",
+            "قنا",
+            "البحر الاحمر",
+            "سوهاج",
+            "جنوب سيناء",
+            "السويس"
     };
 
 
@@ -118,19 +119,79 @@ public class AddEditAddressActivity extends AppCompatActivity {
         ProvinceSpinnerAdapter genderSpinnerAdapter = new ProvinceSpinnerAdapter(this, R.layout.spinner_item);
 
         genderSpinnerAdapter.addAll(spinnerProvinceValue);
-        genderSpinnerAdapter.add("Province");
+        genderSpinnerAdapter.add("المحافظه");
         spinnerProvince.setAdapter(genderSpinnerAdapter);
-        spinnerProvince.setPrompt("Aswan");
+        spinnerProvince.setPrompt("اسوان");
 
         spinnerProvince.setSelection(genderSpinnerAdapter.getCount());
 
         spinnerProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (spinnerProvince.getSelectedItem() == "Province") {
+                if (spinnerProvince.getSelectedItem() == "المحافظه") {
 
                 } else {
                     provinceSelectedItemSpinner = spinnerProvince.getSelectedItem().toString();
+                    if(provinceSelectedItemSpinner=="اسوان") {
+                        provinceSelectedItemSpinner="Aswan";
+                    }else if(provinceSelectedItemSpinner=="السادس من اكتوبر"){
+                        provinceSelectedItemSpinner="6th of October";
+                    }else if(provinceSelectedItemSpinner=="الشرقيه"){
+                        provinceSelectedItemSpinner="Al Sharqia";
+                    }else if(provinceSelectedItemSpinner=="القاهره"){
+                        provinceSelectedItemSpinner=  "Cairo";
+                    }else if(provinceSelectedItemSpinner=="الأسكندريه"){
+                        provinceSelectedItemSpinner="Alexandria";
+                    }else if(provinceSelectedItemSpinner=="اسيوط"){
+                        provinceSelectedItemSpinner="Asyut";
+                    }else if(provinceSelectedItemSpinner=="البحيره"){
+                        provinceSelectedItemSpinner="Beheira";
+                    }else if(provinceSelectedItemSpinner=="بني سويف"){
+                        provinceSelectedItemSpinner="Beni Suef";
+                    }else if(provinceSelectedItemSpinner=="الجيزه"){
+                        provinceSelectedItemSpinner="Giza";
+                    }else if(provinceSelectedItemSpinner=="حلوان"){
+                        provinceSelectedItemSpinner="Helwan";
+                    }else if(provinceSelectedItemSpinner=="الدقهليه"){
+                        provinceSelectedItemSpinner="Dakahlia";
+                    }else if(provinceSelectedItemSpinner=="دمياط"){
+                        provinceSelectedItemSpinner="Damietta";
+                    }else if(provinceSelectedItemSpinner=="الفيوم"){
+                        provinceSelectedItemSpinner="Faiyum";
+                    }else if(provinceSelectedItemSpinner=="الغربيه"){
+                        provinceSelectedItemSpinner= "Gharbia";
+                    }else if(provinceSelectedItemSpinner=="الاسماعليه"){
+                        provinceSelectedItemSpinner="Ismailia";
+                    }else if(provinceSelectedItemSpinner=="كفر الشيخ"){
+                        provinceSelectedItemSpinner="Kafr el-Sheikh";
+                    }else if(provinceSelectedItemSpinner=="الأقصر"){
+                        provinceSelectedItemSpinner="Luxor";
+                    }else if(provinceSelectedItemSpinner=="مطروح"){
+                        provinceSelectedItemSpinner="Matrouh";
+                    }else if(provinceSelectedItemSpinner=="المنيا"){
+                        provinceSelectedItemSpinner="Minya";
+                    }else if(provinceSelectedItemSpinner=="المنوفيه"){
+                        provinceSelectedItemSpinner="Monufia";
+                    }else if(provinceSelectedItemSpinner=="الوادي الجديد"){
+                        provinceSelectedItemSpinner="New Valley";
+                    }else if(provinceSelectedItemSpinner=="شمال سيناء"){
+                        provinceSelectedItemSpinner="North Sinai";
+                    }else if(provinceSelectedItemSpinner=="بورسعيد"){
+                        provinceSelectedItemSpinner="Port Said";
+                    }else if(provinceSelectedItemSpinner=="القليوبيه"){
+                        provinceSelectedItemSpinner="Qalyubia";
+                    }else if(provinceSelectedItemSpinner=="قنا"){
+                        provinceSelectedItemSpinner="Qena";
+                    }else if(provinceSelectedItemSpinner=="البحر الاحمر"){
+                        provinceSelectedItemSpinner="Red Sea";
+                    }else if(provinceSelectedItemSpinner=="سوهاج"){
+                        provinceSelectedItemSpinner="Sohag";
+                    }else if(provinceSelectedItemSpinner=="جنوب سيناء"){
+                        provinceSelectedItemSpinner="South Sinai";
+                    }else if(provinceSelectedItemSpinner=="السويس"){
+                        provinceSelectedItemSpinner="Suez";
+                    }
+
                     btnSave.setOnClickListener(v -> {
                         Log.d(TAG, "onItemSelected: " + provinceSelectedItemSpinner);
                         Log.d(TAG, "onItemSelected: " + accessToken);
@@ -170,6 +231,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
         address1 = addressModel.getAddress1();
         itemProvinceSpinner=addressModel.getProvince();
 
+
         setAddressData(addressId,phone,city,address2,address1,itemProvinceSpinner);
 
 
@@ -191,7 +253,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
         genderSpinnerAdapter.add(itemProvinceSpinner);
         spinnerProvince.setAdapter(genderSpinnerAdapter);
 
-        spinnerProvince.setPrompt("Aswan");
+        spinnerProvince.setPrompt("اسوان");
 
         spinnerProvince.setSelection(genderSpinnerAdapter.getCount());
 
@@ -200,6 +262,65 @@ public class AddEditAddressActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 provinceSelectedItemSpinner = spinnerProvince.getSelectedItem().toString();
+                if(provinceSelectedItemSpinner=="اسوان") {
+                    provinceSelectedItemSpinner="Aswan";
+                }else if(provinceSelectedItemSpinner=="السادس من اكتوبر"){
+                    provinceSelectedItemSpinner="6th of October";
+                }else if(provinceSelectedItemSpinner=="الشرقيه"){
+                    provinceSelectedItemSpinner="Al Sharqia";
+                }else if(provinceSelectedItemSpinner=="القاهره"){
+                    provinceSelectedItemSpinner=  "Cairo";
+                }else if(provinceSelectedItemSpinner=="الأسكندريه"){
+                    provinceSelectedItemSpinner="Alexandria";
+                }else if(provinceSelectedItemSpinner=="اسيوط"){
+                    provinceSelectedItemSpinner="Asyut";
+                }else if(provinceSelectedItemSpinner=="البحيره"){
+                    provinceSelectedItemSpinner="Beheira";
+                }else if(provinceSelectedItemSpinner=="بني سويف"){
+                    provinceSelectedItemSpinner="Beni Suef";
+                }else if(provinceSelectedItemSpinner=="الجيزه"){
+                    provinceSelectedItemSpinner="Giza";
+                }else if(provinceSelectedItemSpinner=="حلوان"){
+                    provinceSelectedItemSpinner="Helwan";
+                }else if(provinceSelectedItemSpinner=="الدقهليه"){
+                    provinceSelectedItemSpinner="Dakahlia";
+                }else if(provinceSelectedItemSpinner=="دمياط"){
+                    provinceSelectedItemSpinner="Damietta";
+                }else if(provinceSelectedItemSpinner=="الفيوم"){
+                    provinceSelectedItemSpinner="Faiyum";
+                }else if(provinceSelectedItemSpinner=="الغربيه"){
+                    provinceSelectedItemSpinner= "Gharbia";
+                }else if(provinceSelectedItemSpinner=="الاسماعليه"){
+                    provinceSelectedItemSpinner="Ismailia";
+                }else if(provinceSelectedItemSpinner=="كفر الشيخ"){
+                    provinceSelectedItemSpinner="Kafr el-Sheikh";
+                }else if(provinceSelectedItemSpinner=="الأقصر"){
+                    provinceSelectedItemSpinner="Luxor";
+                }else if(provinceSelectedItemSpinner=="مطروح"){
+                    provinceSelectedItemSpinner="Matrouh";
+                }else if(provinceSelectedItemSpinner=="المنيا"){
+                    provinceSelectedItemSpinner="Minya";
+                }else if(provinceSelectedItemSpinner=="المنوفيه"){
+                    provinceSelectedItemSpinner="Monufia";
+                }else if(provinceSelectedItemSpinner=="الوادي الجديد"){
+                    provinceSelectedItemSpinner="New Valley";
+                }else if(provinceSelectedItemSpinner=="شمال سيناء"){
+                    provinceSelectedItemSpinner="North Sinai";
+                }else if(provinceSelectedItemSpinner=="بورسعيد"){
+                    provinceSelectedItemSpinner="Port Said";
+                }else if(provinceSelectedItemSpinner=="القليوبيه"){
+                    provinceSelectedItemSpinner="Qalyubia";
+                }else if(provinceSelectedItemSpinner=="قنا"){
+                    provinceSelectedItemSpinner="Qena";
+                }else if(provinceSelectedItemSpinner=="البحر الاحمر"){
+                    provinceSelectedItemSpinner="Red Sea";
+                }else if(provinceSelectedItemSpinner=="سوهاج"){
+                    provinceSelectedItemSpinner="Sohag";
+                }else if(provinceSelectedItemSpinner=="جنوب سيناء"){
+                    provinceSelectedItemSpinner="South Sinai";
+                }else if(provinceSelectedItemSpinner=="السويس"){
+                    provinceSelectedItemSpinner="Suez";
+                }
 
             }
 

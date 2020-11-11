@@ -111,7 +111,7 @@ public class ClientQuery {
                         .shop(
                                 shopQuery -> shopQuery
                                         .collections(
-                                                arg -> arg.first(250),
+                                                arg -> arg.first(600),
                                                 collectionsQuery -> collectionsQuery
                                                         .pageInfo(
                                                                 colPageQuery -> colPageQuery
@@ -125,7 +125,7 @@ public class ClientQuery {
                                                                                         .title()
                                                                                         .updatedAt()
                                                                                         .products(
-                                                                                                args -> args.first(250),
+                                                                                                args -> args.first(600),
                                                                                                 prodQuery -> prodQuery
                                                                                                         .edges(
                                                                                                                 prodEdge -> prodEdge

@@ -161,7 +161,7 @@ public class MyAddressesActivity extends AppCompatActivity
                         @Override
                         public void run() {
                             Log.d(TAG, "run: " + "success");
-
+                            addresses.sort((o1, o2) -> o2.getmID().toString().compareTo(o1.getmID().toString()));
                             addressAdapter = new AddressAdapter(MyAddressesActivity.this, addresses);
                             addressAdapter.onClickDeleteFromAddressList(MyAddressesActivity.this);
                             addressAdapter.onClickEditAddressItem(MyAddressesActivity.this);

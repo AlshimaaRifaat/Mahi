@@ -84,9 +84,10 @@ public class SearchResultActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: "+recentlySearchedList.toString());
 
-        getAllProductsList();
+
 
         selectedOptions = new SelectedOptions();
+        getAllProductsList();
         setupFloatingSearch();
 
 
@@ -176,14 +177,14 @@ public class SearchResultActivity extends AppCompatActivity {
             @Override
             public void onSearchAction(String query) {
                 mLastQuery = query;
-                x = 1;
+
                 DataHelper.findColors(SearchResultActivity.this, query,
                         new DataHelper.OnFindColorsListener() {
 
                             @Override
                             public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
-
+                                x = 1;
                                 getSearchResult(searchResultList);
                                 selectedOptions.setSearchCriteria(mLastQuery.toString());
 
@@ -295,12 +296,14 @@ public class SearchResultActivity extends AppCompatActivity {
                                 allCollectionList = DataManager.getInstance().getAllCollections();
                                 productList = new ArrayList<>();
                                 for (int i = 0; i < allCollectionList.size(); i++) {
+                                    Log.d(TAG, "run: "+allCollectionList.get(i).getTitle());
                                     productList.add(allCollectionList.get(i).getPreviewProducts().get(i));
                                 }
 
                                 if (productList != null)
                                     searchResultList = productList;
                             }
+
                             productAdapter = new ProductAdapter(SearchResultActivity.this, searchResultList);
                             selectedOptions.addObserver(productAdapter);
                             rvProducts.setLayoutManager(new GridLayoutManager(SearchResultActivity.this, 2));
