@@ -140,6 +140,7 @@
     <string name="Do_you_want_to_Delete">هل تريدي مسح العنوان؟</string>
     <string name="Cancel">إلغاء</string>
     <string name="complete_action_using">أكمل الأمر بإستخدام</string>
+    <string name="Select">اختر</string>
 
 
 </resources>

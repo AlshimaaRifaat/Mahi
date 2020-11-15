@@ -54,11 +54,13 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
 
 
         if (getIntent().getExtras() != null) {
+
             String collectionId = getIntent().getExtras().getString("collectionId");
+
 
             byte[] decodedBytes = android.util.Base64.decode(collectionId, android.util.Base64.DEFAULT);
             String decodeCollectionId = new String(decodedBytes).split("/")[4];
-
+            Log.d(TAG, "collectionId: "+decodeCollectionId);
             DisplayMetrics displaymetrics = Resources.getSystem().getDisplayMetrics();
 
             rvCollectionBanners.setHasFixedSize(true);

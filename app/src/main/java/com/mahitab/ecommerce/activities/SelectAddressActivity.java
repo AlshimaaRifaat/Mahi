@@ -1,36 +1,30 @@
-package com.mahitab.ecommerce.fragments;
+package com.mahitab.ecommerce.activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.view.Window;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.activities.CartActivity;
-import com.mahitab.ecommerce.activities.HomeActivity;
-import com.mahitab.ecommerce.activities.PaymentWebViewActivity;
-import com.mahitab.ecommerce.activities.ProductDetailsActivity;
-import com.mahitab.ecommerce.activities.SelectAddressActivity;
-import com.mahitab.ecommerce.adapters.CartAdapter;
+import com.mahitab.ecommerce.adapters.AddressAdapter;
+import com.mahitab.ecommerce.adapters.SelectAddressAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.DataManagerHelper;
 import com.mahitab.ecommerce.managers.GraphClientManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
+import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
@@ -40,129 +34,184 @@ import com.shopify.graphql.support.ID;
 import com.shopify.graphql.support.Input;
 
 import java.io.Serializable;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class CartFragment extends Fragment implements CartAdapter.CartProductClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "CartFragment";
-    private Toolbar toolbar;
-    private RecyclerView rvCartProducts;
-    public static List<CartItemQuantity> cartProducts;
-    private CartAdapter cartAdapter;
+public class SelectAddressActivity extends AppCompatActivity implements SelectAddressAdapter.SelectAddressItemInterface {
+    private static final String TAG = "SelectAddressActivity";
+    private RecyclerView rvAddresses;
+    private List<AddressModel> addresses;
+    private SelectAddressAdapter selectAddressAdapter;
 
-    private LinearLayout llEmptyCart;
-    private LinearLayout llContentCart;
-
-    private TextView tvSubTotalPrice;
-
-    private SharedPreferences defaultPreferences;
-    private Button checkoutButton;
-
-
+    SharedPreferences sharedPreferences;
     String accessToken;
+    public static List<CartItemQuantity> cartProducts;
+
+   String firstName = " ";
+    String lastName = "";
+    String phone = "";
+    String city = "";
+    String country = "";
+    String zip = "";
+    String province = "";
+    String address1 = "";
+    String address2 = "";
+    String email = "";
+    String strEmail, strPassword;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Dialog dialog = new Dialog(this);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        setContentView(R.layout.activity_select_address);
+        initView();
+        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+
+        DataManager.getInstance().setClientManager(SelectAddressActivity.this);
+
+        accessToken = sharedPreferences.getString("token", null);
+        Log.d(TAG, "getSavedAccessToken: " + accessToken);
+        queryAddressList(accessToken);
+        addresses = new ArrayList<>();
+    }
 
 
-    public CartFragment() {
-        // Required empty public constructor
+    private void initView() {
+        rvAddresses = findViewById(R.id.rvAddresses_MyAddressesActivity);
+    }
+
+
+    private void queryAddressList(String accessToken) {
+        Storefront.QueryRootQuery query = Storefront.query(root -> root
+                .customer(accessToken, customer -> customer
+                        .addresses(arg -> arg.first(10), connection -> connection
+                                .edges(edge -> edge
+                                        .node(node -> node
+                                                .address1()
+                                                .address2()
+                                                .city()
+                                                .province()
+                                                .country()
+                                                .phone()
+
+                                        )
+                                )
+                        )
+                )
+        );
+        getAddressList(query, new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+    }
+
+    private void getAddressList(Storefront.QueryRootQuery query, BaseCallback callback) {
+        GraphClientManager.mClient.queryGraph(query).enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
+            @Override
+            public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
+
+                if (!response.hasErrors()) {
+                    DataManagerHelper.getInstance().fetchAddresses().clear();
+                    Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
+                    for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
+
+
+                        AddressModel newAddressesModel = new AddressModel(edge);
+                        Log.d(TAG, "zip: " + edge.getNode().getFirstName());
+                        DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+                    }
+
+                    for (int i = 0; i < DataManager.getInstance().getAddresses().size(); i++) {
+                        Log.d(TAG, "cities: " + DataManager.getInstance().getAddresses().get(i).getCity().toString());
+                        if (DataManager.getInstance().getAddresses().get(i).getZipCode() != null)
+                            Log.d(TAG, "g: " + DataManager.getInstance().getAddresses().get(i).getZipCode().toString());
+                    }
+                    addresses = DataManager.getInstance().getAddresses();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "run: " + "success");
+                            addresses.sort((o1, o2) -> o2.getmID().toString().compareTo(o1.getmID().toString()));
+                            selectAddressAdapter = new SelectAddressAdapter(SelectAddressActivity.this, addresses);
+                            selectAddressAdapter.onClickItemSelectAddress(SelectAddressActivity.this::navigateToPaymentCashOnDelivery);
+                            rvAddresses.setLayoutManager(new LinearLayoutManager(SelectAddressActivity.this));
+                            rvAddresses.setHasFixedSize(true);
+                            rvAddresses.setAdapter(selectAddressAdapter);
+                        }
+                    });
+                    callback.onResponse(BaseCallback.RESULT_OK);
+                    return;
+
+                }
+
+                callback.onFailure(response.errors().get(0).message());
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull GraphError error) {
+                Log.d(TAG, "onFailure: " + error.getMessage().toString());
+
+            }
+        });
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        defaultPreferences = getActivity().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
-
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initView(view);
-
-        if (getActivity() != null && getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).setSupportActionBar(toolbar);
-            setHasOptionsMenu(true);
-        } else if (getActivity() != null && getActivity() instanceof CartActivity) {
-            toolbar.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (getActivity() != null && isResumed()) {
-            toolbar.setTitle(getResources().getString(R.string.cart));
-        }
-
-        if (defaultPreferences.getString("cartProducts", null) == null)
+    public void navigateToPaymentCashOnDelivery(AddressModel addressModel, int Position) {
+        if (sharedPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
         else
-            cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
+            cartProducts = new Gson().fromJson(sharedPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
+        Log.d(TAG, "getSavedCartProducts: " + cartProducts.toString());
 
 
-        displaySuitableLayout();
 
-        rvCartProducts.setHasFixedSize(true);
-        rvCartProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-        cartAdapter = new CartAdapter(requireContext(), cartProducts);
-        rvCartProducts.setAdapter(cartAdapter);
-        cartAdapter.setCartProductClickListener(this);
+        getCustomerAddress(addressModel, Position);
 
-        calculateSubTotalUpdateUI();
-
-        defaultPreferences.registerOnSharedPreferenceChangeListener(this);
-
-
-          //  createAccessToken();
-
-        checkoutButton.setOnClickListener(view1 -> {
-            Intent intent=new Intent(getContext(), SelectAddressActivity.class);
-            startActivity(intent);
-           /* ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-            for (int i = 0; i < cartProducts.size(); i++) {
-                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
-            }
-            Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                    .setLineItemsInput(Input.value(inputArrayList));
-            createCashOnDeliveryCheckOut(input);*/
-        });
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        defaultPreferences.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (sharedPreferences.contains("cartProducts")) {
-            defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
+        ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
+        for (int i = 0; i < cartProducts.size(); i++) {
+            inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
         }
+        Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
+                .setLineItemsInput(Input.value(inputArrayList));
+        createCashOnDeliveryCheckOut(input);
     }
 
-    private void initView(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
-        llEmptyCart = view.findViewById(R.id.llEmptyCart_CartFragment);
-        llContentCart = view.findViewById(R.id.llContentCart_CartFragment);
-        rvCartProducts = view.findViewById(R.id.rvCartProducts_CartFragment);
-        tvSubTotalPrice = view.findViewById(R.id.tvSubTotalPrice_CartFragment);
-        checkoutButton = view.findViewById(R.id.checkoutButton);
+    private void getCustomerAddress(AddressModel addressModel, int position) {
+        createAccessToken();
+        firstName = addressModel.getFirstName();
+        lastName = addressModel.getLastName();
+
+        phone = addressModel.getPhone();
+        city = addressModel.getCity();
+        country = addressModel.getCountry();
+        zip = "12345";
+        province = addressModel.getProvince();
+        address1 = addressModel.getAddress1();
+        address2 = addressModel.getAddress2();
+
+
+
     }
 
-   /* private void createAccessToken() {
+    private void createAccessToken() {
         getSavedEmailAndPassword();
         Log.d(TAG, "createAccessToken :e " + strEmail);
         Log.d(TAG, "createAccessToken:p " + strPassword);
@@ -184,10 +233,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         getAccessTokenFromAPI(mutationQuery);
     }
 
-    private void getSavedEmailAndPassword() {
-        strEmail = defaultPreferences.getString("email", null);
-        strPassword = defaultPreferences.getString("password", null);
-    }
+
 
     private void getAccessTokenFromAPI(Storefront.MutationQuery mutationQuery) {
         GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
@@ -279,34 +325,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     lastName = response.data().getCustomer().getLastName();
                     Log.e("data", "user..." + response.data().getCustomer().getLastName());
                 }
-                if (response.data().getCustomer().getEmail() != null) {
-                    email = response.data().getCustomer().getEmail();
-                    Log.e("data", "user..." + response.data().getCustomer().getEmail());
-                }
 
-
-                if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
-                    phone = response.data().getCustomer().getDefaultAddress().getPhone();
-                }
-
-                if (response.data().getCustomer().getDefaultAddress().getCity() != null) {
-                    city = response.data().getCustomer().getDefaultAddress().getCity();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getCountry() != null) {
-                    country = response.data().getCustomer().getDefaultAddress().getCountry();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getZip() != null) {
-                    zip = response.data().getCustomer().getDefaultAddress().getZip();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getProvince() != null) {
-                    province = response.data().getCustomer().getDefaultAddress().getProvince();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getAddress1() != null) {
-                    address1 = response.data().getCustomer().getDefaultAddress().getAddress1();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getAddress2() != null) {
-                    address2 = response.data().getCustomer().getDefaultAddress().getAddress2();
-                }
 
 
             }
@@ -317,6 +336,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             }
         });
     }
+
 
     private void createCashOnDeliveryCheckOut(Storefront.CheckoutCreateInput input) {
         Storefront.MutationQuery query = Storefront.mutation(mutationQuery -> mutationQuery
@@ -360,11 +380,16 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             }
         });
     }
-
+    private void getSavedEmailAndPassword() {
+        strEmail = sharedPreferences.getString("email", null);
+        strPassword = sharedPreferences.getString("password", null);
+    }
     private void queryUpdateEmail(ID checkoutId) {
+
+
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
                 .checkoutEmailUpdate(checkoutId,
-                        email,
+                        strEmail,
                         result -> result
                                 .checkout(
                                         checkout -> checkout
@@ -394,6 +419,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         );
         updateEmail(mutationQuery);
     }
+
 
     private void updateEmail(Storefront.MutationQuery mutationQuery) {
         GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
@@ -485,7 +511,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                 Log.d(TAG, "id: " + checkoutId.toString());
 
 
-                Intent Getintent = new Intent(getContext(), PaymentWebViewActivity.class);
+                Intent Getintent = new Intent(SelectAddressActivity.this, PaymentWebViewActivity.class);
                 Getintent.putExtra("web_url", webUrl);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("checkout_id", (Serializable) checkoutId);
@@ -502,70 +528,5 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
             }
         });
-    }*/
-
-    @Override
-    public void onIncreaseProductQuantityClick(int position) {
-        cartProducts.get(position).plusQuantity();
-        cartAdapter.notifyDataSetChanged();
-        defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
-        calculateSubTotalUpdateUI();
-    }
-
-    @Override
-    public void onDecreaseProductQuantityClick(int position) {
-        if (cartProducts.get(position).getQuantity() > 1)
-            cartProducts.get(position).minQuantity();
-        else
-            cartProducts.remove(position);
-        cartAdapter.notifyDataSetChanged();
-        defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
-        calculateSubTotalUpdateUI();
-        changeBadge();
-    }
-
-    @Override
-    public void onDeleteProductClick(int position) {
-        cartProducts.remove(position);
-        cartAdapter.notifyDataSetChanged();
-        defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
-        calculateSubTotalUpdateUI();
-        changeBadge();
-    }
-
-    @Override
-    public void onProductClick(String productId) {
-        Log.e(TAG, "onProductClick: "+productId );
-        Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
-        intent.putExtra("productId", productId);
-        startActivity(intent);
-    }
-
-    private void calculateSubTotalUpdateUI() {
-        double subTotal = 0;
-        for (CartItemQuantity cartItem : cartProducts) {
-            subTotal += cartItem.getQuantity() * cartItem.getProductPrice();
-        }
-        String subTotalPrice = NumberFormat.getInstance(new Locale("ar")).format(subTotal) + getString(R.string.egp);
-        tvSubTotalPrice.setText(subTotalPrice);
-    }
-
-    private void displaySuitableLayout() {
-        if (cartProducts.size() == 0) {
-            llEmptyCart.setVisibility(View.VISIBLE);
-            llContentCart.setVisibility(View.GONE);
-        } else {
-            llEmptyCart.setVisibility(View.GONE);
-            llContentCart.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void changeBadge(){
-        BadgeDrawable cartBadge = ((HomeActivity) getActivity()).getBnvHomeNavigation().getOrCreateBadge(R.id.cart_navigation);
-        if (cartProducts.size() >= 1) {
-            cartBadge.setVisible(true);
-            cartBadge.setNumber(cartProducts.size());
-            cartBadge.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
-        } else cartBadge.setVisible(false);
     }
 }

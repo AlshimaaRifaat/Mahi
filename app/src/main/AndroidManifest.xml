@@ -14,7 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".activities.MyOrderDetailsActivity"
+        <activity android:name=".activities.SelectAddressActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+      ></activity>
+        <activity
+            android:name=".activities.MyOrderDetailsActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

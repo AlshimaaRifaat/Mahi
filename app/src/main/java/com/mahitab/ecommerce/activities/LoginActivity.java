@@ -53,8 +53,8 @@ public class LoginActivity extends AppCompatActivity {
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
         tvForgetPassword.setOnClickListener(v ->
-                startActivity(new Intent(this,ResetPasswordActivity.class))
-                );
+                startActivity(new Intent(this, ResetPasswordActivity.class))
+        );
 
         btnLogin.setOnClickListener(v -> {
             email = etEmail.getText().toString();
@@ -136,12 +136,23 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
                 runOnUiThread(() -> {
                     Log.d(TAG, "state: " + "success");
-                    if (response.data() != null) {
-                        accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
-                        Log.d(TAG, "token: " + accessToken);
-                        saveAccessToken(accessToken);
-                        onBackPressed();
-                    }
+                  try {
+                      accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
+                      Log.d(TAG, "token: " + accessToken);
+                      saveAccessToken(accessToken);
+                      onBackPressed();
+                  }catch (NullPointerException e){
+                      Toast.makeText(LoginActivity.this, getResources().getString(R.string.check_your_email_and_password), Toast.LENGTH_SHORT).show();
+                  }
+                      /*  if (response.data()!=null&&response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken() != null) {
+                            accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
+                            Log.d(TAG, "token: " + accessToken);
+                            saveAccessToken(accessToken);
+                            onBackPressed();
+                        } else {
+                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.check_your_email_and_password), Toast.LENGTH_SHORT).show();
+                        }*/
+
                 });
             }
 

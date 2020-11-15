@@ -57,7 +57,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class ProductDetailsActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,
-        ProductImageSliderAdapter.ImageSliderItemClickInterface {
+        ProductImageSliderAdapter.ImageSliderItemClickInterface , RecentlyViewedProductsAdapter.ProductClickListener{
 
     private static final String TAG = "ProductDetailsActivity";
     // change the number to see badge in action
@@ -105,7 +105,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private ProductModel product;
     private RecyclerView rvRelatedProducts,rvRecentlyViewed;
     private SharedPreferences defaultPreferences;
-    private TextView tvSKU;
+    private TextView tvSKU,tRecentlyViewed;
 
     public ArrayList<String> viewedProductList;
     public ArrayList<ProductModel> recentlyViewedProductList;
@@ -244,8 +244,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 if (collection != null) {
                     rvRelatedProducts.setHasFixedSize(true);
                     rvRelatedProducts.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-                    ProductAdapter productAdapter = new ProductAdapter(this,collection.getPreviewProducts());
-                    rvRelatedProducts.setAdapter(productAdapter);
+                    RecentlyViewedProductsAdapter relatedProductsAdapter = new RecentlyViewedProductsAdapter(this,collection.getPreviewProducts());
+                    rvRelatedProducts.setAdapter(relatedProductsAdapter);
                 }
             }
 
@@ -335,15 +335,21 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private void getRecentlyViewedProducts(ArrayList<String> viewedProductList) {
         Log.d(TAG, "getRecentlyViewedProducts: "+viewedProductList);
         recentlyViewedProductList=new ArrayList<>();
+
         for(int i=0;i<viewedProductList.size();i++)
         {
             ProductModel productModel=DataManager.getInstance().getProductByID(viewedProductList.get(i));
             recentlyViewedProductList.add(productModel);
         }
-        rvRecentlyViewed.setHasFixedSize(true);
-        rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
-        RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(this,recentlyViewedProductList);
-        rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
+        if(!recentlyViewedProductList.isEmpty()) {
+            rvRecentlyViewed.setVisibility(View.VISIBLE);
+            tRecentlyViewed.setVisibility(View.VISIBLE);
+            rvRecentlyViewed.setHasFixedSize(true);
+            rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(this, recentlyViewedProductList);
+            recentlyViewedProductsAdapter.setProductClickListener(this::onProductClick);
+            rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
+        }
 
     }
 
@@ -435,6 +441,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         tvOldPrice=findViewById(R.id.tvOldPrice);
         tvDiscount=findViewById(R.id.tvDiscount);
         rvRecentlyViewed=findViewById(R.id.rvRecentlyViewed);
+        tRecentlyViewed=findViewById(R.id.tRecentlyViewed);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {
@@ -534,5 +541,11 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
         new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, (imageView, image) -> Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView))
                 .withStartPosition(position).show();
+    }
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
+        startActivity(intent);
     }
 }

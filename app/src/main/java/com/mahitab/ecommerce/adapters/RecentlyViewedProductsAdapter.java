@@ -25,19 +25,19 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 
-public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<RecentlyViewedProductsAdapter.ProductViewHolder> implements Observer {
+public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<RecentlyViewedProductsAdapter.ProductViewHolder>   {
 
     private ArrayList<ProductModel> productList;
-    private ProductAdapter.ProductClickListener listener;
+    private ProductClickListener listener;
 
-    private ArrayList<ProductModel> productsDataList;
-    private SelectedOptions selectedOptions = new SelectedOptions();
+
+
     Context context;
 
     public RecentlyViewedProductsAdapter(Context context, ArrayList<ProductModel> productList) {
         this.context = context;
         this.productList = productList;
-        updateList();
+
     }
 
     @NonNull
@@ -50,7 +50,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        ProductModel product = productsDataList.get(position);
+        ProductModel product = productList.get(position);
 
         Glide.with(holder.itemView.getContext())
                 .load(product.getImages()[0])
@@ -88,46 +88,12 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
 
     @Override
     public int getItemCount() {
-        return productsDataList.size();
+        return productList.size();
     }
 
-    public void updateList() {
-        productsDataList = new ArrayList<>();
-
-        ArrayList<ProductModel> aux = new ArrayList<>();
-        Log.d("mohamed", "onQueryTextChange: 2");
-        Log.d("mohamed", "onQueryTextChange: 2" + productList);
-
-        for (ProductModel p : productList) {
-
-            if (  //TODO
-                    p.containsSelectedOption("Color", selectedOptions.getColor()) &&
-                            p.containsSelectedOption("Size", selectedOptions.getSize()) &&
-                            p.containsSelectedOption("Material", selectedOptions.getMaterial())
-            ) {
-
-                if (selectedOptions.getLowerPrice() == selectedOptions.getHigherPrice() || p.between(p.getPrice().doubleValue(), selectedOptions.getLowerPrice(), selectedOptions.getHigherPrice())) {
-                    if (selectedOptions.getSearchCriteria().isEmpty()) {
-                        aux.add(p);
-                    } else if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
-                        aux.add(p);
-                    }
-                }
-            }
-        }
-        productsDataList.addAll(aux);
-        Log.d("ab", "updateList: " + productsDataList.toString());
 
 
-    }
 
-    @Override
-    public void update(Observable observable, Object arg) {
-        if (observable instanceof SelectedOptions) {
-            selectedOptions = (SelectedOptions) observable;
-            this.updateList();
-        }
-    }
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivImage;
@@ -143,7 +109,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
-                    listener.onProductClick(productsDataList.get(getAdapterPosition()).getID().toString());
+                    listener.onProductClick(productList.get(getAdapterPosition()).getID().toString());
             });
         }
     }
@@ -152,7 +118,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
         void onProductClick(String productId);
     }
 
-    public void setProductClickListener(ProductAdapter.ProductClickListener listener) {
+    public void setProductClickListener(ProductClickListener listener) {
         this.listener = listener;
     }
 

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,7 +57,8 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
     private RecyclerView rvShapes;
 
     private RecyclerView rvCollectionProducts;
-
+    TextView tSeeAll;
+    String targetId;
     public SubCategoriesFragment() {
         // Required empty public constructor
     }
@@ -73,6 +75,8 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         super.onViewCreated(view, savedInstanceState);
 
         initView(view);
+        DataManager.getInstance().setClientManager(requireContext());
+
 
         if (getContext() != null) {
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(new BroadcastReceiver() {
@@ -84,10 +88,12 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                         if (isAdded()&&selectedCategory != null) {
 
                             if (selectedCategory.getId() != null) {
-                                String target = "gid://shopify/Collection/" + selectedCategory.getId();
-                                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                                String target = "gid://shopify/Collection/" + "174152384649";
+                                 targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
                                 targetId = targetId.trim(); //remove spaces from end of string
                                 CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
+
+
                                 if (collection == null)
                                     Log.e(TAG, "onReceive: collection==null");
                                 else
@@ -103,7 +109,23 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                                     rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
                                     ProductAdapter productAdapter = new ProductAdapter(getContext(), collection.getPreviewProducts());
                                     rvCollectionProducts.setAdapter(productAdapter);
+
+
                                 }
+
+
+                                tSeeAll.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Log.d(TAG, "onClick: "+"morre");
+                                        if(targetId!=null) {
+                                            Intent intent = new Intent(getContext(), CollectionProductsActivity.class);
+                                            Log.d(TAG, "onClick: "+targetId);
+                                            intent.putExtra("collectionId", targetId);
+                                            startActivity(intent);
+                                        }
+                                    }
+                                });
                             }
 
                             if (selectedCategory.getBanners() != null) {
@@ -135,7 +157,11 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                     }
                 }
             }, new IntentFilter("mainCategoryAdapter"));
+
+
         }
+
+
 
     }
 
@@ -171,6 +197,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         cvShape = view.findViewById(R.id.cvShape_SubCategoriesFragment);
         rvShapes = view.findViewById(R.id.rvShapes_SubCategoriesFragment);
         rvCollectionProducts = view.findViewById(R.id.rvCollectionProducts_SubCategoriesFragment);
+        tSeeAll=view.findViewById(R.id.tSeeAll);
     }
 
     private void displayColors() {

@@ -150,6 +150,8 @@
     <string name="Do_you_want_to_Delete">Do you want to Delete?</string>
     <string name="Cancel">Cancel</string>
     <string name="complete_action_using">Complete action using</string>
+    <string name="check_your_email_and_password">" الايميل او الرقم السري غير صحيح!"</string>
+    <string name="Select">اختر</string>
 
 
 </resources>
