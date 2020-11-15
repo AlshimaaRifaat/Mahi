@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,12 +25,14 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.AddEditAddressActivity;
 import com.mahitab.ecommerce.activities.CartActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.PaymentWebViewActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.activities.SelectAddressActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.GraphClientManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.shopify.buy3.GraphCall;
@@ -125,10 +128,15 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
 
           //  createAccessToken();
-
+        DataManager.getInstance().setClientManager(getContext());
         checkoutButton.setOnClickListener(view1 -> {
-            Intent intent=new Intent(getContext(), SelectAddressActivity.class);
-            startActivity(intent);
+           // if(SelectAddressActivity.addresses!=null) {
+                Intent intent = new Intent(getContext(), SelectAddressActivity.class);
+                startActivity(intent);
+          /*  }else{
+                    Toast.makeText(requireContext(), "من فضلك اضف العنوان لتتمكن من عمليه الدفع!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getContext(), AddEditAddressActivity.class));
+            }*/
            /* ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
             for (int i = 0; i < cartProducts.size(); i++) {
                 inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));

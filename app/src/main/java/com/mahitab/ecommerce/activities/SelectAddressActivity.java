@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -40,7 +41,7 @@ import java.util.List;
 public class SelectAddressActivity extends AppCompatActivity implements SelectAddressAdapter.SelectAddressItemInterface {
     private static final String TAG = "SelectAddressActivity";
     private RecyclerView rvAddresses;
-    private List<AddressModel> addresses;
+    public static List<AddressModel> addresses;
     private SelectAddressAdapter selectAddressAdapter;
 
     SharedPreferences sharedPreferences;
@@ -191,7 +192,9 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
         }
         Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
                 .setLineItemsInput(Input.value(inputArrayList));
-        createCashOnDeliveryCheckOut(input);
+        if(addressModel!=null) {
+            createCashOnDeliveryCheckOut(input);
+        }
     }
 
     private void getCustomerAddress(AddressModel addressModel, int position) {
