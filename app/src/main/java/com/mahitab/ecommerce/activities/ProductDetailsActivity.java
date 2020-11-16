@@ -17,6 +17,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +59,7 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class ProductDetailsActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,
-        ProductImageSliderAdapter.ImageSliderItemClickInterface , RecentlyViewedProductsAdapter.ProductClickListener{
+        ProductImageSliderAdapter.ImageSliderItemClickInterface {
 
     private static final String TAG = "ProductDetailsActivity";
     // change the number to see badge in action
@@ -66,7 +68,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private LoopingViewPager viewPager;
     private PageIndicatorView indicatorView;
 
-    private TextView tvTitle,tvDiscount;
+    private TextView tvTitle, tvDiscount;
     private TextView tvPrice;
     private TextView tvDescription;
     private ImageView ivDescription;
@@ -84,7 +86,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private TextView tvWidth2;
     private TextView tvQuantityType;
     private ImageView ivIncreaseQuantity;
-    private TextView tvCartQuantity,tvOldPrice;
+    private TextView tvCartQuantity, tvOldPrice;
     private ImageView ivDecreaseQuantity;
     private ImageView ivBuyByPhone;
     private Button btnBuy;
@@ -103,9 +105,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private String currentProductId;
 
     private ProductModel product;
-    private RecyclerView rvRelatedProducts,rvRecentlyViewed;
+    private RecyclerView rvRelatedProducts, rvRecentlyViewed;
     private SharedPreferences defaultPreferences;
-    private TextView tvSKU,tRecentlyViewed;
+    private TextView tvSKU;
 
     public ArrayList<String> viewedProductList;
     public ArrayList<ProductModel> recentlyViewedProductList;
@@ -143,7 +145,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<ArrayList<String>>() {
             }.getType());
 
-        getRecentlyViewedProducts(viewedProductList);
+        if (viewedProductList != null) {
+            getRecentlyViewedProducts(viewedProductList);
+        }
 
         cartProductsCount = cartProducts.size();
 
@@ -187,20 +191,20 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     tvQuantityType.setVisibility(View.GONE);
                 }
 
-                String sku="#"+product.getSKU();
+                String sku = "#" + product.getSKU();
                 tvSKU.setText(sku);
                 String price = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getPrice()) + getString(R.string.egp);
 
                 tvPrice.setText(price);
 
-                if (product.getVariants().get(0).getOldPrice()!=null) {
+                if (product.getVariants().get(0).getOldPrice() != null) {
                     String oldPrice = NumberFormat.getInstance(new Locale("ar")).format(product.getVariants().get(0).getOldPrice()) + getString(R.string.egp);
                     tvOldPrice.setText(oldPrice);
                     tvOldPrice.setPaintFlags(tvOldPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
 
 
-                if(product.getVariants().get(0).getPrice()!=null&&product.getVariants().get(0).getOldPrice()!=null) {
+                if (product.getVariants().get(0).getPrice() != null && product.getVariants().get(0).getOldPrice() != null) {
                     float mPrice = product.getVariants().get(0).getPrice().floatValue();
                     float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
 
@@ -208,7 +212,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     String discountPercentage = (int) Math.ceil(ratioDiscount) + getResources().getString(R.string.discount_percentage);
 
                     tvDiscount.setText(discountPercentage);
-                }else tvDiscount.setVisibility(View.GONE);
+                } else tvDiscount.setVisibility(View.GONE);
 
                 tvDescription.setText(HtmlCompat.fromHtml(product.getDescription(), HtmlCompat.FROM_HTML_MODE_LEGACY));
 
@@ -231,7 +235,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 viewPager.setIndicatorPageChangeListener(new LoopingViewPager.IndicatorPageChangeListener() {
                     @Override
                     public void onIndicatorProgress(int selectingPosition, float progress) {
-                        Log.d(TAG, "onIndicatorProgress: "+selectingPosition);
+                        Log.d(TAG, "onIndicatorProgress: " + selectingPosition);
                     }
 
                     @Override
@@ -243,16 +247,19 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
                 if (collection != null) {
                     rvRelatedProducts.setHasFixedSize(true);
-                    rvRelatedProducts.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-                    RecentlyViewedProductsAdapter relatedProductsAdapter = new RecentlyViewedProductsAdapter(this,collection.getPreviewProducts());
-                    rvRelatedProducts.setAdapter(relatedProductsAdapter);
+                    rvRelatedProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                    ProductAdapter productAdapter = new ProductAdapter(this, collection.getPreviewProducts());
+                    rvRelatedProducts.setAdapter(productAdapter);
                 }
             }
 
             cvAddReview.setOnClickListener(v -> {
-                Intent intent = new Intent(getApplicationContext(), ReviewActivity.class);
-                intent.putExtra("productId", product.getID().toString());
-                startActivity(intent);
+                String accessToken = defaultPreferences.getString("token", null);
+                if (accessToken != null) {
+                    Intent intent = new Intent(getApplicationContext(), ReviewActivity.class);
+                    intent.putExtra("productId", product.getID().toString());
+                    startActivity(intent);
+                } else startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             });
 
             ivDescription.setOnClickListener(v -> {
@@ -262,7 +269,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             });
 
             btnAddToCart.setOnClickListener(v -> {
-                cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue(),product.getVariants().get(0).getID()));
+                cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue(), product.getVariants().get(0).getID()));
                 Log.e("Tango", product.getID().toString());
                 defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
                 tvCartQuantity.setText(String.valueOf(1));
@@ -307,8 +314,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             ivShareProduct.setOnClickListener(v -> {
                 /*Create an ACTION_SEND Intent*/
                 Intent intent = new Intent(Intent.ACTION_SEND);
-                String urlTitle=product.getTitle().replace(" ","-");
-                String productLink="https://mahitab.com/products/"+urlTitle;
+                String urlTitle = product.getTitle().replace(" ", "-");
+                String productLink = "https://mahitab.com/products/" + urlTitle;
                 intent.setType("text/plain");
                 /*Applying information Subject and Body.*/
                 intent.putExtra(Intent.EXTRA_SUBJECT, product.getTitle());
@@ -326,30 +333,23 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     wishListProducts.add(currentProductId);
                 }
                 defaultPreferences.edit().putString("wishListProducts", new Gson().toJson(wishListProducts)).apply();
-                Log.e(TAG, "onCreate: "+wishListProducts.size() );
+                Log.e(TAG, "onCreate: " + wishListProducts.size());
                 displayIsWishedProduct(isWishedBefore);
             });
         }
     }
 
     private void getRecentlyViewedProducts(ArrayList<String> viewedProductList) {
-        Log.d(TAG, "getRecentlyViewedProducts: "+viewedProductList);
-        recentlyViewedProductList=new ArrayList<>();
-
-        for(int i=0;i<viewedProductList.size();i++)
-        {
-            ProductModel productModel=DataManager.getInstance().getProductByID(viewedProductList.get(i));
+        Log.d(TAG, "getRecentlyViewedProducts: " + viewedProductList);
+        recentlyViewedProductList = new ArrayList<>();
+        for (int i = 0; i < viewedProductList.size(); i++) {
+            ProductModel productModel = DataManager.getInstance().getProductByID(viewedProductList.get(i));
             recentlyViewedProductList.add(productModel);
         }
-        if(!recentlyViewedProductList.isEmpty()) {
-            rvRecentlyViewed.setVisibility(View.VISIBLE);
-            tRecentlyViewed.setVisibility(View.VISIBLE);
-            rvRecentlyViewed.setHasFixedSize(true);
-            rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(this, recentlyViewedProductList);
-            recentlyViewedProductsAdapter.setProductClickListener(this::onProductClick);
-            rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
-        }
+        rvRecentlyViewed.setHasFixedSize(true);
+        rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(recentlyViewedProductList);
+        rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
 
     }
 
@@ -362,9 +362,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             //start update quantity in ui in changed in cart fragment and back to details
             cartProducts = new Gson().fromJson(defaultPreferences.getString("cartProducts", null), new TypeToken<List<CartItemQuantity>>() {
             }.getType());
-            int currentCartProductIndex = IntStream.range(0, cartProducts.size())
-                    .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
-                    .findFirst().orElse(-1);
+            int currentCartProductIndex = -1;
+            if (cartProducts != null) {
+                currentCartProductIndex = IntStream.range(0, cartProducts.size())
+                        .filter(i -> cartProducts.get(i).getProductID().equals(currentProductId))
+                        .findFirst().orElse(-1);
+            }
             if (currentCartProductIndex != -1)
                 updateQuantitySharedPreferencesUI(currentCartProductIndex);
             else
@@ -372,8 +375,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             //end update quantity in ui
         }
 
-        if (product != null)
-            getProductReviews(product.getID().toString());
+        if (product != null) {
+            byte[] decodedBytes = android.util.Base64.decode(product.getID().toString(), android.util.Base64.DEFAULT);
+            String decodeProductId = new String(decodedBytes).split("/")[4];
+
+            getProductReviews(decodeProductId);
+        }
 
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
     }
@@ -384,7 +391,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         defaultPreferences.unregisterOnSharedPreferenceChangeListener(this);
         if (!viewedProductList.isEmpty()) {
             defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductList)).apply();
-            Log.d(TAG, "onPause: "+viewedProductList.toString());
+            Log.d(TAG, "onPause: " + viewedProductList.toString());
         }
     }
 
@@ -437,11 +444,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
         ivShareProduct = findViewById(R.id.ivShareProduct_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
-        tvSKU=findViewById(R.id.tvSKU_ProductDetailsActivity);
-        tvOldPrice=findViewById(R.id.tvOldPrice);
-        tvDiscount=findViewById(R.id.tvDiscount);
-        rvRecentlyViewed=findViewById(R.id.rvRecentlyViewed);
-        tRecentlyViewed=findViewById(R.id.tRecentlyViewed);
+        tvSKU = findViewById(R.id.tvSKU_ProductDetailsActivity);
+        tvOldPrice = findViewById(R.id.tvOldPrice);
+        tvDiscount = findViewById(R.id.tvDiscount);
+        rvRecentlyViewed = findViewById(R.id.rvRecentlyViewed);
     }
 
     private void displayQuantityControls(boolean isAddedToCart) {
@@ -486,8 +492,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
     private void getProductReviews(String productId) {
         productReviewsReference.child(productId)
-                .orderByChild("accepted")
-                .equalTo(true)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -521,18 +525,24 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         int customer2Stars = 0;
         int customer1Stars = 0;
         for (ProductReviewModel review : reviews) {
-            if (review.getRating() == 5)
-                customer5Stars += 1;
-            else if (review.getRating() == 4)
-                customer4Stars += 1;
-            else if (review.getRating() == 3)
-                customer3Stars += 1;
-            else if (review.getRating() == 2)
-                customer2Stars += 1;
-            else if (review.getRating() == 1)
-                customer1Stars += 1;
+            if (review.isAccepted()) {
+                if (review.getRating() == 5)
+                    customer5Stars += 1;
+                else if (review.getRating() == 4)
+                    customer4Stars += 1;
+                else if (review.getRating() == 3)
+                    customer3Stars += 1;
+                else if (review.getRating() == 2)
+                    customer2Stars += 1;
+                else if (review.getRating() == 1)
+                    customer1Stars += 1;
+            }
         }
-        return (customer1Stars + (2 * customer2Stars) + (3 * customer3Stars)+ (4 * customer4Stars) + (5 * customer5Stars)) / (customer1Stars + customer2Stars + customer3Stars + customer4Stars + customer5Stars);
+        int sumStars = (customer1Stars + customer2Stars + customer3Stars + customer4Stars + customer5Stars);
+        if (sumStars == 0)
+            return 0;
+        else
+            return (customer1Stars + (2 * customer2Stars) + (3 * customer3Stars) + (4 * customer4Stars) + (5 * customer5Stars)) / sumStars;
     }
 
 
@@ -541,11 +551,5 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
         new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, (imageView, image) -> Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView))
                 .withStartPosition(position).show();
-    }
-    @Override
-    public void onProductClick(String productId) {
-        Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
-        intent.putExtra("productId", productId);
-        startActivity(intent);
     }
 }

@@ -71,14 +71,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     private List<CartItemQuantity> cartProducts = null;
 
-    boolean sliderBannersLoaded = false;
-    boolean topCollectionsLoaded = false;
-    boolean midCollectionsLoaded = false;
-    boolean bottomCollectionsLoaded = false;
-    boolean topBannersLoaded = false;
-    boolean midBannersLoaded = false;
-    boolean bottomBannersLoaded = false;
-
     private DatabaseReference databaseReference;
 
     @Override
@@ -225,37 +217,42 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot topSnapshot : dataSnapshot.child("Collections/Top").getChildren()) {
-                    String target = "gid://shopify/Collection/" + topSnapshot.child("id").getValue();
-                    String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                    targetId = targetId.trim(); //remove spaces from end of string
-                    topCollectionsIds.add(targetId);
+                    if (topSnapshot.child("id").getValue() != null) {
+                        String target = "gid://shopify/Collection/" + topSnapshot.child("id").getValue();
+                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                        targetId = targetId.trim(); //remove spaces from end of string
+                        topCollectionsIds.add(targetId);
+                    }
                 }
 
                 for (DataSnapshot midSnapshot : dataSnapshot.child("Collections/Mid").getChildren()) {
-                    String target = "gid://shopify/Collection/" + midSnapshot.child("id").getValue();
-                    String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                    targetId = targetId.trim(); //remove spaces from end of string
-                    midCollectionsIds.add(targetId);
+                    if (midSnapshot.child("id").getValue() != null) {
+                        String target = "gid://shopify/Collection/" + midSnapshot.child("id").getValue();
+                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                        targetId = targetId.trim(); //remove spaces from end of string
+                        midCollectionsIds.add(targetId);
+                    }
                 }
 
                 for (DataSnapshot bottomSnapshot : dataSnapshot.child("Collections/Bottom").getChildren()) {
-                    String target = "gid://shopify/Collection/" + bottomSnapshot.child("id").getValue();
-                    String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                    targetId = targetId.trim(); //remove spaces from end of string
-                    bottomCollectionsIds.add(targetId);
+                    if (bottomSnapshot.child("id").getValue() != null) {
+                        String target = "gid://shopify/Collection/" + bottomSnapshot.child("id").getValue();
+                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                        targetId = targetId.trim(); //remove spaces from end of string
+                        bottomCollectionsIds.add(targetId);
+                    }
                 }
 
                 for (DataSnapshot sliderSnapshot : dataSnapshot.child("Slider").getChildren()) {
                     if (sliderSnapshot.child("id").getValue() instanceof String
                             && sliderSnapshot.child("type").getValue() instanceof String
                             && sliderSnapshot.child("image").getValue() instanceof String
-                            && sliderSnapshot.child("numberOfClicks").getValue() instanceof Long){ // validate data types before add in model
+                            && sliderSnapshot.child("numberOfClicks").getValue() instanceof Long) { // validate data types before add in model
 
                         BannerModel sliderBanner = sliderSnapshot.getValue(BannerModel.class);
                         if (sliderBanner != null) {
                             sliderBanner.setReference(sliderSnapshot.getRef());
                             sliderBanners.add(sliderBanner);
-                            sliderBannersLoaded = true;
                         }
                     }
                 }
@@ -264,13 +261,12 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     if (topBannersSnapshot.child("id").getValue() instanceof String
                             && topBannersSnapshot.child("type").getValue() instanceof String
                             && topBannersSnapshot.child("image").getValue() instanceof String
-                            && topBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+                            && topBannersSnapshot.child("numberOfClicks").getValue() instanceof Long) {// validate data types before add in model
 
                         BannerModel banner = topBannersSnapshot.getValue(BannerModel.class);
                         if (banner != null) {
                             banner.setReference(topBannersSnapshot.getRef());
                             topBanners.add(banner);
-                            topBannersLoaded = true;
                         }
                     }
                 }
@@ -279,13 +275,12 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     if (midBannersSnapshot.child("id").getValue() instanceof String
                             && midBannersSnapshot.child("type").getValue() instanceof String
                             && midBannersSnapshot.child("image").getValue() instanceof String
-                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long) {// validate data types before add in model
 
                         BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
                         if (banner != null) {
                             banner.setReference(midBannersSnapshot.getRef());
                             midBanners.add(banner);
-                            midBannersLoaded = true;
                         }
                     }
                 }
@@ -294,13 +289,12 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     if (midBannersSnapshot.child("id").getValue() instanceof String
                             && midBannersSnapshot.child("type").getValue() instanceof String
                             && midBannersSnapshot.child("image").getValue() instanceof String
-                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long){// validate data types before add in model
+                            && midBannersSnapshot.child("numberOfClicks").getValue() instanceof Long) {// validate data types before add in model
 
                         BannerModel banner = midBannersSnapshot.getValue(BannerModel.class);
                         if (banner != null) {
                             banner.setReference(midBannersSnapshot.getRef());
                             bottomBanners.add(banner);
-                            bottomBannersLoaded = true;
                         }
                     }
                 }
@@ -310,56 +304,50 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     public void onResponse(int status) {
                         if (status == 200) {
                             runOnUiThread(() -> {
-
                                 for (int i = 0; i < topCollectionsIds.size(); i++) {
                                     CollectionModel collection = DataManager.getInstance().getCollectionByID(topCollectionsIds.get(i));
-                                    if (collection != null)
-                                        Log.e(TAG, "onResponse:top collection " + collection.getTitle());
-                                    else Log.e(TAG, "onResponse: top collection null");
-                                    topCollections.add(collection);
-                                    if (i == topCollectionsIds.size() - 1)
-                                        topCollectionsLoaded = true;
+                                    if (collection != null) {
+                                        Log.e(TAG, "onResponse: top collection " + collection.getTitle());
+                                        topCollections.add(collection);
+                                    } else Log.e(TAG, "onResponse: top collection null");
                                 }
                                 for (int i = 0; i < midCollectionsIds.size(); i++) {
                                     CollectionModel collection = DataManager.getInstance().getCollectionByID(midCollectionsIds.get(i));
-                                    Log.e(TAG, "onResponse:mid collection " + collection.getTitle());
-                                    midCollections.add(collection);
-                                    if (i == midCollectionsIds.size() - 1)
-                                        midCollectionsLoaded = true;
+                                    if (collection != null) {
+                                        Log.e(TAG, "onResponse: mid collection " + collection.getTitle());
+                                        midCollections.add(collection);
+                                    } else Log.e(TAG, "onResponse: mid collection null");
                                 }
                                 for (int i = 0; i < bottomCollectionsIds.size(); i++) {
                                     CollectionModel collection = DataManager.getInstance().getCollectionByID(bottomCollectionsIds.get(i));
-                                    Log.e(TAG, "onResponse:bottom collection " + collection.getTitle());
-                                    bottomCollections.add(collection);
-                                    if (i == bottomCollectionsIds.size() - 1)
-                                        bottomCollectionsLoaded = true;
+                                    if (collection != null) {
+                                        Log.e(TAG, "onResponse:bottom collection " + collection.getTitle());
+                                        bottomCollections.add(collection);
+                                    } else
+                                        Log.e(TAG, "onResponse:bottom collection null");
                                 }
-                                if (topBannersLoaded && midBannersLoaded && bottomBannersLoaded &&
-                                        sliderBannersLoaded &&
-                                        topCollectionsLoaded && midCollectionsLoaded && bottomCollectionsLoaded) {
-                                    if (homePageLoadedListener != null) {
-                                        homePageLoadedListener.onSliderLoaded(sliderBanners);
-                                        homePageLoadedListener.onTopCollectionLoaded(topCollections);
-                                        homePageLoadedListener.onMidCollectionLoaded(midCollections);
-                                        homePageLoadedListener.onBottomCollectionLoaded(bottomCollections);
-                                        homePageLoadedListener.onTopBannersLoaded(topBanners);
-                                        homePageLoadedListener.onMidBannersLoaded(midBanners);
-                                        homePageLoadedListener.onBottomBannersLoaded(bottomBanners);
-                                    }
+                                if (homePageLoadedListener != null) {
+                                    homePageLoadedListener.onSliderLoaded(sliderBanners);
+                                    homePageLoadedListener.onTopCollectionLoaded(topCollections);
+                                    homePageLoadedListener.onMidCollectionLoaded(midCollections);
+                                    homePageLoadedListener.onBottomCollectionLoaded(bottomCollections);
+                                    homePageLoadedListener.onTopBannersLoaded(topBanners);
+                                    homePageLoadedListener.onMidBannersLoaded(midBanners);
+                                    homePageLoadedListener.onBottomBannersLoaded(bottomBanners);
+                                }
 
-                                    llSplash.animate()
-                                            .translationY(llSplash.getHeight())
-                                            .alpha(0.0f)
-                                            .setDuration(300)
-                                            .setListener(new AnimatorListenerAdapter() {
-                                                @Override
-                                                public void onAnimationEnd(Animator animation) {
-                                                    super.onAnimationEnd(animation);
-                                                    llSplash.setVisibility(View.GONE);
-                                                    llHome.setVisibility(View.VISIBLE);
-                                                }
-                                            });
-                                }
+                                llSplash.animate()
+                                        .translationY(llSplash.getHeight())
+                                        .alpha(0.0f)
+                                        .setDuration(300)
+                                        .setListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                super.onAnimationEnd(animation);
+                                                llSplash.setVisibility(View.GONE);
+                                                llHome.setVisibility(View.VISIBLE);
+                                            }
+                                        });
                             });
                         } else {
                             this.onFailure("An unknown error has occurred");

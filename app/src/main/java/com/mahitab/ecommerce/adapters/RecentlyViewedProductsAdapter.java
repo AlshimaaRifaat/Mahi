@@ -1,8 +1,6 @@
 package com.mahitab.ecommerce.adapters;
 
-import android.content.Context;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,27 +15,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.models.ProductModel;
-import com.mahitab.ecommerce.models.SelectedOptions;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
 
-public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<RecentlyViewedProductsAdapter.ProductViewHolder>   {
+public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<RecentlyViewedProductsAdapter.ProductViewHolder> {
 
-    private ArrayList<ProductModel> productList;
-    private ProductClickListener listener;
+    private final ArrayList<ProductModel> productList;
+    private ProductAdapter.ProductClickListener listener;
 
 
-
-    Context context;
-
-    public RecentlyViewedProductsAdapter(Context context, ArrayList<ProductModel> productList) {
-        this.context = context;
+    public RecentlyViewedProductsAdapter(ArrayList<ProductModel> productList) {
         this.productList = productList;
-
     }
 
     @NonNull
@@ -47,20 +37,21 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
     }
 
 
-
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         ProductModel product = productList.get(position);
 
-        Glide.with(holder.itemView.getContext())
-                .load(product.getImages()[0])
-                .thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-                .placeholder(R.drawable.ic_image_gray_24dp)
-                .fallback(R.drawable.ic_image_gray_24dp)
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.ivImage);
+        if (product.getImages()[0] != null){
+            Glide.with(holder.itemView.getContext())
+                    .load(product.getImages()[0])
+                    .thumbnail(/*sizeMultiplier*/ 0.25f)
+                    .apply(new RequestOptions())
+                    .placeholder(R.drawable.ic_image_gray_24dp)
+                    .fallback(R.drawable.ic_image_gray_24dp)
+                    .dontTransform()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.ivImage);
+        }
 
         holder.tvTitle.setText(product.getTitle());
 
@@ -91,10 +82,6 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
         return productList.size();
     }
 
-
-
-
-
     public class ProductViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivImage;
         private final TextView tvTitle;
@@ -118,7 +105,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
         void onProductClick(String productId);
     }
 
-    public void setProductClickListener(ProductClickListener listener) {
+    public void setProductClickListener(ProductAdapter.ProductClickListener listener) {
         this.listener = listener;
     }
 

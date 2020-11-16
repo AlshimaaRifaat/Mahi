@@ -25,9 +25,7 @@
                 android:paddingBottom="8dp"
                 app:autoScroll="true"
                 app:isInfinite="true"
-                app:scrollInterval="3000"
-                android:visibility="gone"
-               />
+                app:scrollInterval="3000" />
 
             <com.rd.PageIndicatorView
                 android:id="@+id/pageIndicatorView"
@@ -142,6 +140,18 @@
                     </LinearLayout>
 
                     <ImageView
+                        android:id="@+id/ivWishProduct_ProductDetailsActivity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="?android:attr/actionBarItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_favorite_border_yellow_24dp"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
                         android:id="@+id/ivShareProduct_ProductDetailsActivity"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -153,17 +163,6 @@
                         android:src="@drawable/ic_share_yellow_24dp"
                         tools:ignore="ContentDescription" />
 
-                    <ImageView
-                        android:id="@+id/ivWishProduct_ProductDetailsActivity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="?android:attr/actionBarItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_favorite_border_yellow_24dp"
-                        tools:ignore="ContentDescription" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -277,9 +276,7 @@
                     android:id="@+id/rvProductReviews_ProductDetailsActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="1"
                     tools:listitem="@layout/review_item" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -325,32 +322,24 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRelatedProducts_ProductDetailsActivity"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
             android:layout_marginTop="8dp"
-            android:layout_marginRight="10dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:focusable="true"
-            android:text="@string/RecentlyViewed"
-            android:textColor="@color/colorPrimary"
-            android:textSize="15sp"
-            tools:listitem="@layout/product_item"
-         />
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/product_item" />
 
         <TextView
-            android:id="@+id/tRecentlyViewed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:layout_marginTop="8dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="8dp"
             android:background="?android:attr/actionBarItemBackground"
             android:focusable="true"
             android:text="@string/RecentlyViewed"
             android:textColor="@color/colorPrimary"
-            android:textSize="15sp"
-            android:visibility="gone"/>
+            android:textSize="15sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRecentlyViewed"
@@ -359,7 +348,6 @@
             android:layout_marginTop="8dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/product_item"
-            android:visibility="gone"/>
+            tools:listitem="@layout/product_item" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

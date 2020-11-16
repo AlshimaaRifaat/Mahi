@@ -13,11 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.GraphClientManager;
+import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.ProductReviewModel;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
@@ -57,12 +58,16 @@ public class ReviewActivity extends AppCompatActivity {
 
         if (getIntent().getExtras() != null) {
             productId = getIntent().getExtras().getString("productId");
+            byte[] decodedBytes = android.util.Base64.decode(productId, android.util.Base64.DEFAULT);
+            String decodeProductId = new String(decodedBytes).split("/")[4];
 
             String accessToken = defaultPreferences.getString("token", null);
             if (accessToken != null)
                 fetchCustomerQuery(accessToken);
 
-            btnSave.setOnClickListener(v -> saveProductReview(productId, customer.getEmail(), new ProductReviewModel(productId,customer.getFirstName(), customer.getLastName(), etMessage.getText().toString(), rbRating.getRating())));
+            ProductModel product = DataManager.getInstance().getProductByID(productId);
+
+            btnSave.setOnClickListener(v -> saveProductReview(decodeProductId, customer.getEmail(), new ProductReviewModel(productId, customer.getFirstName(), customer.getLastName(), customer.getEmail().toLowerCase(),product.getTitle(), etMessage.getText().toString(), rbRating.getRating())));
         }
     }
 

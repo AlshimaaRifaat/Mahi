@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,14 +24,12 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
-import com.mahitab.ecommerce.activities.AddEditAddressActivity;
 import com.mahitab.ecommerce.activities.CartActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.PaymentWebViewActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
 import com.mahitab.ecommerce.activities.SelectAddressActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
-import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.GraphClientManager;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.shopify.buy3.GraphCall;
@@ -65,7 +62,17 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
 
     String accessToken;
-
+    String firstName = " ";
+    String lastName = "";
+    String phone = "";
+    String city = "";
+    String country = "";
+    String zip = "";
+    String province = "";
+    String address1 = "";
+    String address2 = "";
+    String email = "";
+    String strEmail, strPassword;
 
     public CartFragment() {
         // Required empty public constructor
@@ -74,8 +81,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        defaultPreferences = getActivity().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
-
+        defaultPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -83,7 +89,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_cart, container, false);
-
     }
 
     @Override
@@ -126,24 +131,20 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
 
+        String token = defaultPreferences.getString("token", null);
+        if (token != null)
+            createAccessToken();
 
-          //  createAccessToken();
-        DataManager.getInstance().setClientManager(getContext());
         checkoutButton.setOnClickListener(view1 -> {
-           // if(SelectAddressActivity.addresses!=null) {
-                Intent intent = new Intent(getContext(), SelectAddressActivity.class);
-                startActivity(intent);
-          /*  }else{
-                    Toast.makeText(requireContext(), "من فضلك اضف العنوان لتتمكن من عمليه الدفع!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getContext(), AddEditAddressActivity.class));
-            }*/
-           /* ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-            for (int i = 0; i < cartProducts.size(); i++) {
-                inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
-            }
-            Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                    .setLineItemsInput(Input.value(inputArrayList));
-            createCashOnDeliveryCheckOut(input);*/
+            if (token == null) {
+                ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
+                for (int i = 0; i < cartProducts.size(); i++) {
+                    inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
+                }
+                Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
+                        .setLineItemsInput(Input.value(inputArrayList));
+                createCashOnDeliveryCheckOut(input);
+            } else startActivity(new Intent(getActivity(), SelectAddressActivity.class));
         });
 
     }
@@ -170,7 +171,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         checkoutButton = view.findViewById(R.id.checkoutButton);
     }
 
-   /* private void createAccessToken() {
+    private void createAccessToken() {
         getSavedEmailAndPassword();
         Log.d(TAG, "createAccessToken :e " + strEmail);
         Log.d(TAG, "createAccessToken:p " + strPassword);
@@ -210,7 +211,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
                     Log.e("TAG", "login" + response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken());
                     // queryUserDetails(accessToken);
-                    Log.d(TAG, "accessToken: "+accessToken.toString());
                     fetchCustomerQuery(accessToken);
                 }
             }
@@ -329,19 +329,17 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     private void createCashOnDeliveryCheckOut(Storefront.CheckoutCreateInput input) {
         Storefront.MutationQuery query = Storefront.mutation(mutationQuery -> mutationQuery
                 .checkoutCreate(input, createPayloadQuery -> createPayloadQuery
-                        .checkout(checkoutQuery -> checkoutQuery
-                                .webUrl()
+                        .checkout(Storefront.CheckoutQuery::webUrl
                         )
                         .userErrors(userErrorQuery -> userErrorQuery
                                 .field()
                                 .message()
                         ))
         );
-
-        getCashPaymentStatus(query);
+        getCheckoutId(query);
     }
 
-    private void getCashPaymentStatus(Storefront.MutationQuery query) {
+    private void getCheckoutId(Storefront.MutationQuery query) {
 
         GraphClientManager.mClient.mutateGraph(query).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
@@ -352,11 +350,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
                     Log.d(TAG, "ch id: " + checkoutId.toString());
 
-                    if (checkoutId.toString() != null) {
-                        queryUpdateEmail(checkoutId);
-                    }
-
-
+                    queryUpdateAddress(checkoutId);
                 }
 
             }
@@ -369,86 +363,9 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         });
     }
 
-    private void queryUpdateEmail(ID checkoutId) {
-        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                .checkoutEmailUpdate(checkoutId,
-                        email,
-                        result -> result
-                                .checkout(
-                                        checkout -> checkout
-                                                .webUrl()
-                                                .email()
-                                                .shippingAddress(
-                                                        address -> address
-                                                                .firstName()
-                                                                .lastName()
-                                                                .phone()
-                                                                .company()
-                                                                .address1()
-                                                                .address2()
-                                                                .city()
-                                                                .province()
-                                                                .country()
-                                                                .zip()
-                                                )
-                                                .createdAt()
-                                )
-                                .userErrors(
-                                        error -> error
-                                                .field()
-                                                .message()
-                                )
-                )
-        );
-        updateEmail(mutationQuery);
-    }
-
-    private void updateEmail(Storefront.MutationQuery mutationQuery) {
-        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-
-                String strCheckoutId = response.data().getCheckoutEmailUpdate().getCheckout().getId().toString();
-                Log.d(TAG, "ch id email: " + strCheckoutId);
-
-                if (strCheckoutId != null) {
-
-                    ID checkoutId = new ID(strCheckoutId);
-                    Log.d(TAG, "itt: " + checkoutId);
-                    queryUpdateAddress(checkoutId);
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-
-            }
-        });
-    }
-
     private void queryUpdateAddress(ID checkoutId) {
-        Log.d(TAG, "firstName: " + firstName);
-        Log.d(TAG, "lastName: " + lastName);
-        Log.d(TAG, "phone: " + phone);
-        Log.d(TAG, "city: " + city);
-        Log.d(TAG, "country: " + country);
-        Log.d(TAG, "zip: " + zip);
-        Log.d(TAG, "province: " + province);
-        Log.d(TAG, "address1: " + address1);
-        Log.d(TAG, "address2: " + address2);
-
         Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
-                .setFirstName(firstName)
-                .setLastName(lastName)
-                .setPhone(phone)
-                .setCity(city)
-                .setCountry(country)
-                .setZip(zip)
-                .setProvince(province)
-                .setAddress1(address1)
-                .setAddress2(address2);
+                .setZip("12345");
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
                 .checkoutShippingAddressUpdate(
                         inputAddress,
@@ -492,13 +409,12 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
                 Log.d(TAG, "id: " + checkoutId.toString());
 
-
-                Intent Getintent = new Intent(getContext(), PaymentWebViewActivity.class);
-                Getintent.putExtra("web_url", webUrl);
+                Intent guestCustomerIntent = new Intent(getContext(), PaymentWebViewActivity.class);
+                guestCustomerIntent.putExtra("web_url", webUrl);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("checkout_id", (Serializable) checkoutId);
-                Getintent.putExtras(bundle);
-                startActivity(Getintent);
+                guestCustomerIntent.putExtras(bundle);
+                startActivity(guestCustomerIntent);
 
                 Log.d(TAG, "iddd: " + checkoutId.toString());
 
@@ -510,7 +426,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
             }
         });
-    }*/
+    }
 
     @Override
     public void onIncreaseProductQuantityClick(int position) {
@@ -543,7 +459,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
     @Override
     public void onProductClick(String productId) {
-        Log.e(TAG, "onProductClick: "+productId );
+        Log.e(TAG, "onProductClick: " + productId);
         Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
         intent.putExtra("productId", productId);
         startActivity(intent);
@@ -568,12 +484,14 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         }
     }
 
-    private void changeBadge(){
-        BadgeDrawable cartBadge = ((HomeActivity) getActivity()).getBnvHomeNavigation().getOrCreateBadge(R.id.cart_navigation);
-        if (cartProducts.size() >= 1) {
-            cartBadge.setVisible(true);
-            cartBadge.setNumber(cartProducts.size());
-            cartBadge.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
-        } else cartBadge.setVisible(false);
+    private void changeBadge() {
+        if (getActivity() instanceof HomeActivity) {
+            BadgeDrawable cartBadge = ((HomeActivity) getActivity()).getBnvHomeNavigation().getOrCreateBadge(R.id.cart_navigation);
+            if (cartProducts.size() >= 1) {
+                cartBadge.setVisible(true);
+                cartBadge.setNumber(cartProducts.size());
+                cartBadge.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary));
+            } else cartBadge.setVisible(false);
+        }
     }
 }

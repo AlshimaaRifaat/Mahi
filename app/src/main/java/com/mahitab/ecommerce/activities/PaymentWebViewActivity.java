@@ -46,6 +46,8 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
         mywebview = findViewById(R.id.webView);
 
+        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+
         Intent intent = getIntent();
         webUrl = intent.getExtras().getString("web_url");
         checkoutId = (ID) getIntent().getSerializableExtra("checkout_id");
@@ -57,7 +59,6 @@ public class PaymentWebViewActivity extends AppCompatActivity {
     }
 
     private void getSavedAccessToken() {
-        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString("token", null);
         Log.d(TAG, "getSavedAccessToken: " + accessToken);
         queryMyOrders(accessToken);
@@ -68,9 +69,7 @@ public class PaymentWebViewActivity extends AppCompatActivity {
                 .customer(accessToken, customer -> customer
                         .orders(arg -> arg.first(100), connection -> connection
                                 .edges(edge -> edge
-                                        .node(node -> node
-                                                .orderNumber()
-
+                                        .node(Storefront.OrderQuery::orderNumber
                                         )
                                 )
                         )
@@ -116,9 +115,9 @@ public class PaymentWebViewActivity extends AppCompatActivity {
                                     timerStop();
                                     //TODO Handle after order completed process
                                     //TODO You could simply finish this activty and intent to Home with an extra to empty cart
-                                   Intent navigate = new Intent(PaymentWebViewActivity.this, HomeActivity.class);
-                                    sign="mark";
-                                    navigate.putExtra("from_payment",sign );
+                                    Intent navigate = new Intent(PaymentWebViewActivity.this, HomeActivity.class);
+                                    sign = "mark";
+                                    navigate.putExtra("from_payment", sign);
                                     startActivity(navigate);
                                 }
                             });
@@ -182,7 +181,8 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
     Runnable TimerRunnable = new Runnable() {
         public void run() {
-            getSavedAccessToken();
+            if (sharedPreferences.getString("email", null) != null)
+                getSavedAccessToken();
         }
     };
 

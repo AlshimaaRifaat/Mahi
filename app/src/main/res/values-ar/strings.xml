@@ -141,6 +141,8 @@
     <string name="Cancel">إلغاء</string>
     <string name="complete_action_using">أكمل الأمر بإستخدام</string>
     <string name="Select">اختر</string>
+    <string name="check_your_email_and_password">" الايميل او الرقم السري غير صحيح!"</string>
 
+    <string name="under_review">قيد المراجعة</string>
 
 </resources>

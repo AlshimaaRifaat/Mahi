@@ -40,6 +40,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.tvMessage.setText(review.getMessage());
 
         holder.rbRating.setRating(review.getRating());
+
+        if (review.isAccepted())
+            holder.tvUnderReview.setVisibility(View.GONE);
+        else
+            holder.tvUnderReview.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -51,13 +56,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         private final TextView tvFullName;
         private final TextView tvMessage;
         private final RatingBar rbRating;
+        private final TextView tvUnderReview;
 
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
             tvFullName = itemView.findViewById(R.id.tvFullName_ReviewItem);
             tvMessage = itemView.findViewById(R.id.tvMessage_ReviewItem);
             rbRating = itemView.findViewById(R.id.rbRating_ReviewItem);
-            if (getAdapterPosition() > 1) {
+            tvUnderReview = itemView.findViewById(R.id.tvUnderReview_ReviewItem);
+            if (reviewList.size() > 1) {
                 ((Activity) itemView.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                 //if you need three fix imageview in width
                 itemView.getLayoutParams().width = (int) (displaymetrics.widthPixels / 1.5);
