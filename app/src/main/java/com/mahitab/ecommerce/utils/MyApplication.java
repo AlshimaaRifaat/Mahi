@@ -28,8 +28,6 @@ public class MyApplication extends Application {
         FirebaseMessaging.getInstance().isAutoInitEnabled();
 
         DataManager.getInstance().setClientManager(this);
-
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 
     public void triggerNotification(Class targetNotificationActivity, String channelId, String title, String text, String bigText, int priority, boolean autoCancel, int notificationId, int pendingIntentFlag){

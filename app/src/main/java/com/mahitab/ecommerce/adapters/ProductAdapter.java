@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +29,8 @@ import java.util.Observer;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
     private ArrayList<ProductModel> productList;
+    private int sectionWidth;
+    private RecyclerView.LayoutManager layoutManager;
     private ProductClickListener listener;
 
     private ArrayList<ProductModel> productsDataList;
@@ -38,6 +41,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     public ProductAdapter(Context context, ArrayList<ProductModel> productList) {
+        this.productList = productList;
+        updateList();
+    }
+
+    public ProductAdapter(LinearLayoutManager layoutManager,int sectionWidth, ArrayList<ProductModel> productList) {
+        this.layoutManager=layoutManager;
+        this.sectionWidth = sectionWidth;
         this.productList = productList;
         updateList();
     }
@@ -140,6 +150,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
             tvDiscount = itemView.findViewById(R.id.tvDiscount_ProductItem);
+            if (layoutManager instanceof LinearLayoutManager && ((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.HORIZONTAL){
+                itemView.getLayoutParams().width = (int) (sectionWidth / 2.8);
+            }
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
                     listener.onProductClick(productsDataList.get(getAdapterPosition()).getID().toString());

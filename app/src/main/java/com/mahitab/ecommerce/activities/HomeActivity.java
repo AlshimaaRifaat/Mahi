@@ -39,6 +39,7 @@ import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CartItemQuantity;
+import com.mahitab.ecommerce.models.Collection;
 import com.mahitab.ecommerce.models.CollectionModel;
 
 import java.nio.charset.StandardCharsets;
@@ -57,9 +58,9 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     private LinearLayout llHome;
     private LinearLayout llSplash;
 
-    private List<CollectionModel> topCollections;
-    private List<CollectionModel> midCollections;
-    private List<CollectionModel> bottomCollections;
+    private List<CollectionModel> topCollectionModels;
+    private List<CollectionModel> midCollectionModels;
+    private List<CollectionModel> bottomCollectionModels;
 
     private List<BannerModel> sliderBanners;
 
@@ -85,9 +86,9 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
         sliderBanners = new ArrayList<>();
-        topCollections = new ArrayList<>();
-        midCollections = new ArrayList<>();
-        bottomCollections = new ArrayList<>();
+        topCollectionModels = new ArrayList<>();
+        midCollectionModels = new ArrayList<>();
+        bottomCollectionModels = new ArrayList<>();
         topBanners = new ArrayList<>();
         midBanners = new ArrayList<>();
         bottomBanners = new ArrayList<>();
@@ -210,36 +211,55 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private void loadHomePage() {
-        List<String> topCollectionsIds = new ArrayList<>();
-        List<String> midCollectionsIds = new ArrayList<>();
-        List<String> bottomCollectionsIds = new ArrayList<>();
+        List<Collection> topCollections = new ArrayList<>();
+        List<Collection> midCollections = new ArrayList<>();
+        List<Collection> bottomCollections = new ArrayList<>();
         databaseReference.child("HomePage").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot topSnapshot : dataSnapshot.child("Collections/Top").getChildren()) {
-                    if (topSnapshot.child("id").getValue() != null) {
-                        String target = "gid://shopify/Collection/" + topSnapshot.child("id").getValue();
-                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                        targetId = targetId.trim(); //remove spaces from end of string
-                        topCollectionsIds.add(targetId);
+                    if (topSnapshot.child("id").getValue() != null &&
+                            topSnapshot.child("id").getValue() instanceof String &&
+                            topSnapshot.child("image").getValue() instanceof String) {
+                        Collection topCollection = topSnapshot.getValue(Collection.class);
+                        if (topCollection != null) {
+                            String target = "gid://shopify/Collection/" + topCollection.getId();
+                            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                            targetId = targetId.trim(); //remove spaces from end of string
+                            topCollection.setEncodedId(targetId);
+                            topCollections.add(topCollection);
+                            Log.e(TAG, "onDataChange: top "+topCollection.getImage());
+                        }
                     }
                 }
 
                 for (DataSnapshot midSnapshot : dataSnapshot.child("Collections/Mid").getChildren()) {
-                    if (midSnapshot.child("id").getValue() != null) {
-                        String target = "gid://shopify/Collection/" + midSnapshot.child("id").getValue();
-                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                        targetId = targetId.trim(); //remove spaces from end of string
-                        midCollectionsIds.add(targetId);
+                    if (midSnapshot.child("id").getValue() != null &&
+                            midSnapshot.child("id").getValue() instanceof String &&
+                            midSnapshot.child("image").getValue() instanceof String) {
+                        Collection midCollection = midSnapshot.getValue(Collection.class);
+                        if (midCollection != null) {
+                            String target = "gid://shopify/Collection/" + midCollection.getId();
+                            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                            targetId = targetId.trim(); //remove spaces from end of string
+                            midCollection.setEncodedId(targetId);
+                            midCollections.add(midCollection);
+                        }
                     }
                 }
 
                 for (DataSnapshot bottomSnapshot : dataSnapshot.child("Collections/Bottom").getChildren()) {
-                    if (bottomSnapshot.child("id").getValue() != null) {
-                        String target = "gid://shopify/Collection/" + bottomSnapshot.child("id").getValue();
-                        String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                        targetId = targetId.trim(); //remove spaces from end of string
-                        bottomCollectionsIds.add(targetId);
+                    if (bottomSnapshot.child("id").getValue() != null &&
+                            bottomSnapshot.child("id").getValue() instanceof String &&
+                            bottomSnapshot.child("image").getValue() instanceof String) {
+                        Collection bottomCollection = bottomSnapshot.getValue(Collection.class);
+                        if (bottomCollection != null) {
+                            String target = "gid://shopify/Collection/" + bottomCollection.getId();
+                            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                            targetId = targetId.trim(); //remove spaces from end of string
+                            bottomCollection.setEncodedId(targetId);
+                            bottomCollections.add(bottomCollection);
+                        }
                     }
                 }
 
@@ -304,33 +324,35 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     public void onResponse(int status) {
                         if (status == 200) {
                             runOnUiThread(() -> {
-                                for (int i = 0; i < topCollectionsIds.size(); i++) {
-                                    CollectionModel collection = DataManager.getInstance().getCollectionByID(topCollectionsIds.get(i));
-                                    if (collection != null) {
-                                        Log.e(TAG, "onResponse: top collection " + collection.getTitle());
-                                        topCollections.add(collection);
+                                for (int i = 0; i < topCollections.size(); i++) {
+                                    CollectionModel topCollectionModel = DataManager.getInstance().getCollectionByID(topCollections.get(i).getEncodedId());
+                                    if (topCollectionModel != null) {
+                                        topCollectionModel.setImage(topCollections.get(i).getImage());
+                                        topCollectionModels.add(topCollectionModel);
                                     } else Log.e(TAG, "onResponse: top collection null");
                                 }
-                                for (int i = 0; i < midCollectionsIds.size(); i++) {
-                                    CollectionModel collection = DataManager.getInstance().getCollectionByID(midCollectionsIds.get(i));
-                                    if (collection != null) {
-                                        Log.e(TAG, "onResponse: mid collection " + collection.getTitle());
-                                        midCollections.add(collection);
+                                for (int i = 0; i < midCollections.size(); i++) {
+                                    CollectionModel midCollectionModel = DataManager.getInstance().getCollectionByID(midCollections.get(i).getEncodedId());
+                                    if (midCollectionModel != null) {
+                                        midCollectionModel.setImage(midCollections.get(i).getImage());
+                                        Log.e(TAG, "onResponse: mid collection " + midCollectionModel.getTitle() + " " + topCollections.get(i).getImage());
+                                        midCollectionModels.add(midCollectionModel);
                                     } else Log.e(TAG, "onResponse: mid collection null");
                                 }
-                                for (int i = 0; i < bottomCollectionsIds.size(); i++) {
-                                    CollectionModel collection = DataManager.getInstance().getCollectionByID(bottomCollectionsIds.get(i));
-                                    if (collection != null) {
-                                        Log.e(TAG, "onResponse:bottom collection " + collection.getTitle());
-                                        bottomCollections.add(collection);
+                                for (int i = 0; i < bottomCollections.size(); i++) {
+                                    CollectionModel bottomCollectionModel = DataManager.getInstance().getCollectionByID(bottomCollections.get(i).getEncodedId());
+                                    if (bottomCollectionModel != null) {
+                                        bottomCollectionModel.setImage(bottomCollections.get(i).getImage());
+                                        Log.e(TAG, "onResponse:bottom collection " + bottomCollectionModel.getTitle() + " " + topCollections.get(i).getImage());
+                                        bottomCollectionModels.add(bottomCollectionModel);
                                     } else
                                         Log.e(TAG, "onResponse:bottom collection null");
                                 }
                                 if (homePageLoadedListener != null) {
                                     homePageLoadedListener.onSliderLoaded(sliderBanners);
-                                    homePageLoadedListener.onTopCollectionLoaded(topCollections);
-                                    homePageLoadedListener.onMidCollectionLoaded(midCollections);
-                                    homePageLoadedListener.onBottomCollectionLoaded(bottomCollections);
+                                    homePageLoadedListener.onTopCollectionLoaded(topCollectionModels);
+                                    homePageLoadedListener.onMidCollectionLoaded(midCollectionModels);
+                                    homePageLoadedListener.onBottomCollectionLoaded(bottomCollectionModels);
                                     homePageLoadedListener.onTopBannersLoaded(topBanners);
                                     homePageLoadedListener.onMidBannersLoaded(midBanners);
                                     homePageLoadedListener.onBottomBannersLoaded(bottomBanners);

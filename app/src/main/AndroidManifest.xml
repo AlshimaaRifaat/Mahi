@@ -16,7 +16,7 @@
         tools:ignore="AllowBackup">
         <activity android:name=".activities.SelectAddressActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-      ></activity>
+      />
         <activity
             android:name=".activities.MyOrderDetailsActivity"
             android:label=""
@@ -71,7 +71,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.DescriptionActivity"
-            android:label=""
+            android:label="@string/description"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.CollectionProductsActivity"
