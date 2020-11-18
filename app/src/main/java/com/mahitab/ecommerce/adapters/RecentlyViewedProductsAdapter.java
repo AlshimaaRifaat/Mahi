@@ -23,7 +23,7 @@ import java.util.Locale;
 public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<RecentlyViewedProductsAdapter.ProductViewHolder> {
 
     private final ArrayList<ProductModel> productList;
-    private ProductAdapter.ProductClickListener listener;
+    private RecentlyViewedProductsAdapter.ProductClickListener listener;
 
 
     public RecentlyViewedProductsAdapter(ArrayList<ProductModel> productList) {
@@ -105,7 +105,7 @@ public class RecentlyViewedProductsAdapter extends RecyclerView.Adapter<Recently
         void onProductClick(String productId);
     }
 
-    public void setProductClickListener(ProductAdapter.ProductClickListener listener) {
+    public void setProductClickListener(RecentlyViewedProductsAdapter.ProductClickListener listener) {
         this.listener = listener;
     }
 

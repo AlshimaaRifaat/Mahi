@@ -114,9 +114,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private SharedPreferences defaultPreferences;
     private TextView tvSKU;
 
-    public ArrayList<String> viewedProductList;
-    public ArrayList<ProductModel> recentlyViewedProductList;
-
+    public ArrayList<String> viewedProductsIds;
+    public ArrayList<ProductModel> recentlyViewedProducts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,30 +144,30 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
 
         if (defaultPreferences.getString("viewedProductList", null) == null)
-            viewedProductList = new ArrayList<>();
+            viewedProductsIds = new ArrayList<>();
         else
-            viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<ArrayList<String>>() {
+            viewedProductsIds = new Gson().fromJson(defaultPreferences.getString("viewedProductsIds", null), new TypeToken<ArrayList<String>>() {
             }.getType());
 
-        if (viewedProductList.size() > 0) {
-            getRecentlyViewedProducts(viewedProductList);
-        }
+        if (viewedProductsIds != null && viewedProductsIds.size() > 0)
+            getRecentlyViewedProducts(viewedProductsIds);
 
         cartProductsCount = cartProducts.size();
 
         if (getIntent().getExtras() != null) {
             currentProductId = getIntent().getExtras().getString("productId");
 
-            boolean isViewedBefore = viewedProductList.stream()
+            boolean isViewedBefore = viewedProductsIds.stream()
                     .anyMatch(productId -> productId.equals(currentProductId));
+
             if (!isViewedBefore) {
-                if (viewedProductList.size() ==5){
-                    viewedProductList.add(currentProductId);
-                    viewedProductList.remove(0);
-                }else {
-                    viewedProductList.add(currentProductId);
+                if (viewedProductsIds.size() == 5) {
+                    viewedProductsIds.add(currentProductId);
+                    viewedProductsIds.remove(0);
+                } else {
+                    viewedProductsIds.add(currentProductId);
                 }
-                defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductList)).apply();
+                defaultPreferences.edit().putString("viewedProductsIds", new Gson().toJson(viewedProductsIds)).apply();
             }
 
             boolean isAddedBefore = cartProducts.stream()
@@ -183,7 +182,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
-            Log.e(TAG, "onCreate: "+currentProductId );
+            Log.e(TAG, "onCreate: " + currentProductId);
             if (product != null) {
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(product.getTitle());
@@ -365,14 +364,14 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private void getRecentlyViewedProducts(ArrayList<String> viewedProductList) {
         Log.d(TAG, "getRecentlyViewedProducts: " + viewedProductList);
         cvRecentlyViewed.setVisibility(View.VISIBLE);
-        recentlyViewedProductList = new ArrayList<>();
+        recentlyViewedProducts = new ArrayList<>();
         for (int i = 0; i < viewedProductList.size(); i++) {
             ProductModel productModel = DataManager.getInstance().getProductByID(viewedProductList.get(i));
-            recentlyViewedProductList.add(productModel);
+            recentlyViewedProducts.add(productModel);
         }
         rvRecentlyViewed.setHasFixedSize(true);
         rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(recentlyViewedProductList);
+        RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(recentlyViewedProducts);
         rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
         recentlyViewedProductsAdapter.setProductClickListener(this);
     }
@@ -413,9 +412,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         defaultPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        if (!viewedProductList.isEmpty()) {
-            defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductList)).apply();
-            Log.d(TAG, "onPause: " + viewedProductList.toString());
+        if (!viewedProductsIds.isEmpty()) {
+            defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductsIds)).apply();
+            Log.d(TAG, "onPause: " + viewedProductsIds.toString());
         }
     }
 
