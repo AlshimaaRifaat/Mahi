@@ -24,10 +24,6 @@ public class DescriptionActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.description));
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
         WebView wvDescription=findViewById(R.id.wvDescription_DescriptionActivity);
         if (getIntent().getExtras()!=null){
             String description=getIntent().getExtras().getString("description");
@@ -39,6 +35,11 @@ public class DescriptionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(getResources().getString(R.string.description));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         overridePendingTransition(0, 0); // remove activity default transition
     }
 

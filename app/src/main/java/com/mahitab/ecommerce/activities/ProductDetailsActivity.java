@@ -3,13 +3,16 @@ package com.mahitab.ecommerce.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,7 +20,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -27,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -59,6 +60,8 @@ import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 public class ProductDetailsActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener,
+        ProductAdapter.ProductClickListener,
+        RecentlyViewedProductsAdapter.ProductClickListener,
         ProductImageSliderAdapter.ImageSliderItemClickInterface {
 
     private static final String TAG = "ProductDetailsActivity";
@@ -91,6 +94,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private ImageView ivBuyByPhone;
     private Button btnBuy;
     private CardView cvAddReview;
+    private CardView cvRecentlyViewed;
+    private CardView cvDescription;
 
     private MenuItem cartMenuItem;
 
@@ -145,7 +150,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             viewedProductList = new Gson().fromJson(defaultPreferences.getString("viewedProductList", null), new TypeToken<ArrayList<String>>() {
             }.getType());
 
-        if (viewedProductList != null) {
+        if (viewedProductList.size() > 0) {
             getRecentlyViewedProducts(viewedProductList);
         }
 
@@ -157,7 +162,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements
             boolean isViewedBefore = viewedProductList.stream()
                     .anyMatch(productId -> productId.equals(currentProductId));
             if (!isViewedBefore) {
-                viewedProductList.add(currentProductId);
+                if (viewedProductList.size() ==5){
+                    viewedProductList.add(currentProductId);
+                    viewedProductList.remove(0);
+                }else {
+                    viewedProductList.add(currentProductId);
+                }
                 defaultPreferences.edit().putString("viewedProductList", new Gson().toJson(viewedProductList)).apply();
             }
 
@@ -173,6 +183,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
             product = DataManager.getInstance().getProductByID(currentProductId);
 
+            Log.e(TAG, "onCreate: "+currentProductId );
             if (product != null) {
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(product.getTitle());
@@ -247,9 +258,16 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 CollectionModel collection = DataManager.getInstance().getCollectionByID(product.getCollectionID());
                 if (collection != null) {
                     rvRelatedProducts.setHasFixedSize(true);
-                    rvRelatedProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-                    ProductAdapter productAdapter = new ProductAdapter(this, collection.getPreviewProducts());
+                    LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                    rvRelatedProducts.setLayoutManager(manager);
+                    ViewGroup.LayoutParams params = rvRelatedProducts.getLayoutParams();
+                    DisplayMetrics displaymetrics = Resources.getSystem().getDisplayMetrics();
+
+                    params.height = displaymetrics.heightPixels / 3;
+                    rvRelatedProducts.setLayoutParams(params);
+                    ProductAdapter productAdapter = new ProductAdapter(manager, displaymetrics.widthPixels, collection.getPreviewProducts());
                     rvRelatedProducts.setAdapter(productAdapter);
+                    productAdapter.setProductClickListener(this);
                 }
             }
 
@@ -262,6 +280,11 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 } else startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             });
 
+            cvDescription.setOnClickListener(v -> {
+                Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
+                intent.putExtra("description", product.getDescription());
+                startActivity(intent);
+            });
             ivDescription.setOnClickListener(v -> {
                 Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
                 intent.putExtra("description", product.getDescription());
@@ -341,6 +364,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
     private void getRecentlyViewedProducts(ArrayList<String> viewedProductList) {
         Log.d(TAG, "getRecentlyViewedProducts: " + viewedProductList);
+        cvRecentlyViewed.setVisibility(View.VISIBLE);
         recentlyViewedProductList = new ArrayList<>();
         for (int i = 0; i < viewedProductList.size(); i++) {
             ProductModel productModel = DataManager.getInstance().getProductByID(viewedProductList.get(i));
@@ -350,7 +374,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         RecentlyViewedProductsAdapter recentlyViewedProductsAdapter = new RecentlyViewedProductsAdapter(recentlyViewedProductList);
         rvRecentlyViewed.setAdapter(recentlyViewedProductsAdapter);
-
+        recentlyViewedProductsAdapter.setProductClickListener(this);
     }
 
     @Override
@@ -421,6 +445,14 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
+        startActivity(intent);
+        finish();
+    }
+
     private void initView() {
         viewPager = findViewById(R.id.viewPager);
         indicatorView = findViewById(R.id.pageIndicatorView);
@@ -442,6 +474,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         rbAverageRating = findViewById(R.id.rbAverageRating_ProductDetailsActivity);
         rvProductReviews = findViewById(R.id.rvProductReviews_ProductDetailsActivity);
         cvAddReview = findViewById(R.id.cvAddReview_ProductDetailsActivity);
+        cvRecentlyViewed = findViewById(R.id.cvRecentlyViewed_ProductDetailsActivity);
+        cvDescription = findViewById(R.id.cvDescription_ProductDetailsActivity);
         ivShareProduct = findViewById(R.id.ivShareProduct_ProductDetailsActivity);
         ivWishProduct = findViewById(R.id.ivWishProduct_ProductDetailsActivity);
         tvSKU = findViewById(R.id.tvSKU_ProductDetailsActivity);

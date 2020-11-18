@@ -1,6 +1,5 @@
 package com.mahitab.ecommerce.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
 import android.util.Log;
@@ -9,9 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -29,22 +28,29 @@ import java.util.Observer;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
-    public ArrayList<ProductModel> productList;
+    private ArrayList<ProductModel> productList;
+    private int sectionWidth;
+    private RecyclerView.LayoutManager layoutManager;
     private ProductClickListener listener;
-    private Context context ;
 
-
-    public ArrayList<ProductModel> productsDataList;
+    private ArrayList<ProductModel> productsDataList;
     private SelectedOptions selectedOptions = new SelectedOptions();
 
+    public ProductAdapter(ArrayList<ProductModel> productList) {
+        this.productsDataList = productList;
+    }
 
     public ProductAdapter(Context context, ArrayList<ProductModel> productList) {
         this.productList = productList;
-        this.context = context;
         updateList();
-
     }
 
+    public ProductAdapter(LinearLayoutManager layoutManager,int sectionWidth, ArrayList<ProductModel> productList) {
+        this.layoutManager=layoutManager;
+        this.sectionWidth = sectionWidth;
+        this.productList = productList;
+        updateList();
+    }
 
     @NonNull
     @Override
@@ -54,7 +60,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-
         ProductModel product = productsDataList.get(position);
 
         Glide.with(holder.itemView.getContext())
@@ -119,14 +124,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 aux.add(p);
             }
         }
-
-        if(aux.isEmpty())
-        {
-            Log.e("empty","yes");
-           Toast.makeText(context,context.getString(R.string.hasntItem),Toast.LENGTH_LONG).show();
-        }else {
-            productsDataList.addAll(aux);
-        }
+        productsDataList.addAll(aux);
         Log.d("ab", "updateList: " + productsDataList.toString());
     }
 
@@ -152,6 +150,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
             tvDiscount = itemView.findViewById(R.id.tvDiscount_ProductItem);
+            if (layoutManager instanceof LinearLayoutManager && ((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.HORIZONTAL){
+                itemView.getLayoutParams().width = (int) (sectionWidth / 2.8);
+            }
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)
                     listener.onProductClick(productsDataList.get(getAdapterPosition()).getID().toString());
