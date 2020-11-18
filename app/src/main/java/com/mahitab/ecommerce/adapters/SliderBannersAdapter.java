@@ -34,9 +34,9 @@ public class SliderBannersAdapter extends LoopingPagerAdapter<BannerModel> {
         ImageView ivImage = view.findViewById(R.id.ivImage);
         Glide.with(context)
                 .load(imageSliderModelList.get(position).getImage())
-                .thumbnail(/*sizeMultiplier*/ 0.25f)
+                .thumbnail(Glide.with(context).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
-                .placeholder(R.drawable.ic_image_gray_24dp)
+//                .placeholder(R.drawable.ic_image_gray_24dp)
                 .fallback(R.drawable.ic_image_gray_24dp)
                 .dontTransform()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)

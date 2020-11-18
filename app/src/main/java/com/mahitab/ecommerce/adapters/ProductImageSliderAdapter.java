@@ -38,7 +38,7 @@ public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
 
         Glide.with(context)
                 .load(imageList.get(listPosition))
-                .thumbnail(/*sizeMultiplier=*/ 0.25f)
+                .thumbnail(Glide.with(context).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
                 .dontTransform()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)

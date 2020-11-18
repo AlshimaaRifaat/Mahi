@@ -37,9 +37,9 @@ public class ShapeAdapter extends RecyclerView.Adapter<ShapeAdapter.ShapeViewHol
 
         Glide.with(holder.itemView.getContext())
                 .load(shape.getImage())
-                .thumbnail(/*sizeMultiplier*/ 0.25f)
+                .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
                 .apply(new RequestOptions())
-                .placeholder(R.drawable.ic_image_gray_24dp)
+//                .placeholder(R.drawable.ic_image_gray_24dp)
                 .fallback(R.drawable.ic_image_gray_24dp)
                 .dontTransform()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
