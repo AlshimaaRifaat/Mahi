@@ -40,7 +40,6 @@ import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 import com.shopify.graphql.support.Input;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,18 +64,18 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     private static final long MIN_CLICK_INTERVAL = 1000; //in millis
     private long lastClickTime = 0;
 
-    String accessToken;
-    String firstName = " ";
-    String lastName = "";
-    String phone = "";
-    String city = "";
-    String country = "";
-    String zip = "";
-    String province = "";
-    String address1 = "";
-    String address2 = "";
-    String email = "";
-    String strEmail, strPassword;
+    private String accessToken;
+    private String firstName = " ";
+    private String lastName = "";
+    private String phone = "";
+    private String city = "";
+    private String country = "";
+    private String zip = "";
+    private String province = "";
+    private String address1 = "";
+    private String address2 = "";
+    private String email = "";
+    private String strEmail, strPassword;
 
     public CartFragment() {
         // Required empty public constructor
@@ -303,31 +302,30 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     Log.e("data", "user..." + response.data().getCustomer().getEmail());
                 }
 
+                if (response.data().getCustomer().getDefaultAddress()!=null){
+                    if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
+                        phone = response.data().getCustomer().getDefaultAddress().getPhone();
+                    }
 
-                if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
-                    phone = response.data().getCustomer().getDefaultAddress().getPhone();
+                    if (response.data().getCustomer().getDefaultAddress().getCity() != null) {
+                        city = response.data().getCustomer().getDefaultAddress().getCity();
+                    }
+                    if (response.data().getCustomer().getDefaultAddress().getCountry() != null) {
+                        country = response.data().getCustomer().getDefaultAddress().getCountry();
+                    }
+                    if (response.data().getCustomer().getDefaultAddress().getZip() != null) {
+                        zip = response.data().getCustomer().getDefaultAddress().getZip();
+                    }
+                    if (response.data().getCustomer().getDefaultAddress().getProvince() != null) {
+                        province = response.data().getCustomer().getDefaultAddress().getProvince();
+                    }
+                    if (response.data().getCustomer().getDefaultAddress().getAddress1() != null) {
+                        address1 = response.data().getCustomer().getDefaultAddress().getAddress1();
+                    }
+                    if (response.data().getCustomer().getDefaultAddress().getAddress2() != null) {
+                        address2 = response.data().getCustomer().getDefaultAddress().getAddress2();
+                    }
                 }
-
-                if (response.data().getCustomer().getDefaultAddress().getCity() != null) {
-                    city = response.data().getCustomer().getDefaultAddress().getCity();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getCountry() != null) {
-                    country = response.data().getCustomer().getDefaultAddress().getCountry();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getZip() != null) {
-                    zip = response.data().getCustomer().getDefaultAddress().getZip();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getProvince() != null) {
-                    province = response.data().getCustomer().getDefaultAddress().getProvince();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getAddress1() != null) {
-                    address1 = response.data().getCustomer().getDefaultAddress().getAddress1();
-                }
-                if (response.data().getCustomer().getDefaultAddress().getAddress2() != null) {
-                    address2 = response.data().getCustomer().getDefaultAddress().getAddress2();
-                }
-
-
             }
 
             @Override
@@ -423,7 +421,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                 Intent guestCustomerIntent = new Intent(getContext(), PaymentWebViewActivity.class);
                 guestCustomerIntent.putExtra("web_url", webUrl);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("checkout_id", (Serializable) checkoutId);
+                bundle.putSerializable("checkout_id", checkoutId);
                 guestCustomerIntent.putExtras(bundle);
                 startActivity(guestCustomerIntent);
 

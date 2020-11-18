@@ -37,6 +37,7 @@ import com.mahitab.ecommerce.managers.FirebaseManager;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.CategoryModel;
 import com.mahitab.ecommerce.models.CollectionModel;
+import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.ShapeModel;
 
 import java.nio.charset.StandardCharsets;
@@ -44,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SubCategoriesFragment extends Fragment implements BannerAdapter.BannerClickListener {
+public class SubCategoriesFragment extends Fragment implements BannerAdapter.BannerClickListener, ProductAdapter.ProductClickListener {
     private static final String TAG = "SubCategoriesFragment";
 
     private CardView cvColors;
@@ -57,8 +58,11 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
     private RecyclerView rvShapes;
 
     private RecyclerView rvCollectionProducts;
-    TextView tSeeAll;
-    String targetId;
+    private ArrayList<ProductModel> collectionProducts;
+    private ProductAdapter productAdapter;
+    private TextView tSeeAll;
+    private String targetId;
+
     public SubCategoriesFragment() {
         // Required empty public constructor
     }
@@ -85,18 +89,21 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                     if (intent.getExtras() != null) {
                         CategoryModel selectedCategory = intent.getExtras().getParcelable("category");
 
-                        if (isAdded()&&selectedCategory != null) {
+                        if (isAdded() && selectedCategory != null) {
 
                             if (selectedCategory.getId() != null) {
-                                String target = "gid://shopify/Collection/" + "174152384649";
-                                 targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                                String target = "gid://shopify/Collection/" + selectedCategory.getId();
+                                targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
                                 targetId = targetId.trim(); //remove spaces from end of string
                                 CollectionModel collection = DataManager.getInstance().getCollectionByID(targetId);
 
 
-                                if (collection == null)
-                                    Log.e(TAG, "onReceive: collection==null");
-                                else
+                                if (collection == null) {
+                                    if (collectionProducts != null)
+                                        collectionProducts.clear();
+                                    if (productAdapter != null)
+                                        productAdapter.notifyDataSetChanged();
+                                } else
                                     Log.e(TAG, "onReceive: " + collection.getTitle());
                                 if (collection != null) {
                                     if (((HomeActivity) requireActivity()).getSupportActionBar() != null) {
@@ -105,25 +112,22 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                                             actionBar.setTitle(collection.getTitle());
                                     }
 
+                                    collectionProducts = collection.getPreviewProducts();
                                     rvCollectionProducts.setHasFixedSize(true);
                                     rvCollectionProducts.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
-                                    ProductAdapter productAdapter = new ProductAdapter(getContext(), collection.getPreviewProducts());
+                                    productAdapter = new ProductAdapter(getContext(), collectionProducts);
                                     rvCollectionProducts.setAdapter(productAdapter);
-
-
+                                    productAdapter.setProductClickListener(SubCategoriesFragment.this);
                                 }
 
 
-                                tSeeAll.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Log.d(TAG, "onClick: "+"morre");
-                                        if(targetId!=null) {
-                                            Intent intent = new Intent(getContext(), CollectionProductsActivity.class);
-                                            Log.d(TAG, "onClick: "+targetId);
-                                            intent.putExtra("collectionId", targetId);
-                                            startActivity(intent);
-                                        }
+                                tSeeAll.setOnClickListener(v -> {
+                                    Log.d(TAG, "onClick: " + "morre");
+                                    if (targetId != null) {
+                                        Intent intent1 = new Intent(getContext(), CollectionProductsActivity.class);
+                                        Log.d(TAG, "onClick: " + targetId);
+                                        intent1.putExtra("collectionId", targetId);
+                                        startActivity(intent1);
                                     }
                                 });
                             }
@@ -131,7 +135,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
                             if (selectedCategory.getBanners() != null) {
                                 DisplayMetrics displaymetrics = Resources.getSystem().getDisplayMetrics();
 
-                                int subFragmentWidthPixels = (int) (displaymetrics.widthPixels/1.2);
+                                int subFragmentWidthPixels = (int) (displaymetrics.widthPixels / 1.2);
 
                                 rvBanners.setHasFixedSize(true);
                                 rvBanners.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -162,34 +166,33 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         }
 
 
-
     }
 
     @Override
     public void onBannerClick(BannerModel banner) {
         FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
-        if(!banner.getId().isEmpty()) {
-        String type;
-        Intent intent;
-        if (banner.getType().startsWith("p")) {
-            type = "Product";
-            String target = "gid://shopify/" + type + "/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getContext(), ProductDetailsActivity.class);
-            intent.putExtra("productId", targetId);
-            Log.e(TAG, "onBannerClick: " + targetId);
-            startActivity(intent);
-        } else if (banner.getType().startsWith("c")) {
-            type = "Collection";
-            String target = "gid://shopify/" + type + "/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getContext(), CollectionProductsActivity.class);
-            intent.putExtra("collectionId", targetId);
-            startActivity(intent);
+        if (!banner.getId().isEmpty()) {
+            String type;
+            Intent intent;
+            if (banner.getType().startsWith("p")) {
+                type = "Product";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getContext(), ProductDetailsActivity.class);
+                intent.putExtra("productId", targetId);
+                Log.e(TAG, "onBannerClick: " + targetId);
+                startActivity(intent);
+            } else if (banner.getType().startsWith("c")) {
+                type = "Collection";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getContext(), CollectionProductsActivity.class);
+                intent.putExtra("collectionId", targetId);
+                startActivity(intent);
+            }
         }
-    }
     }
 
     private void initView(View view) {
@@ -199,7 +202,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         cvShape = view.findViewById(R.id.cvShape_SubCategoriesFragment);
         rvShapes = view.findViewById(R.id.rvShapes_SubCategoriesFragment);
         rvCollectionProducts = view.findViewById(R.id.rvCollectionProducts_SubCategoriesFragment);
-        tSeeAll=view.findViewById(R.id.tSeeAll);
+        tSeeAll = view.findViewById(R.id.tSeeAll);
     }
 
     private void displayColors() {
@@ -226,5 +229,12 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         rvShapes.setLayoutManager(new GridLayoutManager(getContext(), 4, LinearLayoutManager.VERTICAL, false));
         ShapeAdapter shapeAdapter = new ShapeAdapter(shapes);
         rvShapes.setAdapter(shapeAdapter);
+    }
+
+    @Override
+    public void onProductClick(String productId) {
+        Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
+        intent.putExtra("productId", productId);
+        startActivity(intent);
     }
 }
