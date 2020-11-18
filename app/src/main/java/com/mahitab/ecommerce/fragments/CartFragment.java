@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,9 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     private SharedPreferences defaultPreferences;
     private Button checkoutButton;
 
+
+    private static final long MIN_CLICK_INTERVAL = 1000; //in millis
+    private long lastClickTime = 0;
 
     String accessToken;
     String firstName = " ";
@@ -136,17 +140,24 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             createAccessToken();
 
         checkoutButton.setOnClickListener(view1 -> {
-            if (token == null) {
-                ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-                for (int i = 0; i < cartProducts.size(); i++) {
-                    inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
-                }
-                Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                        .setLineItemsInput(Input.value(inputArrayList));
-                createCashOnDeliveryCheckOut(input);
-            } else startActivity(new Intent(getActivity(), SelectAddressActivity.class));
-        });
 
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime - lastClickTime > MIN_CLICK_INTERVAL) {
+                lastClickTime = currentTime;
+
+                if (token == null) {
+                    ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
+                    for (int i = 0; i < cartProducts.size(); i++) {
+                        inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
+                    }
+                    Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
+                            .setLineItemsInput(Input.value(inputArrayList));
+                    createCashOnDeliveryCheckOut(input);
+                } else
+                    Log.e("Iam","Select");
+                    startActivity(new Intent(getActivity(), SelectAddressActivity.class));
+            }
+        });
     }
 
     @Override

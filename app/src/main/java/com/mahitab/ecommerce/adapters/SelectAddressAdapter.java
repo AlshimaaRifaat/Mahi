@@ -1,6 +1,10 @@
 package com.mahitab.ecommerce.adapters;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +27,13 @@ public class SelectAddressAdapter extends RecyclerView.Adapter<SelectAddressAdap
     private List<AddressModel> addressList;
     Context context;
      SelectAddressItemInterface selectAddressItemInterface;
-
-    public SelectAddressAdapter( Context context,List<AddressModel> addressList) {
+    private  Dialog dialog;
+    private static final long MIN_CLICK_INTERVAL = 3000; //in millis
+    private long lastClickTime = 0;
+    public SelectAddressAdapter( Context context,List<AddressModel> addressList,Dialog dialog) {
         this.addressList = addressList;
         this.context=context;
+        this.dialog = dialog;
     }
 
     @NonNull
@@ -47,14 +54,31 @@ public class SelectAddressAdapter extends RecyclerView.Adapter<SelectAddressAdap
         holder.tvAddressLine2.setText(address.getAddress2());
         holder.tvMobileNumber.setText(address.getPhone());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.btnSelectAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectAddressItemInterface.navigateToPaymentCashOnDelivery(address,position);
+                long currentTime = SystemClock.elapsedRealtime();
+                if (currentTime - lastClickTime > MIN_CLICK_INTERVAL) {
+                    lastClickTime = currentTime;
+                    loadDialog();
+                    selectAddressItemInterface.navigateToPaymentCashOnDelivery(address,position);
+                }
+
+
+
 
             }
         });
 
+
+    }
+
+    // using to Show Load Dialog
+    public void loadDialog()
+    {
+      /*  dialog = new Dialog(context);
+        dialog.setContentView(LayoutInflater.from(context).inflate(R.layout.load_dialog,null,false));*/
+        dialog.show();
 
     }
 
@@ -75,7 +99,6 @@ public class SelectAddressAdapter extends RecyclerView.Adapter<SelectAddressAdap
             tvAddressLine2 = itemView.findViewById(R.id.tvAddressLine2_AddressItem);
             tvMobileNumber = itemView.findViewById(R.id.tvMobileNumber_AddressItem);
             btnSelectAddress = itemView.findViewById(R.id.btnSelectAddress);
-
         }
 
 

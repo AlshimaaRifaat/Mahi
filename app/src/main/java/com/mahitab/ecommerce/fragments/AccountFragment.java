@@ -21,6 +21,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.ChangePasswordActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.LoginActivity;
 import com.mahitab.ecommerce.activities.MyAddressesActivity;
@@ -43,11 +44,14 @@ public class AccountFragment extends Fragment {
     private TextView tvCustomerName;
     private LinearLayout llLoginRegister, ll_customer_account_data;
     private Button btnSignOut;
+    private TextView changepassword;
 
     private CardView cvMyOrders;
     private CardView cvMyWishList;
     private CardView cvMyAddresses;
     private CardView cvHelp;
+
+
 
     private SharedPreferences defaultPreferences;
 
@@ -90,6 +94,7 @@ public class AccountFragment extends Fragment {
         cvMyWishList.setOnClickListener(v -> startActivity(new Intent(getContext(), MyWishListActivity.class)));
 
         cvMyAddresses.setOnClickListener(v -> startActivity(new Intent(getContext(), MyAddressesActivity.class)));
+        changepassword.setOnClickListener(v -> startActivity(new Intent(getContext(), ChangePasswordActivity.class)));
 
         btnSignOut.setOnClickListener(onClickListener -> {
             defaultPreferences.edit().clear().apply();
@@ -139,7 +144,7 @@ public class AccountFragment extends Fragment {
         cvMyOrders = view.findViewById(R.id.cvMyOrders_CustomerAccountData);
         cvMyWishList = view.findViewById(R.id.cvMyWishList_CustomerAccountData);
         cvHelp = view.findViewById(R.id.cvHelp_CustomerAccountData);
-    }
+        this.changepassword = (TextView) view.findViewById(R.id.changePassLogo);    }
 
 
     private void fetchCustomerQuery(String accessToken) {

@@ -168,6 +168,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
     @Override
     public void onBannerClick(BannerModel banner) {
         FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
+        if(!banner.getId().isEmpty()) {
         String type;
         Intent intent;
         if (banner.getType().startsWith("p")) {
@@ -188,6 +189,7 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
             intent.putExtra("collectionId", targetId);
             startActivity(intent);
         }
+    }
     }
 
     private void initView(View view) {

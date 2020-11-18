@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final CollectionModel collectionModel;
+    private final CollectionModel collection;
     private final List<ProductModel> productList;
 
     public static final int VIEW_TYPE_COLLECTION = 1;
@@ -35,9 +35,9 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
 
     private final DisplayMetrics displaymetrics = new DisplayMetrics();
 
-    public CollectionProductsAdapter(CollectionModel collectionModel) {
-        this.collectionModel = collectionModel;
-        this.productList = collectionModel.getPreviewProducts();
+    public CollectionProductsAdapter(CollectionModel collection) {
+        this.collection = collection;
+        this.productList = collection.getPreviewProducts();
     }
 
     @NonNull
@@ -55,20 +55,19 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
             case VIEW_TYPE_COLLECTION:
                 CollectionViewHolder viewHolder1 = (CollectionViewHolder) holder;
 
-                if (collectionModel.getImage() != null)
-                    Glide.with(viewHolder1.itemView.getContext())
-                            .load(collectionModel.getImage())
-                            .thumbnail(/*sizeMultiplier*/ 0.25f)
-                            .apply(new RequestOptions())
-                            .placeholder(R.drawable.ic_image_gray_24dp)
-                            .fallback(R.drawable.ic_image_gray_24dp)
-                            .dontTransform()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(viewHolder1.ivCollectionImage);
-                else
-                    Glide.with(viewHolder1.itemView.getContext()).clear(viewHolder1.ivCollectionImage);
+                collection.setImage("https://cdn.shopify.com/s/files/1/0339/2074/5609/files/4_1000x_crop_center.jpg?v=1584268288");
 
-                viewHolder1.tvCollectionTitle.setText(collectionModel.getTitle());
+                Glide.with(viewHolder1.itemView.getContext())
+                        .load(collection.getImage())
+                        .thumbnail(/*sizeMultiplier*/ 0.25f)
+                        .apply(new RequestOptions())
+                        .placeholder(R.drawable.ic_image_gray_24dp)
+                        .fallback(R.drawable.ic_image_gray_24dp)
+                        .dontTransform()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(viewHolder1.ivCollectionImage);
+
+                viewHolder1.tvCollectionTitle.setText(collection.getTitle());
                 break;
             case VIEW_TYPE_PRODUCTS:
                 ProductViewHolder viewHolder2 = (ProductViewHolder) holder;
@@ -105,8 +104,8 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
                         float mOldPrice = product.getVariants().get(0).getOldPrice().floatValue();
 
                         float ratioDiscount = ((mOldPrice - mPrice) / mOldPrice) * 100;
-                        String discountPercentage = (int) Math.ceil(ratioDiscount) + viewHolder2.itemView.getContext().getResources().getString(R.string.discount_percentage);
-                        viewHolder2.tvDiscount.setText(discountPercentage);
+                        String discountPercentage= (int) Math.ceil(ratioDiscount)+ viewHolder2.itemView.getContext().getResources().getString(R.string.discount_percentage);
+                        viewHolder2.tvDiscount.setText( discountPercentage);
                         viewHolder2.tvDiscount.setVisibility(View.VISIBLE);
 
                     } else {
@@ -154,7 +153,7 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
 
             itemView.setOnClickListener(v -> {
                 if (collectionClickListener != null) {
-                    collectionClickListener.onCollectionClick(collectionModel);
+                    collectionClickListener.onCollectionClick(collection);
                 }
             });
         }

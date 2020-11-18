@@ -154,26 +154,29 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
     @Override
     public void onBannerClick(BannerModel banner) {
         FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
-        String type;
-        Intent intent;
-        if (banner.getType().startsWith("p")) {
-            type = "Product";
-            String target = "gid://shopify/" + type + "/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
-            intent.putExtra("productId", targetId);
-            startActivity(intent);
-            finish();
-        } else if (banner.getType().startsWith("c")) {
-            type = "Collection";
-            String target = "gid://shopify/" + type + "/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getApplicationContext(), CollectionProductsActivity.class);
-            intent.putExtra("collectionId", targetId);
-            startActivity(intent);
-            finish();
-        }
+         if(!banner.getId().isEmpty())
+         {
+             String type;
+             Intent intent;
+             if (banner.getType().startsWith("p")) {
+                 type = "Product";
+                 String target = "gid://shopify/" + type + "/" + banner.getId();
+                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                 targetId = targetId.trim(); //remove spaces from end of string
+                 intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+                 intent.putExtra("productId", targetId);
+                 startActivity(intent);
+                 finish();
+             } else if (banner.getType().startsWith("c")) {
+                 type = "Collection";
+                 String target = "gid://shopify/" + type + "/" + banner.getId();
+                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                 targetId = targetId.trim(); //remove spaces from end of string
+                 intent = new Intent(getApplicationContext(), CollectionProductsActivity.class);
+                 intent.putExtra("collectionId", targetId);
+                 startActivity(intent);
+                 finish();
+             }
+         }
     }
 }

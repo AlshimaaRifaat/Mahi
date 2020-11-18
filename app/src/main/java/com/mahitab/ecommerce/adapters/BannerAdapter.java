@@ -61,11 +61,11 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
             ivImage = itemView.findViewById(R.id.ivImage_BannerItem);
 
             if (bannerList.size() == 1)
-                itemView.getLayoutParams().width = (int) (sectionWidth/1.06);
+                itemView.getLayoutParams().width = sectionWidth;
             else if (bannerList.size() == 2)
-                itemView.getLayoutParams().width = (int) (sectionWidth / 2.16);
+                itemView.getLayoutParams().width = sectionWidth / 2;
             else
-                itemView.getLayoutParams().width = (int) (sectionWidth / 3.16);
+                itemView.getLayoutParams().width = sectionWidth / 3;
 
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION)

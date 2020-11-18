@@ -53,7 +53,7 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
 
         rvWishedProducts.setHasFixedSize(true);
         rvWishedProducts.setLayoutManager(new GridLayoutManager(this, 2));
-        productAdapter = new ProductAdapter(wishedProducts);
+        productAdapter = new ProductAdapter(this,wishedProducts);
         rvWishedProducts.setAdapter(productAdapter);
         productAdapter.setProductClickListener(this);
 
@@ -75,7 +75,12 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
             wishListItems = new Gson().fromJson(defaultPreferences.getString("wishListProducts", null), new TypeToken<List<String>>() {
             }.getType());
 
-        getWishedProducts(wishListItems);
+        if (wishListItems != null) {
+            getWishedProducts(wishListItems);
+        } else {
+            wishedProducts.clear();
+            productAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -93,12 +98,10 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
     }
 
     private void getWishedProducts(List<String> productsIds) {
-        if (productsIds.size() > 0) {
-            for (String productId : productsIds) {
-                ProductModel product = DataManager.getInstance().getProductByID(productId);
-                wishedProducts.add(product);
-            }
-        } else wishedProducts.clear();
+        for (String productId : productsIds) {
+            ProductModel product = DataManager.getInstance().getProductByID(productId);
+            wishedProducts.add(product);
+        }
         productAdapter.notifyDataSetChanged();
     }
 }

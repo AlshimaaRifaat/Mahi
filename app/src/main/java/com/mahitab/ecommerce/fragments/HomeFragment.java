@@ -172,21 +172,26 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
     @Override
     public void onBannerClick(BannerModel banner) {
         FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
-        Intent intent;
-        if (banner.getType().startsWith("p")) {
-            String target = "gid://shopify/Product/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getContext(), ProductDetailsActivity.class);
-            intent.putExtra("productId", targetId);
-            startActivity(intent);
-        } else if (banner.getType().startsWith("c")) {
-            String target = "gid://shopify/Collection/" + banner.getId();
-            String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-            targetId = targetId.trim(); //remove spaces from end of string
-            intent = new Intent(getContext(), CollectionProductsActivity.class);
-            intent.putExtra("collectionId", targetId);
-            startActivity(intent);
+        if(!banner.getId().isEmpty()) {
+            String type;
+            Intent intent;
+            if (banner.getType().startsWith("p")) {
+                type = "Product";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getContext(), ProductDetailsActivity.class);
+                intent.putExtra("productId", targetId);
+                startActivity(intent);
+            } else if (banner.getType().startsWith("c")) {
+                type = "Collection";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getContext(), CollectionProductsActivity.class);
+                intent.putExtra("collectionId", targetId);
+                startActivity(intent);
+            }
         }
     }
 
@@ -201,9 +206,6 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     @Override
     public void onTopCollectionLoaded(List<CollectionModel> collections) {
-//        for (CollectionModel model:collections) {
-//            Log.e("TAG Home", "onTopCollectionLoaded: "+model.getImage() );
-//        }
         topCollectionsAdapter.setCollections(collections);
     }
 

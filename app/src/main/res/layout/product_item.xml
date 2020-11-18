@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:weightSum="10"
         android:orientation="vertical">
 
@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/imageRl"
-            android:layout_weight="6">
+            android:layout_weight="7">
 
             <ImageView
                 android:id="@+id/ivImage_ProductItem"
@@ -50,69 +50,64 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_marginBottom="4dp"
-            android:layout_weight="4.5">
-            <LinearLayout
+            android:layout_margin="8dp"
+            android:id="@+id/titleLl"
+            android:layout_weight="1.75"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitle_ProductItem"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:id="@+id/titleLl"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:minLines="2"
+                android:text="قماش قماش قماش قماش قماش قماش"
+                app:autoSizeMaxTextSize="24dp"
+                app:autoSizeMinTextSize="14dp"
+                app:autoSizeStepGranularity="2dp"
+                app:autoSizeTextType="uniform"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:id="@+id/priceLl"
+            android:layout_margin="8dp"
+            android:layout_weight="1.25"
+            android:weightSum="2.2">
 
-                <TextView
-                    android:id="@+id/tvTitle_ProductItem"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:minLines="2"
-                    android:text="قماش قماش قماش قماش قماش قماش"
-                    app:autoSizeMaxTextSize="24dp"
-                    app:autoSizeMinTextSize="14dp"
-                    app:autoSizeStepGranularity="2dp"
-                    app:autoSizeTextType="uniform"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/priceLl"
-                android:padding="8dp"
-                android:weightSum="2.2">
+            <TextView
+                android:id="@+id/tvPrice_ProductItem"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:text="50 جنية"
+                android:gravity="center"
+                android:textColor="@color/colorPrimaryDark"
+                app:autoSizeMaxTextSize="24dp"
+                app:autoSizeMinTextSize="14dp"
+                app:autoSizeStepGranularity="2dp"
+                app:autoSizeTextType="uniform"/>
 
-                <TextView
-                    android:id="@+id/tvPrice_ProductItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:text="50 جنية"
-                    android:gravity="center"
-                    android:textColor="@color/colorPrimaryDark"
-                    app:autoSizeMaxTextSize="24dp"
-                    app:autoSizeMinTextSize="14dp"
-                    app:autoSizeStepGranularity="2dp"
-                    app:autoSizeTextType="uniform"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2" />
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.2" />
-
-                <TextView
-                    android:id="@+id/tvOldPrice_ProductItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:text="40 جنية"
-                    android:gravity="center"
-                    app:autoSizeMaxTextSize="24dp"
-                    app:autoSizeMinTextSize="14dp"
-                    app:autoSizeStepGranularity="2dp"
-                    app:autoSizeTextType="uniform" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/tvOldPrice_ProductItem"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:text="40 جنية"
+                android:gravity="center"
+                app:autoSizeMaxTextSize="24dp"
+                app:autoSizeMinTextSize="14dp"
+                app:autoSizeStepGranularity="2dp"
+                app:autoSizeTextType="uniform" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

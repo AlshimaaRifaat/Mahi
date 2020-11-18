@@ -6,8 +6,6 @@ import java.util.List;
 
 public class Collection {
     private String id;
-    @Exclude
-    private String encodedId;
     private String image;
     @Exclude
     private List<BannerModel> banners;
@@ -21,15 +19,6 @@ public class Collection {
 
     public String getId() {
         return id;
-    }
-
-    @Exclude
-    public String getEncodedId() {
-        return encodedId;
-    }
-
-    public void setEncodedId(String encodedId) {
-        this.encodedId = encodedId;
     }
 
     public String getImage() {

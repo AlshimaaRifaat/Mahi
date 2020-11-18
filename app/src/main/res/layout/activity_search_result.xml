@@ -6,7 +6,7 @@
     android:background="#fff"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.mahitab.ecommerce.activities.SearchResultActivity">
-    >
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
@@ -19,6 +19,7 @@
     <com.arlib.floatingsearchview.FloatingSearchView
         android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
+        app:floatingSearch_leftActionMode="showSearch"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +31,6 @@
         app:floatingSearch_suggestionsListAnimDuration="250"
         app:floatingSearch_showSearchKey="true"
         android:layout_alignParentTop="true"
-        app:floatingSearch_menu="@menu/home_menu"
         app:iconifiedByDefault="false"
         app:searchIcon="@null"
         app:floatingSearch_close_search_on_keyboard_dismiss="true"

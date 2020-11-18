@@ -11,6 +11,8 @@
     <string name="see_all">المزيد</string>
     <!-- Home Activity -->
 
+    <string name="changePass">تغير كلمة السر</string>
+
     <string name="title_activity_product_details">تفاصيل المنتج</string>
     <string name="egp">\u0020جنيه</string>
 
@@ -129,6 +131,14 @@
     <string name="we_will_send_you_an_email_to_reset_your_password_text">سنرسل لك بريدًا إلكترونيًا لإعادة تعيين كلمة المرور الخاصة بك</string>
     <!-- ResetPasswordActivity -->
 
+    <!-- change password-->
+    <string name="changePasswordLogo">تغير كلمة المرور</string>
+    <!-- change pasword -->
+
+    <!--SearchResult-->
+    <string name="hasntItem">لا توجد نتيجة بحث</string>
+    <!--SearchResult-->
+
     <string name="meter">متر</string>
     <string name="number">عدد</string>
 
@@ -140,7 +150,7 @@
     <string name="Do_you_want_to_Delete">هل تريدي مسح العنوان؟</string>
     <string name="Cancel">إلغاء</string>
     <string name="complete_action_using">أكمل الأمر بإستخدام</string>
-    <string name="Select">اختر</string>
+    <string name="Select">اختر العنوان</string>
     <string name="check_your_email_and_password">" الايميل او الرقم السري غير صحيح!"</string>
 
     <string name="under_review">قيد المراجعة</string>

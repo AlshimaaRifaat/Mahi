@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
     public static List<AddressModel> addresses;
     private SelectAddressAdapter selectAddressAdapter;
 
+    private    Dialog dialog ;
     SharedPreferences sharedPreferences;
     String accessToken;
     public static List<CartItemQuantity> cartProducts;
@@ -81,6 +83,8 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
 
     private void initView() {
         rvAddresses = findViewById(R.id.rvAddresses_MyAddressesActivity);
+        this.dialog = new Dialog(this);
+        dialog.setContentView(R.layout.load_dialog);
     }
 
 
@@ -148,7 +152,8 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
                         public void run() {
                             Log.d(TAG, "run: " + "success");
                             addresses.sort((o1, o2) -> o2.getmID().toString().compareTo(o1.getmID().toString()));
-                            selectAddressAdapter = new SelectAddressAdapter(SelectAddressActivity.this, addresses);
+
+                            selectAddressAdapter = new SelectAddressAdapter(SelectAddressActivity.this, addresses,dialog);
                             selectAddressAdapter.onClickItemSelectAddress(SelectAddressActivity.this::navigateToPaymentCashOnDelivery);
                             rvAddresses.setLayoutManager(new LinearLayoutManager(SelectAddressActivity.this));
                             rvAddresses.setHasFixedSize(true);
@@ -175,6 +180,7 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
 
     @Override
     public void navigateToPaymentCashOnDelivery(AddressModel addressModel, int Position) {
+
         if (sharedPreferences.getString("cartProducts", null) == null)
             cartProducts = new ArrayList<>();
         else
@@ -531,5 +537,19 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+         dialog.dismiss();
+
     }
 }

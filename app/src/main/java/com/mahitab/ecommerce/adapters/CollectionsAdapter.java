@@ -25,7 +25,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
         CollectionProductsAdapter.CollectionClickListener
         , CollectionProductsAdapter.ProductClickListener {
 
-    private  List<CollectionModel> collectionList;
+    private List<CollectionModel> collectionList;
     private final Context context;
 
     private CollectionClickListener listener;
@@ -45,6 +45,7 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
     @Override
     public void onBindViewHolder(@NonNull CollectionProductsViewHolder holder, int position) {
         CollectionModel collection = collectionList.get(position);
+
         holder.rvProducts.setHasFixedSize(true);
         CollectionProductsAdapter collectionProductsAdapter = new CollectionProductsAdapter(collection);
         GridLayoutManager layoutManager = new GridLayoutManager(holder.itemView.getContext(), 1, GridLayoutManager.HORIZONTAL, false);

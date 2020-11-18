@@ -17,7 +17,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowInsets;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -36,6 +39,8 @@ import com.mahitab.ecommerce.search.DataHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
@@ -45,15 +50,13 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
     SelectedOptions selectedOptions;
     private MenuItem searchMenuItem = null;
     private ImageView searchCloseIcon,imgCart;
-
-    private ArrayList<ProductModel> searchResultList = null;
-    private ArrayList<ProductModel> productList = null;
+    private ArrayList<ProductModel> searchResultList = new ArrayList<>();
+    private ArrayList<ProductModel> productList  = new ArrayList<>();
     private ProductAdapter productAdapter;
-
     private Toolbar toolbar;
     RecyclerView rvProducts;
     public static int x=0;
-    ArrayList<CollectionModel> allCollectionList=null;
+    ArrayList<CollectionModel> allCollectionList=  new ArrayList<>();
     public static ArrayList<ColorSuggestion> recentlySearchedList;
     private SharedPreferences defaultPreferences;
     FloatingSearchView mSearchView;
@@ -102,19 +105,24 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
             @Override
             public void onSearchTextChanged(String oldQuery, final String newQuery) {
 
+                Log.e("Text","Change");
                 //get suggestions based on newQuery
 
                 //pass them on to the search view
-                // mSearchView.swapSuggestions(newQuery);
 
-                /*   */
+
                 if(newQuery!=null) {
+
+
                     getSearchResult();
+
+
                     selectedOptions.setSearchCriteria(newQuery);
 
 
                 }
-                Log.d(TAG, "list: " + recentlySearchedList.toString());
+
+             // will uncommit  Log.d(TAG, "list: " + recentlySearchedList.toString());
 
 
                 if (!oldQuery.equals("") && newQuery.equals("")) {
@@ -147,16 +155,20 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                             });
                 }
 
-                Log.d(TAG, "onSearchTextChanged()");
+                // will uncommint Log.d(TAG, "onSearchTextChanged()");
             }
+
         });
+
 
         mSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
             @Override
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
 
                 ColorSuggestion colorSuggestion = (ColorSuggestion) searchSuggestion;
-                Log.d(TAG, "onSuggestionClicked: "+colorSuggestion.getBody().toString());
+                Log.e("SuggestionClicked","Clicked");
+
+                // will uncommint  Log.d(TAG, "onSuggestionClicked: "+colorSuggestion.getBody().toString());
                 DataHelper.findColors(SearchResultActivity.this, colorSuggestion.getBody(),
                         new DataHelper.OnFindColorsListener() {
 
@@ -167,18 +179,16 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                                 selectedOptions.setSearchCriteria(colorSuggestion.getBody());
                                 mSearchView.clearSuggestions();
                                 mSearchView.setSearchFocusable(false);
-
                             }
-
                         });
-                Log.d(TAG, "onSuggestionClicked()");
-
+               // will uncommint Log.d(TAG, "onSuggestionClicked()");
                 mLastQuery = searchSuggestion.getBody();
             }
 
             @Override
             public void onSearchAction(String query) {
                 mLastQuery = query;
+                Log.e("SearchAction","Search");
 
                 DataHelper.findColors(SearchResultActivity.this, query,
                         new DataHelper.OnFindColorsListener() {
@@ -188,28 +198,41 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                                 //show search results
                                 x = 1;
                                 getSearchResult();
+                                //getSearchResult();
                                 selectedOptions.setSearchCriteria(mLastQuery.toString());
 
+                                /*Start Check If Has Same Value*/
+                                boolean result = true ;
+                                for (int x=0;x<recentlySearchedList.size();x++)
+                                {
 
-                                recentlySearchedList.add(new ColorSuggestion(mLastQuery));
-
-                                if (!recentlySearchedList.isEmpty()) {
-                                    Gson gson = new Gson();
-                                    String json = gson.toJson(recentlySearchedList);
-                                    shEditor.remove("recentlySearchedList").apply();
-                                    shEditor.putString("recentlySearchedList", json);
-                                    shEditor.apply();
+                                    if(recentlySearchedList.get(x).getBody().equals(query))
+                                    {
+                                        result=false;
+                                    }
                                 }
-                                Log.d(TAG, "list: " + recentlySearchedList.toString());
-                            }
 
+                                if (result==true)
+                                {
+                                    recentlySearchedList.add(new ColorSuggestion(mLastQuery));
+                                }
+                                if (!recentlySearchedList.isEmpty())
+                                {
+                                   if(result==true)
+                                   {
+                                       Gson gson = new Gson();
+                                       String json = gson.toJson(recentlySearchedList);
+                                       shEditor.remove("recentlySearchedList").apply();
+                                       shEditor.putString("recentlySearchedList", json);
+                                       shEditor.apply();
+                                   }
+                                }
+                               /*End Check If Has Same Value*/
+                            }
                         });
                 Log.d(TAG, "onSearchAction()");
             }
         });
-
-
-
 
         mSearchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
@@ -231,34 +254,37 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                 //you can also set setSearchText(...) to make keep the query there when not focused and when focus returns
                 //mSearchView.setSearchText(searchSuggestion.getBody());
 
-                Log.d(TAG, "onFocusCleared()");
+                 Log.d(TAG, "onFocusCleared()");
             }
         });
-
 
         //handle menu clicks the same way as you would
         //in a regular activity
 
-
+/*
+// Shymaa Code
         mSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
                 //just print action
-
                if(item.getItemId()==R.id.action_search){
                    x = 1;
+                   Log.e("Action Menu","Selected");
 
-                   Log.d(TAG, "query: "+mSearchView.getQuery());
+                   // wiil un commint   Log.d(TAG, "query: "+mSearchView.getQuery());
                    getSearchResult();
                    selectedOptions.setSearchCriteria(mSearchView.getQuery());
                    mSearchView.clearSuggestions();
                    mSearchView.setSearchFocusable(false);
-               }
 
+
+
+               }
 
 
             }
         });
+*/
 
         //use this listener to listen to menu clicks when app:floatingSearch_leftAction="showHome"
         mSearchView.setOnHomeActionClickListener(new FloatingSearchView.OnHomeActionClickListener() {
@@ -268,7 +294,6 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                 Log.d(TAG, "onHomeClicked()");
             }
         });
-
         /*
          * Here you have access to the left icon and the text of a given suggestion
          * item after as it is bound to the suggestion list. You can utilize this
@@ -281,16 +306,19 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
          * items in the list.
          */
 
-
     }
-
-
 
 
     private void initView() {
         rvProducts=findViewById( R.id.rvProducts );
         toolbar = findViewById(R.id.toolbar);
         mSearchView= findViewById(R.id.floating_search_view);
+        mSearchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSearchView.setShowSearchKey(true);
+            }
+        });
     }
 
     private void getAllProductsList() {
@@ -301,7 +329,6 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             if (x == 1) {
                                 searchResultList = DataManager.getInstance().getAllProducts();
                                 Log.d(TAG, "x1: " + searchResultList.get(0).getTitle());
@@ -340,6 +367,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
     }
 
     private void getSearchResult() {
+
         searchResultList=DataManager.getInstance().getAllProducts();
         productAdapter = new ProductAdapter(this,searchResultList);
         productAdapter.setProductClickListener(this::onProductClick);
