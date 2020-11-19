@@ -3,6 +3,7 @@ package com.mahitab.ecommerce.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,6 +57,14 @@ public class PaymentWebViewActivity extends AppCompatActivity {
         mywebview.getSettings().setJavaScriptEnabled(true);
         mywebview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         mywebview.loadUrl(webUrl);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_CANCELED, returnIntent);
+        finish();
     }
 
     private void getSavedAccessToken() {

@@ -1,10 +1,10 @@
 package com.mahitab.ecommerce.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +47,7 @@ import java.util.Locale;
 
 public class CartFragment extends Fragment implements CartAdapter.CartProductClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CartFragment";
+    private static final int LAUNCH_PAYMENT_ACTIVITY = 101;
     private Toolbar toolbar;
     private RecyclerView rvCartProducts;
     public static List<CartItemQuantity> cartProducts;
@@ -59,10 +60,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
     private SharedPreferences defaultPreferences;
     private Button checkoutButton;
-
-
-    private static final long MIN_CLICK_INTERVAL = 1000; //in millis
-    private long lastClickTime = 0;
 
     private String accessToken;
     private String firstName = " ";
@@ -139,22 +136,17 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             createAccessToken();
 
         checkoutButton.setOnClickListener(view1 -> {
-
-            long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime - lastClickTime > MIN_CLICK_INTERVAL) {
-                lastClickTime = currentTime;
-
-                if (token == null) {
-                    ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-                    for (int i = 0; i < cartProducts.size(); i++) {
-                        inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
-                    }
-                    Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                            .setLineItemsInput(Input.value(inputArrayList));
-                    createCashOnDeliveryCheckOut(input);
-                } else
-                    Log.e("Iam","Select");
-                    startActivity(new Intent(getActivity(), SelectAddressActivity.class));
+            checkoutButton.setEnabled(false);
+            if (token == null) {
+                ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
+                for (int i = 0; i < cartProducts.size(); i++) {
+                    inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
+                }
+                Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
+                        .setLineItemsInput(Input.value(inputArrayList));
+                createCashOnDeliveryCheckOut(input);
+            } else {
+                startActivityForResult(new Intent(getActivity(), SelectAddressActivity.class), LAUNCH_PAYMENT_ACTIVITY);
             }
         });
     }
@@ -169,6 +161,14 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (sharedPreferences.contains("cartProducts")) {
             defaultPreferences.edit().putString("cartProducts", new Gson().toJson(cartProducts)).apply();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LAUNCH_PAYMENT_ACTIVITY && resultCode == Activity.RESULT_CANCELED) {
+            checkoutButton.setEnabled(true);
         }
     }
 
@@ -302,7 +302,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                     Log.e("data", "user..." + response.data().getCustomer().getEmail());
                 }
 
-                if (response.data().getCustomer().getDefaultAddress()!=null){
+                if (response.data().getCustomer().getDefaultAddress() != null) {
                     if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
                         phone = response.data().getCustomer().getDefaultAddress().getPhone();
                     }
@@ -423,7 +423,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("checkout_id", checkoutId);
                 guestCustomerIntent.putExtras(bundle);
-                startActivity(guestCustomerIntent);
+                startActivityForResult(guestCustomerIntent,LAUNCH_PAYMENT_ACTIVITY);
 
                 Log.d(TAG, "iddd: " + checkoutId.toString());
 
