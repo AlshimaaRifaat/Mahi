@@ -71,4 +71,8 @@ dependencies {
 
     implementation 'com.github.arimorty:floatingsearchview:2.1.1'
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.10'
+
+    //RxJAva
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.0.8'
 }

@@ -30,62 +30,53 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:layout_margin="16dp"
                 android:orientation="horizontal"
-                android:padding="8dp"
-                android:layout_gravity="bottom"
-                >
+                android:padding="8dp">
+
                 <TextView
                     android:id="@+id/welcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
                     android:text="@string/welcome"
                     android:textSize="17sp"
                     android:textStyle="bold"
-                    android:layout_alignParentRight="true"
-
-                    />
+                    tools:ignore="RelativeOverlap" />
 
                 <TextView
-                android:id="@+id/tvCustomerName_AccountFragment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"
-                android:textSize="17sp"
-                android:layout_toLeftOf="@id/welcome"
-                android:textStyle="bold" />
-
-                <TextView
-                    android:layout_margin="8dp"
-                    android:layout_marginBottom="10dp"
-                    android:textColor="@color/colorPrimary"
-                    android:id="@+id/changePassLogo"
+                    android:id="@+id/tvCustomerName_AccountFragment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:textSize="12dp"
+                    android:layout_toLeftOf="@id/welcome"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    tools:ignore="RtlHardcoded" />
+
+                <TextView
+                    android:id="@+id/tvChangePassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:text="@string/changePasswordLogo" />
+                    android:layout_margin="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="left"
+                    android:visibility="gone"
+                    android:text="@string/changePasswordLogo"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12dp"
+                    tools:ignore="RtlHardcoded,SpUsage" />
 
 
             </RelativeLayout>
-         <!--  <TextView
-                android:layout_margin="8dp"
-               android:layout_marginBottom="10dp"
-               android:textColor="@color/colorPrimary"
-                android:id="@+id/changePassLogo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-               android:textSize="12dp"
-                android:text="@string/changePasswordLogo" />-->
 
             <LinearLayout
                 android:id="@+id/llLoginRegister_AccountFragment"
@@ -121,9 +112,7 @@
                 android:text="@string/sign_out"
                 tools:ignore="ButtonStyle" />
 
-            <include
-                layout="@layout/customer_account_data"
-                />
+            <include layout="@layout/customer_account_data" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

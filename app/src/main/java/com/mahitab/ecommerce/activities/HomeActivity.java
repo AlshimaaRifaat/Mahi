@@ -176,6 +176,14 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     private void initView() {
         llHome = findViewById(R.id.llHome_HomeActivity);
         llSplash = findViewById(R.id.llSplash_HomeActivity);

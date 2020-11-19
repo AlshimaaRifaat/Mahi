@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,27 +28,32 @@ import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CartActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
-import com.mahitab.ecommerce.activities.PaymentWebViewActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
-import com.mahitab.ecommerce.activities.SelectAddressActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
-import com.mahitab.ecommerce.managers.GraphClientManager;
+import com.mahitab.ecommerce.managers.DataManager;
+import com.mahitab.ecommerce.managers.DataManagerHelper;
+import com.mahitab.ecommerce.managers.ShopifyManager;
+import com.mahitab.ecommerce.models.AddressModel;
 import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
+import com.shopify.buy3.QueryGraphCall;
 import com.shopify.buy3.Storefront;
-import com.shopify.graphql.support.ID;
-import com.shopify.graphql.support.Input;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+
+import static com.mahitab.ecommerce.managers.ShopifyManager.LAUNCH_PAYMENT_ACTIVITY;
+
 public class CartFragment extends Fragment implements CartAdapter.CartProductClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CartFragment";
-    private static final int LAUNCH_PAYMENT_ACTIVITY = 101;
+
     private Toolbar toolbar;
     private RecyclerView rvCartProducts;
     public static List<CartItemQuantity> cartProducts;
@@ -59,20 +65,10 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     private TextView tvSubTotalPrice;
 
     private SharedPreferences defaultPreferences;
-    private Button checkoutButton;
+    private Button btnCheckout;
 
-    private String accessToken;
-    private String firstName = " ";
-    private String lastName = "";
-    private String phone = "";
-    private String city = "";
-    private String country = "";
-    private String zip = "";
-    private String province = "";
-    private String address1 = "";
-    private String address2 = "";
-    private String email = "";
-    private String strEmail, strPassword;
+    private ProgressBar pbLoadingPayment;
+    private ArrayList<AddressModel> customerAddresses;
 
     public CartFragment() {
         // Required empty public constructor
@@ -132,21 +128,90 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         defaultPreferences.registerOnSharedPreferenceChangeListener(this);
 
         String token = defaultPreferences.getString("token", null);
-        if (token != null)
-            createAccessToken();
+        if (token != null && isResumed()) {
+            Log.e(TAG, "onResume: " + token);
+            ShopifyManager.getCustomerAddresses(token).subscribe(new Observer<QueryGraphCall>() {
+                @Override
+                public void onSubscribe(Disposable d) {
 
-        checkoutButton.setOnClickListener(view1 -> {
-            checkoutButton.setEnabled(false);
-            if (token == null) {
-                ArrayList<Storefront.CheckoutLineItemInput> inputArrayList = new ArrayList<>();
-                for (int i = 0; i < cartProducts.size(); i++) {
-                    inputArrayList.add(new Storefront.CheckoutLineItemInput(cartProducts.get(i).getQuantity(), cartProducts.get(i).getVariantId()));
                 }
-                Storefront.CheckoutCreateInput input = new Storefront.CheckoutCreateInput()
-                        .setLineItemsInput(Input.value(inputArrayList));
-                createCashOnDeliveryCheckOut(input);
+
+                @Override
+                public void onNext(QueryGraphCall queryGraphCall) {
+                    queryGraphCall.enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
+                        @Override
+                        public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
+                            if (!response.hasErrors()) {
+                                DataManagerHelper.getInstance().fetchAddresses().clear();
+                                Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
+                                for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
+                                    AddressModel newAddressesModel = new AddressModel(edge);
+                                    DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+                                }
+                                customerAddresses = DataManager.getInstance().getAddresses();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull GraphError error) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "onError: " + e.getMessage());
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
+        }
+
+        btnCheckout.setOnClickListener(view1 -> {
+            pbLoadingPayment.setVisibility(View.VISIBLE);
+            btnCheckout.setEnabled(false);
+            if (token == null) {
+                ShopifyManager.checkoutAsGuest(requireActivity(), cartProducts);
             } else {
-                startActivityForResult(new Intent(getActivity(), SelectAddressActivity.class), LAUNCH_PAYMENT_ACTIVITY);
+                if (customerAddresses != null && customerAddresses.size() == 1) {
+                    ShopifyManager.getCurrentCustomer(token).subscribe(new Observer<QueryGraphCall>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(QueryGraphCall customerQueryGraphCall) {
+                            customerQueryGraphCall.enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
+                                @Override
+                                public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
+                                    if (!response.hasErrors()) {
+                                        ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, response.data().getCustomer(), customerAddresses.get(0));
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull GraphError error) {
+                                    Log.e(TAG, "onFailure: " + error.getMessage());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e(TAG, "onError: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+                }
             }
         });
     }
@@ -168,273 +233,9 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LAUNCH_PAYMENT_ACTIVITY && resultCode == Activity.RESULT_CANCELED) {
-            checkoutButton.setEnabled(true);
+            pbLoadingPayment.setVisibility(View.GONE);
+            btnCheckout.setEnabled(true);
         }
-    }
-
-    private void initView(View view) {
-        toolbar = view.findViewById(R.id.toolbar);
-        llEmptyCart = view.findViewById(R.id.llEmptyCart_CartFragment);
-        llContentCart = view.findViewById(R.id.llContentCart_CartFragment);
-        rvCartProducts = view.findViewById(R.id.rvCartProducts_CartFragment);
-        tvSubTotalPrice = view.findViewById(R.id.tvSubTotalPrice_CartFragment);
-        checkoutButton = view.findViewById(R.id.checkoutButton);
-    }
-
-    private void createAccessToken() {
-        getSavedEmailAndPassword();
-        Log.d(TAG, "createAccessToken :e " + strEmail);
-        Log.d(TAG, "createAccessToken:p " + strPassword);
-        Storefront.CustomerAccessTokenCreateInput tokenCreateInput = new Storefront.CustomerAccessTokenCreateInput(strEmail, strPassword);
-
-        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                .customerAccessTokenCreate(tokenCreateInput, query -> query
-                        .customerAccessToken(customerAccessToken -> customerAccessToken
-                                .accessToken()
-                                .expiresAt()
-
-                        )
-                        .userErrors(userError -> userError
-                                .field()
-                                .message()
-                        )
-                )
-        );
-        getAccessTokenFromAPI(mutationQuery);
-    }
-
-    private void getSavedEmailAndPassword() {
-        strEmail = defaultPreferences.getString("email", null);
-        strPassword = defaultPreferences.getString("password", null);
-    }
-
-    private void getAccessTokenFromAPI(Storefront.MutationQuery mutationQuery) {
-        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-
-                if (!response.data().getCustomerAccessTokenCreate().getUserErrors().isEmpty()) {
-                    for (Storefront.UserError error : response.data().getCustomerAccessTokenCreate().getUserErrors()) {
-                        Log.e("TAG", "error is" + error.getMessage());
-                    }
-                } else {
-                    accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
-                    Log.e("TAG", "login" + response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken());
-                    // queryUserDetails(accessToken);
-                    fetchCustomerQuery(accessToken);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-                Log.d("TAG", "Create customer Account API FAIL:" + error.getMessage());
-            }
-        });
-    }
-
-    private void fetchCustomerQuery(String accessToken) {
-        Storefront.QueryRootQuery queryRootQuery = Storefront.query(rootQuery -> rootQuery
-                .customer(
-                        accessToken,
-                        userQuery -> userQuery
-                                .id()
-                                .firstName()
-                                .lastName()
-                                .email()
-                                .acceptsMarketing()
-                                .displayName()
-                                .phone()
-                                .defaultAddress(
-                                        address -> address
-                                                .firstName()
-                                                .lastName()
-                                                .address1()
-                                                .address2()
-                                                .phone()
-                                                .company()
-                                                .city()
-                                                .country()
-                                                .province()
-                                                .zip()
-                                )
-                                .addresses(
-                                        args -> args
-                                                .first(25),
-                                        address -> address
-                                                .edges(
-                                                        edge -> edge
-                                                                .node(
-                                                                        node -> node
-                                                                                .firstName()
-                                                                                .lastName()
-                                                                                .address1()
-                                                                                .address2()
-                                                                                .phone()
-                                                                                .company()
-                                                                                .city()
-                                                                                .country()
-                                                                                .province()
-                                                                                .zip()
-                                                                )
-                                                )
-                                )
-                )
-        );
-
-        getCustomerInformation(queryRootQuery);
-    }
-
-    private void getCustomerInformation(Storefront.QueryRootQuery queryRootQuery) {
-        GraphClientManager.mClient.queryGraph(queryRootQuery).enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
-
-                if (response.data().getCustomer().getFirstName() != null) {
-                    firstName = response.data().getCustomer().getFirstName();
-                    Log.e("data", "user..." + response.data().getCustomer().getFirstName());
-                }
-                if (response.data().getCustomer().getLastName() != null) {
-                    lastName = response.data().getCustomer().getLastName();
-                    Log.e("data", "user..." + response.data().getCustomer().getLastName());
-                }
-                if (response.data().getCustomer().getEmail() != null) {
-                    email = response.data().getCustomer().getEmail();
-                    Log.e("data", "user..." + response.data().getCustomer().getEmail());
-                }
-
-                if (response.data().getCustomer().getDefaultAddress() != null) {
-                    if (response.data().getCustomer().getDefaultAddress().getPhone() != null) {
-                        phone = response.data().getCustomer().getDefaultAddress().getPhone();
-                    }
-
-                    if (response.data().getCustomer().getDefaultAddress().getCity() != null) {
-                        city = response.data().getCustomer().getDefaultAddress().getCity();
-                    }
-                    if (response.data().getCustomer().getDefaultAddress().getCountry() != null) {
-                        country = response.data().getCustomer().getDefaultAddress().getCountry();
-                    }
-                    if (response.data().getCustomer().getDefaultAddress().getZip() != null) {
-                        zip = response.data().getCustomer().getDefaultAddress().getZip();
-                    }
-                    if (response.data().getCustomer().getDefaultAddress().getProvince() != null) {
-                        province = response.data().getCustomer().getDefaultAddress().getProvince();
-                    }
-                    if (response.data().getCustomer().getDefaultAddress().getAddress1() != null) {
-                        address1 = response.data().getCustomer().getDefaultAddress().getAddress1();
-                    }
-                    if (response.data().getCustomer().getDefaultAddress().getAddress2() != null) {
-                        address2 = response.data().getCustomer().getDefaultAddress().getAddress2();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-                Log.e("TAG", "Failed to execute query", error);
-            }
-        });
-    }
-
-    private void createCashOnDeliveryCheckOut(Storefront.CheckoutCreateInput input) {
-        Storefront.MutationQuery query = Storefront.mutation(mutationQuery -> mutationQuery
-                .checkoutCreate(input, createPayloadQuery -> createPayloadQuery
-                        .checkout(Storefront.CheckoutQuery::webUrl
-                        )
-                        .userErrors(userErrorQuery -> userErrorQuery
-                                .field()
-                                .message()
-                        ))
-        );
-        getCheckoutId(query);
-    }
-
-    private void getCheckoutId(Storefront.MutationQuery query) {
-
-        GraphClientManager.mClient.mutateGraph(query).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                if (!response.data().getCheckoutCreate().getUserErrors().isEmpty()) {
-                    // handle user friendly errors
-                } else {
-                    ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
-                    Log.d(TAG, "ch id: " + checkoutId.toString());
-
-                    queryUpdateAddress(checkoutId);
-                }
-
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-                // handle errors
-                // Log.d(TAG, "onFailure: " + error.getMessage().toString());
-            }
-        });
-    }
-
-    private void queryUpdateAddress(ID checkoutId) {
-        Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
-                .setZip("12345");
-        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                .checkoutShippingAddressUpdate(
-                        inputAddress,
-                        checkoutId,
-                        result -> result
-                                .checkout(
-                                        checkout -> checkout
-                                                .email()
-                                                .webUrl()
-                                                .shippingAddress(
-                                                        address -> address
-                                                                .firstName()
-                                                                .lastName()
-                                                                .phone()
-                                                                .company()
-                                                                .address1()
-                                                                .address2()
-                                                                .city()
-                                                                .province()
-                                                                .country()
-                                                                .zip()
-                                                )
-                                )
-                                .userErrors(
-                                        error -> error
-                                                .field()
-                                                .message()
-                                )
-                )
-        );
-        updateAddress(mutationQuery);
-    }
-
-    private void updateAddress(Storefront.MutationQuery mutationQuery) {
-        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-            @Override
-            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                String webUrl = response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl();
-                Log.d(TAG, "web url: " + response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl());
-                ID checkoutId = response.data().getCheckoutShippingAddressUpdate().getCheckout().getId();
-
-                Log.d(TAG, "id: " + checkoutId.toString());
-
-                Intent guestCustomerIntent = new Intent(getContext(), PaymentWebViewActivity.class);
-                guestCustomerIntent.putExtra("web_url", webUrl);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("checkout_id", checkoutId);
-                guestCustomerIntent.putExtras(bundle);
-                startActivityForResult(guestCustomerIntent,LAUNCH_PAYMENT_ACTIVITY);
-
-                Log.d(TAG, "iddd: " + checkoutId.toString());
-
-
-            }
-
-            @Override
-            public void onFailure(@NonNull GraphError error) {
-
-            }
-        });
     }
 
     @Override
@@ -472,6 +273,16 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
         Intent intent = new Intent(getContext(), ProductDetailsActivity.class);
         intent.putExtra("productId", productId);
         startActivity(intent);
+    }
+
+    private void initView(View view) {
+        toolbar = view.findViewById(R.id.toolbar);
+        llEmptyCart = view.findViewById(R.id.llEmptyCart_CartFragment);
+        llContentCart = view.findViewById(R.id.llContentCart_CartFragment);
+        rvCartProducts = view.findViewById(R.id.rvCartProducts_CartFragment);
+        tvSubTotalPrice = view.findViewById(R.id.tvSubTotalPrice_CartFragment);
+        btnCheckout = view.findViewById(R.id.btnCheckout_CartFragment);
+        pbLoadingPayment = view.findViewById(R.id.pbLoadingPayment_CartFragment);
     }
 
     private void calculateSubTotalUpdateUI() {

@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
 
             if (validateFields(email, password)) {
                 queryForLoginUser();
-                saveEmailAndPassword(email, password);
             }
         });
     }
@@ -108,8 +107,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void queryForLoginUser() {
-        Log.d(TAG, "email: " + email);
-        Log.d(TAG, "pass: " + password);
         Storefront.CustomerAccessTokenCreateInput input = new Storefront.CustomerAccessTokenCreateInput(email, password);
 
         Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
@@ -139,20 +136,11 @@ public class LoginActivity extends AppCompatActivity {
                   try {
                       accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
                       Log.d(TAG, "token: " + accessToken);
-                      saveAccessToken(accessToken);
+                      saveCustomerSharedPref(accessToken);
                       onBackPressed();
                   }catch (NullPointerException e){
                       Toast.makeText(LoginActivity.this, getResources().getString(R.string.check_your_email_and_password), Toast.LENGTH_SHORT).show();
                   }
-                      /*  if (response.data()!=null&&response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken() != null) {
-                            accessToken = response.data().getCustomerAccessTokenCreate().getCustomerAccessToken().getAccessToken();
-                            Log.d(TAG, "token: " + accessToken);
-                            saveAccessToken(accessToken);
-                            onBackPressed();
-                        } else {
-                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.check_your_email_and_password), Toast.LENGTH_SHORT).show();
-                        }*/
-
                 });
             }
 
@@ -167,12 +155,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void saveEmailAndPassword(String email, String password) {
+    private void saveCustomerSharedPref(String accessToken) {
         defaultPreferences.edit().putString("email", email).apply();
         defaultPreferences.edit().putString("password", password).apply();
-    }
-
-    private void saveAccessToken(String accessToken) {
         defaultPreferences.edit().putString("token", accessToken).apply();
     }
 
@@ -181,7 +166,6 @@ public class LoginActivity extends AppCompatActivity {
             tilEmail.setError(msg);
             return;
         }
-
         showOnUiThread(msg);
     }
 

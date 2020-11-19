@@ -1,18 +1,22 @@
 package com.mahitab.ecommerce.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.managers.GraphClientManager;
@@ -21,42 +25,41 @@ import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphError;
 import com.shopify.buy3.GraphResponse;
 import com.shopify.buy3.Storefront;
-import com.shopify.graphql.support.ID;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class PaymentWebViewActivity extends AppCompatActivity {
     private static final String TAG = "PaymentWebViewActivity";
-    String webUrl;
-    WebView mywebview;
-    ID checkoutId;
-    SharedPreferences sharedPreferences;
-    String accessToken;
-    boolean running;
-    final int REQUEST_INTERVAL = 2000;
-    Timer requestIntervalTimer;
-    int previousOrderNumber = 0;
-    boolean getPreviousOrderNumberOnce;
-    String sign;
+    private SharedPreferences sharedPreferences;
+    private boolean running;
+    private Timer requestIntervalTimer;
+    private int previousOrderNumber = 0;
+    private boolean getPreviousOrderNumberOnce;
+    private String sign;
 
+    private boolean loadingFinished = true;
+    private boolean redirect = false;
+
+    private WebView wvCheckOut;
+    private ProgressBar pbLoadingPayment;
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_web_view);
 
-        mywebview = findViewById(R.id.webView);
-
+        initView();
         sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
 
-        Intent intent = getIntent();
-        webUrl = intent.getExtras().getString("web_url");
-        checkoutId = (ID) getIntent().getSerializableExtra("checkout_id");
-        mywebview.setWebViewClient(new MyBrowser());
-        mywebview.getSettings().setLoadsImagesAutomatically(true);
-        mywebview.getSettings().setJavaScriptEnabled(true);
-        mywebview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        mywebview.loadUrl(webUrl);
+        if (getIntent().getExtras() != null) {
+            String webUrl = getIntent().getExtras().getString("web_url");
+            wvCheckOut.setWebViewClient(new MyBrowser());
+            wvCheckOut.getSettings().setLoadsImagesAutomatically(true);
+            wvCheckOut.getSettings().setJavaScriptEnabled(true);
+            wvCheckOut.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+            wvCheckOut.loadUrl(webUrl);
+        }
     }
 
     @Override
@@ -68,7 +71,7 @@ public class PaymentWebViewActivity extends AppCompatActivity {
     }
 
     private void getSavedAccessToken() {
-        accessToken = sharedPreferences.getString("token", null);
+        String accessToken = sharedPreferences.getString("token", null);
         Log.d(TAG, "getSavedAccessToken: " + accessToken);
         queryMyOrders(accessToken);
     }
@@ -87,11 +90,9 @@ public class PaymentWebViewActivity extends AppCompatActivity {
         getMyOrdersList(query, new BaseCallback() {
             @Override
             public void onResponse(int status) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (status == 200) {
-                        }
+                runOnUiThread(() -> {
+                    if (status == 200) {
+                        Log.e(TAG, "onResponse: getMyOrdersList");
                     }
                 });
 
@@ -118,17 +119,15 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
                     if (previousOrderNumber != 0) {
                         if (previousOrderNumber != connection.getEdges().get(connection.getEdges().size() - 1).getNode().getOrderNumber()) {
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(PaymentWebViewActivity.this, "Order Completed", Toast.LENGTH_LONG).show();
-                                    timerStop();
-                                    //TODO Handle after order completed process
-                                    //TODO You could simply finish this activty and intent to Home with an extra to empty cart
-                                    Intent navigate = new Intent(PaymentWebViewActivity.this, HomeActivity.class);
-                                    sign = "mark";
-                                    navigate.putExtra("from_payment", sign);
-                                    startActivity(navigate);
-                                }
+                            runOnUiThread(() -> {
+                                Toast.makeText(PaymentWebViewActivity.this, "Order Completed", Toast.LENGTH_LONG).show();
+                                timerStop();
+                                //TODO Handle after order completed process
+                                //TODO You could simply finish this activty and intent to Home with an extra to empty cart
+                                Intent navigate = new Intent(PaymentWebViewActivity.this, HomeActivity.class);
+                                sign = "mark";
+                                navigate.putExtra("from_payment", sign);
+                                startActivity(navigate);
                             });
                         }
                     }
@@ -142,10 +141,15 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull GraphError error) {
-                Log.d(TAG, "onFailure: " + error.getMessage().toString());
+                Log.d(TAG, "onFailure: " + error.getMessage());
 
             }
         });
+    }
+
+    private void initView() {
+        wvCheckOut= findViewById(R.id.wvCheckOut_PaymentWebViewActivity);
+        pbLoadingPayment = findViewById(R.id.pbLoadingPayment_PaymentWebViewActivity);
     }
 
     public void onPause() {
@@ -167,6 +171,7 @@ public class PaymentWebViewActivity extends AppCompatActivity {
         running = true;
         if (requestIntervalTimer == null) {
             requestIntervalTimer = new Timer();
+            int REQUEST_INTERVAL = 2000;
             requestIntervalTimer.schedule(new TimerTask() {
                 public void run() {
                     runOnUiThread(TimerRunnable);
@@ -197,13 +202,51 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
 
     private class MyBrowser extends WebViewClient {
+        @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
+            if (!loadingFinished) {
+                redirect = true;
+            }
+
+            loadingFinished = false;
             Log.d(TAG, "onCreate: " + url);
             view.loadUrl(url);
-
             return true;
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            if (!loadingFinished) {
+                redirect = true;
+            }
+
+            loadingFinished = false;
+            Log.d(TAG, "onCreate: " + request.getUrl());
+            view.loadUrl(String.valueOf(request.getUrl()));
+            return true;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap facIcon) {
+            loadingFinished = false;
+            //SHOW LOADING IF IT ISNT ALREADY VISIBLE
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            if(!redirect){
+                loadingFinished = true;
+            }
+
+            if(loadingFinished && !redirect){
+                //HIDE LOADING IT HAS FINISHED
+                pbLoadingPayment.setVisibility(View.GONE);
+            } else{
+                redirect = false;
+            }
+
         }
     }
 }
