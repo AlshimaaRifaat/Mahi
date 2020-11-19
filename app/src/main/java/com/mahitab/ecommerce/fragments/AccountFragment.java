@@ -52,7 +52,6 @@ public class AccountFragment extends Fragment {
     private CardView cvHelp;
 
 
-
     private SharedPreferences defaultPreferences;
 
     public AccountFragment() {
@@ -97,7 +96,7 @@ public class AccountFragment extends Fragment {
         changepassword.setOnClickListener(v -> startActivity(new Intent(getContext(), ChangePasswordActivity.class)));
 
         btnSignOut.setOnClickListener(onClickListener -> {
-            defaultPreferences.edit().clear().apply();
+            clearUserSharedPref();
             startActivity(new Intent(getActivity(), HomeActivity.class));
             getActivity().finish();
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getResources().getString(R.string.sign_out_message), Toast.LENGTH_SHORT).show());
@@ -144,7 +143,8 @@ public class AccountFragment extends Fragment {
         cvMyOrders = view.findViewById(R.id.cvMyOrders_CustomerAccountData);
         cvMyWishList = view.findViewById(R.id.cvMyWishList_CustomerAccountData);
         cvHelp = view.findViewById(R.id.cvHelp_CustomerAccountData);
-        this.changepassword = (TextView) view.findViewById(R.id.changePassLogo);    }
+        this.changepassword = view.findViewById(R.id.changePassLogo);
+    }
 
 
     private void fetchCustomerQuery(String accessToken) {
@@ -222,4 +222,9 @@ public class AccountFragment extends Fragment {
         });
     }
 
+    private void clearUserSharedPref() {
+        defaultPreferences.edit().putString("email",null).apply();
+        defaultPreferences.edit().putString("password",null).apply();
+        defaultPreferences.edit().putString("token",null).apply();
+    }
 }
