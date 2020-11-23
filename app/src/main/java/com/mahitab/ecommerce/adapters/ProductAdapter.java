@@ -168,4 +168,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.listener = listener;
     }
 
+    public void setProductList(ArrayList<ProductModel> productList){
+        this.productsDataList=productList;
+        notifyDataSetChanged();
+    }
 }

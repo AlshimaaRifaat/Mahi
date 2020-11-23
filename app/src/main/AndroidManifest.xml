@@ -15,8 +15,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity android:name=".activities.SelectAddressActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-      ></activity>
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
             android:name=".activities.MyOrderDetailsActivity"
             android:label=""
@@ -85,7 +84,8 @@
             android:name=".activities.ProductDetailsActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.HomeActivity">
+        <activity android:name=".activities.HomeActivity"
+            android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

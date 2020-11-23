@@ -80,9 +80,12 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
 
         initView(view);
         DataManager.getInstance().setClientManager(requireContext());
+    }
 
-
-        if (getContext() != null) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getContext() != null && isAdded()) {
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -164,8 +167,6 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
 
 
         }
-
-
     }
 
     @Override

@@ -139,17 +139,19 @@ public class AccountFragment extends Fragment {
                     queryGraphCall.enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
                         @Override
                         public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
-                            if (!response.hasErrors()){
+                            if (!response.hasErrors()) {
                                 requireActivity().runOnUiThread(() -> {
                                     tvChangePassword.setVisibility(View.VISIBLE);
-                                    tvCustomerName.setText(response.data().getCustomer().getFirstName());
+                                    if (response.data() != null && response.data().getCustomer() != null) {
+                                        tvCustomerName.setText(response.data().getCustomer().getFirstName());
+                                    }
                                 });
                             }
                         }
 
                         @Override
                         public void onFailure(@NonNull GraphError error) {
-                            Log.e(TAG, "onFailure: "+error.getMessage() );
+                            Log.e(TAG, "onFailure: " + error.getMessage());
                         }
                     });
                 }

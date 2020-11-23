@@ -1,7 +1,11 @@
 package com.mahitab.ecommerce.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.HomeActivity;
+import com.mahitab.ecommerce.activities.SearchResultActivity;
 
 public class CategoriesFragment extends Fragment {
 
@@ -43,9 +48,19 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getActivity() != null && isResumed()) {
-            toolbar.setTitle(getResources().getString(R.string.categories));
-        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.home_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_search)
+            startActivity(new Intent(getContext(), SearchResultActivity.class));
+        return super.onOptionsItemSelected(item);
     }
 
     private void initView(View view) {

@@ -3,25 +3,17 @@ package com.mahitab.ecommerce.managers;
 import android.content.Context;
 
 
-import com.mahitab.ecommerce.managers.ClientMutation;
-import com.mahitab.ecommerce.managers.ClientQuery;
 import com.mahitab.ecommerce.models.CurrentUser;
 import com.shopify.buy3.GraphCall;
 import com.shopify.buy3.GraphClient;
 import com.shopify.buy3.HttpCachePolicy;
 import com.shopify.buy3.MutationGraphCall;
 import com.shopify.buy3.QueryGraphCall;
-import com.shopify.buy3.RetryHandler;
 import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 import com.shopify.graphql.support.Nullable;
 
 import java.util.UUID;
-
-
-//import okhttp3url.OkHttpClient;
-//import okhttp3.logging.HttpLoggingInterceptor;
-
 
 public final class GraphClientManager {
     private static final String SHOP_DOMAIN = "mahitab.com";
@@ -57,8 +49,15 @@ public final class GraphClientManager {
         call.enqueue(callback);
     }
 
-    void getCollections(GraphCall.Callback<Storefront.QueryRoot> callback) {
-        Storefront.QueryRootQuery query = ClientQuery.queryCollections();
+    void getHomeCollections(GraphCall.Callback<Storefront.QueryRoot> callback) {
+        Storefront.QueryRootQuery query = ClientQuery.queryHomeCollections();
+        QueryGraphCall call = mClient.queryGraph(query);
+
+        call.enqueue(callback);
+    }
+
+    void getCollectionsAllProducts(GraphCall.Callback<Storefront.QueryRoot> callback) {
+        Storefront.QueryRootQuery query = ClientQuery.queryCollectionsAllProducts();
         QueryGraphCall call = mClient.queryGraph(query);
 
         call.enqueue(callback);

@@ -8,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,11 +26,14 @@ import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.FirebaseManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.BannerModel;
 import com.mahitab.ecommerce.models.Collection;
 import com.mahitab.ecommerce.models.CollectionModel;
+import com.mahitab.ecommerce.models.ProductModel;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
@@ -40,7 +44,10 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
     private RecyclerView rvCollectionBanners;
     private BannerAdapter bannerAdapter;
 
+    private ProgressBar pbLoadingCollectionProducts;
     private RecyclerView rvCollectionProducts;
+    private ArrayList<ProductModel> collectionProducts;
+    private ProductAdapter productAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +67,7 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
 
             byte[] decodedBytes = android.util.Base64.decode(collectionId, android.util.Base64.DEFAULT);
             String decodeCollectionId = new String(decodedBytes).split("/")[4];
-            Log.d(TAG, "collectionId: "+decodeCollectionId);
+            Log.d(TAG, "collectionId: " + decodeCollectionId);
             DisplayMetrics displaymetrics = Resources.getSystem().getDisplayMetrics();
 
             rvCollectionBanners.setHasFixedSize(true);
@@ -101,27 +108,32 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
             });
 
             CollectionModel collection = DataManager.getInstance().getCollectionByID(collectionId);
-            if (collection != null) {
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle(collection.getTitle());
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                }
-
-                rvCollectionProducts.setHasFixedSize(true);
-                rvCollectionProducts.setLayoutManager(new GridLayoutManager(this, 2));
-                ProductAdapter productAdapter = new ProductAdapter(this, collection.getPreviewProducts());
-                rvCollectionProducts.setAdapter(productAdapter);
-                productAdapter.setProductClickListener(this);
-                rvCollectionProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        if (recyclerView.computeVerticalScrollOffset() == 0)
-                            rvCollectionBanners.setVisibility(View.VISIBLE);
-                        else rvCollectionBanners.setVisibility(View.GONE);
-                    }
-                });
+            collectionProducts=collection.getPreviewProducts();
+            Log.e(TAG, "run: " + collectionProducts.size());
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(collection.getTitle());
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
+
+            if (collectionProducts.size() == 4){
+                getAllProducts(collectionId);
+            }else pbLoadingCollectionProducts.setVisibility(View.GONE);
+
+            rvCollectionProducts.setHasFixedSize(true);
+            rvCollectionProducts.setLayoutManager(new GridLayoutManager(CollectionProductsActivity.this, 2));
+            collectionProducts = collection.getPreviewProducts();
+            productAdapter = new ProductAdapter(CollectionProductsActivity.this, collectionProducts);
+            rvCollectionProducts.setAdapter(productAdapter);
+            productAdapter.setProductClickListener(CollectionProductsActivity.this);
+            rvCollectionProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if (recyclerView.computeVerticalScrollOffset() == 0)
+                        rvCollectionBanners.setVisibility(View.VISIBLE);
+                    else rvCollectionBanners.setVisibility(View.GONE);
+                }
+            });
         }
     }
 
@@ -149,34 +161,56 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
     private void initView() {
         rvCollectionBanners = findViewById(R.id.rvCollectionBanners_CollectionProductsActivity);
         rvCollectionProducts = findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);
+        pbLoadingCollectionProducts = findViewById(R.id.pbLoadingCollectionProducts_CollectionProductsActivity);
     }
 
     @Override
     public void onBannerClick(BannerModel banner) {
         FirebaseManager.incrementBannerNoOfClicks(banner.getReference());
-         if(!banner.getId().isEmpty())
-         {
-             String type;
-             Intent intent;
-             if (banner.getType().startsWith("p")) {
-                 type = "Product";
-                 String target = "gid://shopify/" + type + "/" + banner.getId();
-                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                 targetId = targetId.trim(); //remove spaces from end of string
-                 intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
-                 intent.putExtra("productId", targetId);
-                 startActivity(intent);
-                 finish();
-             } else if (banner.getType().startsWith("c")) {
-                 type = "Collection";
-                 String target = "gid://shopify/" + type + "/" + banner.getId();
-                 String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
-                 targetId = targetId.trim(); //remove spaces from end of string
-                 intent = new Intent(getApplicationContext(), CollectionProductsActivity.class);
-                 intent.putExtra("collectionId", targetId);
-                 startActivity(intent);
-                 finish();
-             }
-         }
+        if (!banner.getId().isEmpty()) {
+            String type;
+            Intent intent;
+            if (banner.getType().startsWith("p")) {
+                type = "Product";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
+                intent.putExtra("productId", targetId);
+                startActivity(intent);
+                finish();
+            } else if (banner.getType().startsWith("c")) {
+                type = "Collection";
+                String target = "gid://shopify/" + type + "/" + banner.getId();
+                String targetId = Base64.encodeToString(target.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+                targetId = targetId.trim(); //remove spaces from end of string
+                intent = new Intent(getApplicationContext(), CollectionProductsActivity.class);
+                intent.putExtra("collectionId", targetId);
+                startActivity(intent);
+                finish();
+            }
+        }
+    }
+
+    private void getAllProducts(String collectionId){
+        DataManager.getInstance().collectionsAllProducts(new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                if (status == 200) {
+                    runOnUiThread(() -> {
+                        pbLoadingCollectionProducts.setVisibility(View.GONE);
+                        collectionProducts.clear();
+                        collectionProducts = DataManager.getInstance().getCollectionByID(collectionId).getPreviewProducts();
+                        productAdapter.setProductList(collectionProducts);
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                getAllProducts(collectionId);
+                Log.e(TAG, "onFailure: " + message);
+            }
+        });
     }
 }

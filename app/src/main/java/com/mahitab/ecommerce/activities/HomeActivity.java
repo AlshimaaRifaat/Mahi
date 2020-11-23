@@ -327,7 +327,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                     }
                 }
 
-                DataManager.getInstance().collections(new BaseCallback() {
+                DataManager.getInstance().homeCollections(new BaseCallback() {
                     @Override
                     public void onResponse(int status) {
                         if (status == 200) {

@@ -664,8 +664,8 @@ public final class DataManager extends Observable {
     //endregion
 
     //region Server calls
-    public void collections(BaseCallback callback) {
-        mClientManager.getCollections(new GraphCall.Callback<Storefront.QueryRoot>() {
+    public void homeCollections(BaseCallback callback) {
+        mClientManager.getHomeCollections(new GraphCall.Callback<Storefront.QueryRoot>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
                 if (!response.hasErrors()) {
@@ -698,9 +698,8 @@ public final class DataManager extends Observable {
         });
     }
 
-    //region Server calls
-    public void allCollections(BaseCallback callback) {
-        mClientManager.getAllCollections(new GraphCall.Callback<Storefront.QueryRoot>() {
+    public void collectionsAllProducts(BaseCallback callback) {
+        mClientManager.getCollectionsAllProducts(new GraphCall.Callback<Storefront.QueryRoot>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
                 if (!response.hasErrors()) {
@@ -732,7 +731,6 @@ public final class DataManager extends Observable {
             }
         });
     }
-
 
     public void products(String collectionID, BaseCallback callback) {
         if (DataManagerHelper.getInstance().getCollections().containsKey(collectionID)) {
@@ -767,8 +765,6 @@ public final class DataManager extends Observable {
             });
         }
     }
-
-
 
     //region CART
     public double getProductsPrice() {

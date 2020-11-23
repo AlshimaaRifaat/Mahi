@@ -92,7 +92,6 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
 
 
         selectedOptions = new SelectedOptions();
-        getAllProductsList();
         setupFloatingSearch();
 
 
@@ -319,51 +318,6 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                 mSearchView.setShowSearchKey(true);
             }
         });
-    }
-
-    private void getAllProductsList() {
-        DataManager.getInstance().allCollections(new BaseCallback() {
-            @Override
-            public void onResponse(int status) {
-                if (status == 200) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (x == 1) {
-                                searchResultList = DataManager.getInstance().getAllProducts();
-                                Log.d(TAG, "x1: " + searchResultList.get(0).getTitle());
-                            } else {
-                                allCollectionList = DataManager.getInstance().getAllCollections();
-                                productList = new ArrayList<>();
-                                for (int i = 0; i < allCollectionList.size(); i++) {
-                                    Log.d(TAG, "run: "+allCollectionList.get(i).getTitle());
-                                    productList.add(allCollectionList.get(i).getPreviewProducts().get(i));
-                                }
-
-                                if (productList != null)
-                                    searchResultList = productList;
-                            }
-
-                            productAdapter = new ProductAdapter(SearchResultActivity.this, searchResultList);
-                            selectedOptions.addObserver(productAdapter);
-                            rvProducts.setLayoutManager(new GridLayoutManager(SearchResultActivity.this, 2));
-                            rvProducts.setHasFixedSize(true);
-                            rvProducts.setAdapter(productAdapter);
-                        }
-
-                    });
-                } else {
-                    this.onFailure("An unknown error has occurred");
-                }
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        });
-
-
     }
 
     private void getSearchResult() {
