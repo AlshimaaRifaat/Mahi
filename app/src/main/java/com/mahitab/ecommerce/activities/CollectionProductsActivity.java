@@ -28,6 +28,7 @@ import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.FirebaseManager;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.BannerModel;
+
 import com.mahitab.ecommerce.models.Collection;
 import com.mahitab.ecommerce.models.CollectionModel;
 import com.mahitab.ecommerce.models.ProductModel;
@@ -48,6 +49,7 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
     private RecyclerView rvCollectionProducts;
     private ArrayList<ProductModel> collectionProducts;
     private ProductAdapter productAdapter;
+    private Collection collection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +83,23 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot topSnapshot : dataSnapshot.child("Top").getChildren()) {
-                        Collection collection = topSnapshot.getValue(Collection.class);
+                        collection = topSnapshot.getValue(Collection.class);
                         if (collection != null && collection.getId().equals(decodeCollectionId)) {
+                            rvCollectionBanners.setVisibility(View.VISIBLE);
                             bannerAdapter.setBannerList(FirebaseManager.getBanners(topSnapshot));
                         }
                     }
                     for (DataSnapshot midSnapshot : dataSnapshot.child("Mid").getChildren()) {
-                        Collection collection = midSnapshot.getValue(Collection.class);
+                        collection = midSnapshot.getValue(Collection.class);
                         if (collection != null && collection.getId().equals(decodeCollectionId)) {
+                            rvCollectionBanners.setVisibility(View.VISIBLE);
                             bannerAdapter.setBannerList(FirebaseManager.getBanners(midSnapshot));
                         }
                     }
                     for (DataSnapshot bottomSnapshot : dataSnapshot.child("Bottom").getChildren()) {
-                        Collection collection = bottomSnapshot.getValue(Collection.class);
+                        collection = bottomSnapshot.getValue(Collection.class);
                         if (collection != null && collection.getId().equals(decodeCollectionId)) {
+                            rvCollectionBanners.setVisibility(View.VISIBLE);
                             bannerAdapter.setBannerList(FirebaseManager.getBanners(bottomSnapshot));
                         }
                     }
@@ -107,21 +112,21 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
                 }
             });
 
-            CollectionModel collection = DataManager.getInstance().getCollectionByID(collectionId);
-            collectionProducts=collection.getPreviewProducts();
+            CollectionModel collectionModel = DataManager.getInstance().getCollectionByID(collectionId);
+            collectionProducts = collectionModel.getPreviewProducts();
             Log.e(TAG, "run: " + collectionProducts.size());
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(collection.getTitle());
+                getSupportActionBar().setTitle(collectionModel.getTitle());
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
 
-            if (collectionProducts.size() == 4){
+            if (collectionProducts.size() == 4) {
                 getAllProducts(collectionId);
-            }else pbLoadingCollectionProducts.setVisibility(View.GONE);
+            } else pbLoadingCollectionProducts.setVisibility(View.GONE);
 
             rvCollectionProducts.setHasFixedSize(true);
             rvCollectionProducts.setLayoutManager(new GridLayoutManager(CollectionProductsActivity.this, 2));
-            collectionProducts = collection.getPreviewProducts();
+            collectionProducts = collectionModel.getPreviewProducts();
             productAdapter = new ProductAdapter(CollectionProductsActivity.this, collectionProducts);
             rvCollectionProducts.setAdapter(productAdapter);
             productAdapter.setProductClickListener(CollectionProductsActivity.this);
@@ -129,9 +134,11 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (recyclerView.computeVerticalScrollOffset() == 0)
-                        rvCollectionBanners.setVisibility(View.VISIBLE);
-                    else rvCollectionBanners.setVisibility(View.GONE);
+                    if (collection.getBanners() != null && collection.getBanners().size() > 0) {
+                        if (recyclerView.computeVerticalScrollOffset() == 0)
+                            rvCollectionBanners.setVisibility(View.VISIBLE);
+                        else rvCollectionBanners.setVisibility(View.GONE);
+                    }
                 }
             });
         }
@@ -192,7 +199,7 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
         }
     }
 
-    private void getAllProducts(String collectionId){
+    private void getAllProducts(String collectionId) {
         DataManager.getInstance().collectionsAllProducts(new BaseCallback() {
             @Override
             public void onResponse(int status) {
