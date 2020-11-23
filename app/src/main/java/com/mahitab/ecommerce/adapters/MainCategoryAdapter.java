@@ -47,6 +47,7 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
                 .into(holder.ivCategoryImage);
 
         holder.itemView.setSelected(selectedPosition == position);
+        holder.itemView.setEnabled(selectedPosition != position);
 
         if (selectedPosition == position) {
             Intent intent = new Intent("mainCategoryAdapter");
