@@ -29,6 +29,7 @@ import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CartActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
 import com.mahitab.ecommerce.activities.ProductDetailsActivity;
+import com.mahitab.ecommerce.activities.SelectAddressActivity;
 import com.mahitab.ecommerce.adapters.CartAdapter;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.DataManagerHelper;
@@ -143,12 +144,14 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                         public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
                             if (!response.hasErrors()) {
                                 DataManagerHelper.getInstance().fetchAddresses().clear();
-                                Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
-                                for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
-                                    AddressModel newAddressesModel = new AddressModel(edge);
-                                    DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+                                if (response.data() != null && response.data().getCustomer() != null) {
+                                    Storefront.MailingAddressConnection connection = response.data().getCustomer().getAddresses();
+                                    for (Storefront.MailingAddressEdge edge : connection.getEdges()) {
+                                        AddressModel newAddressesModel = new AddressModel(edge);
+                                        DataManagerHelper.getInstance().fetchAddresses().put(newAddressesModel.getmID().toString(), newAddressesModel);
+                                    }
+                                    customerAddresses = DataManager.getInstance().getAddresses();
                                 }
-                                customerAddresses = DataManager.getInstance().getAddresses();
                             }
                         }
 
@@ -189,8 +192,13 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                             customerQueryGraphCall.enqueue(new GraphCall.Callback<Storefront.QueryRoot>() {
                                 @Override
                                 public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
-                                    if (!response.hasErrors()) {
-                                        ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, response.data().getCustomer(), customerAddresses.get(0));
+                                    if (!response.hasErrors() && response.data() != null) {
+                                        Storefront.Customer currentCustomer=response.data().getCustomer();
+                                        AddressModel selectedAddress=customerAddresses.get(0);
+                                        selectedAddress.setFirstName(currentCustomer.getFirstName());
+                                        selectedAddress.setLastName(currentCustomer.getLastName());
+                                        selectedAddress.setZipCode("12345");
+                                        ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, currentCustomer, selectedAddress);
                                     }
                                 }
 
@@ -211,7 +219,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
                         }
                     });
-                }
+                }else startActivityForResult(new Intent(requireActivity(), SelectAddressActivity.class),LAUNCH_PAYMENT_ACTIVITY);
             }
         });
     }

@@ -127,4 +127,19 @@ public class AddressModel implements Serializable {
         this.mID = mID;
     }
 
+    @Override
+    public String toString() {
+        return "AddressModel{" +
+                "address1='" + address1 + '\'' +
+                ", address2='" + address2 + '\'' +
+                ", city='" + city + '\'' +
+                ", zipCode='" + zipCode + '\'' +
+                ", province='" + province + '\'' +
+                ", phone='" + phone + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", country='" + country + '\'' +
+                ", mID=" + mID +
+                '}';
+    }
 }

@@ -2,7 +2,6 @@ package com.mahitab.ecommerce.managers;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -18,7 +17,6 @@ import com.shopify.buy3.Storefront;
 import com.shopify.graphql.support.ID;
 import com.shopify.graphql.support.Input;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,20 +121,19 @@ public class ShopifyManager {
         GraphClientManager.mClient.mutateGraph(query).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                if (!response.data().getCheckoutCreate().getUserErrors().isEmpty()) {
-                    // handle user friendly errors
-                    Log.e(TAG, "onResponse: " + response.data().getCheckoutCreate().getUserErrors());
-                } else {
-                    ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
-                    String webUrl = response.data().getCheckoutCreate().getCheckout().getWebUrl();
-                    Log.d(TAG, "ch id: " + checkoutId.toString());
+                if (response.data() != null) {
+                    if (!response.data().getCheckoutCreate().getUserErrors().isEmpty()) {
+                        // handle user friendly errors
+                        Log.e(TAG, "onResponse: " + response.data().getCheckoutCreate().getUserErrors());
+                    } else {
+                        ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
+                        String webUrl = response.data().getCheckoutCreate().getCheckout().getWebUrl();
+                        Log.d(TAG, "ch id: " + checkoutId.toString());
 
-                    Intent guestCustomerIntent = new Intent(activity, PaymentWebViewActivity.class);
-                    guestCustomerIntent.putExtra("web_url", webUrl);
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("checkout_id", checkoutId);
-                    guestCustomerIntent.putExtras(bundle);
-                    activity.startActivityForResult(guestCustomerIntent, LAUNCH_PAYMENT_ACTIVITY);
+                        Intent guestCustomerIntent = new Intent(activity, PaymentWebViewActivity.class);
+                        guestCustomerIntent.putExtra("web_url", webUrl);
+                        activity.startActivityForResult(guestCustomerIntent, LAUNCH_PAYMENT_ACTIVITY);
+                    }
                 }
 
             }
@@ -170,134 +167,136 @@ public class ShopifyManager {
         GraphClientManager.mClient.mutateGraph(query).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
             @Override
             public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                if (!response.data().getCheckoutCreate().getUserErrors().isEmpty()) {
-                    // handle user friendly errors
-                    Log.e(TAG, "onResponse: " + response.data().getCheckoutCreate().getUserErrors());
-                } else {
-                    ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
+                if (response.data() != null) {
+                    if (!response.data().getCheckoutCreate().getUserErrors().isEmpty()) {
+                        // handle user friendly errors
+                        Log.e(TAG, "onResponse: " + response.data().getCheckoutCreate().getUserErrors());
+                    } else {
+                        ID checkoutId = response.data().getCheckoutCreate().getCheckout().getId();
 
 
-                    // update email  MutationQuery for second time
-                    Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                            .checkoutEmailUpdate(checkoutId,
-                                    currentCustomer.getEmail(),
-                                    result -> result
-                                            .checkout(
-                                                    checkout -> checkout
-                                                            .webUrl()
-                                                            .email()
-                                                            .shippingAddress(
-                                                                    address -> address
-                                                                            .firstName()
-                                                                            .lastName()
-                                                                            .phone()
-                                                                            .company()
-                                                                            .address1()
-                                                                            .address2()
-                                                                            .city()
-                                                                            .province()
-                                                                            .country()
-                                                                            .zip()
+                        // update email  MutationQuery for second time
+                        Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
+                                .checkoutEmailUpdate(checkoutId,
+                                        currentCustomer.getEmail(),
+                                        result -> result
+                                                .checkout(
+                                                        checkout -> checkout
+                                                                .webUrl()
+                                                                .email()
+                                                                .shippingAddress(
+                                                                        address -> address
+                                                                                .firstName()
+                                                                                .lastName()
+                                                                                .phone()
+                                                                                .company()
+                                                                                .address1()
+                                                                                .address2()
+                                                                                .city()
+                                                                                .province()
+                                                                                .country()
+                                                                                .zip()
+                                                                )
+                                                                .createdAt()
+                                                )
+                                                .userErrors(
+                                                        error -> error
+                                                                .field()
+                                                                .message()
+                                                )
+                                )
+                        );
+
+                        GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
+                            @Override
+                            public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+
+                                String strCheckoutId = null;
+                                if (response.data() != null) {
+                                    strCheckoutId = response.data().getCheckoutEmailUpdate().getCheckout().getId().toString();
+                                }
+                                Log.d(TAG, "ch id email: " + strCheckoutId);
+
+                                if (strCheckoutId != null) {
+
+                                    ID checkoutId = new ID(strCheckoutId);
+                                    Log.d(TAG, "itt: " + checkoutId);
+
+                                    //queryUpdateAddress(checkoutId);
+                                    Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
+                                            .setFirstName(currentCustomer.getFirstName())
+                                            .setLastName(currentCustomer.getLastName())
+                                            .setPhone(currentCustomer.getPhone())
+                                            .setCity(addressModel.getCity())
+                                            .setCountry(addressModel.getCountry())
+                                            .setZip(addressModel.getZipCode())
+                                            .setProvince(addressModel.getProvince())
+                                            .setAddress1(addressModel.getAddress1())
+                                            .setAddress2(addressModel.getAddress2());
+
+                                    Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
+                                            .checkoutShippingAddressUpdate(
+                                                    inputAddress,
+                                                    checkoutId,
+                                                    result -> result
+                                                            .checkout(
+                                                                    checkout -> checkout
+                                                                            .email()
+                                                                            .webUrl()
+                                                                            .shippingAddress(
+                                                                                    address -> address
+                                                                                            .firstName()
+                                                                                            .lastName()
+                                                                                            .phone()
+                                                                                            .company()
+                                                                                            .address1()
+                                                                                            .address2()
+                                                                                            .city()
+                                                                                            .province()
+                                                                                            .country()
+                                                                                            .zip()
+                                                                            )
                                                             )
-                                                            .createdAt()
+                                                            .userErrors(
+                                                                    error -> error
+                                                                            .field()
+                                                                            .message()
+                                                            )
                                             )
-                                            .userErrors(
-                                                    error -> error
-                                                            .field()
-                                                            .message()
-                                            )
-                            )
-                    );
+                                    );
 
-                    GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-                        @Override
-                        public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-
-                            String strCheckoutId = response.data().getCheckoutEmailUpdate().getCheckout().getId().toString();
-                            Log.d(TAG, "ch id email: " + strCheckoutId);
-
-                            if (strCheckoutId != null) {
-
-                                ID checkoutId = new ID(strCheckoutId);
-                                Log.d(TAG, "itt: " + checkoutId);
-
-                                //queryUpdateAddress(checkoutId);
-                                Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
-                                        .setFirstName(currentCustomer.getFirstName())
-                                        .setLastName(currentCustomer.getLastName())
-                                        .setPhone(currentCustomer.getPhone())
-                                        .setCity(addressModel.getCity())
-                                        .setCountry(addressModel.getCountry())
-                                        .setZip(addressModel.getZipCode())
-                                        .setProvince(addressModel.getProvince())
-                                        .setAddress1(addressModel.getAddress1())
-                                        .setAddress2(addressModel.getAddress2());
-
-                                Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
-                                        .checkoutShippingAddressUpdate(
-                                                inputAddress,
-                                                checkoutId,
-                                                result -> result
-                                                        .checkout(
-                                                                checkout -> checkout
-                                                                        .email()
-                                                                        .webUrl()
-                                                                        .shippingAddress(
-                                                                                address -> address
-                                                                                        .firstName()
-                                                                                        .lastName()
-                                                                                        .phone()
-                                                                                        .company()
-                                                                                        .address1()
-                                                                                        .address2()
-                                                                                        .city()
-                                                                                        .province()
-                                                                                        .country()
-                                                                                        .zip()
-                                                                        )
-                                                        )
-                                                        .userErrors(
-                                                                error -> error
-                                                                        .field()
-                                                                        .message()
-                                                        )
-                                        )
-                                );
-
-                                GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
-                                    @Override
-                                    public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
-                                        String webUrl = response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl();
-                                        Log.d(TAG, "web url: " + response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl());
-                                        ID checkoutId = response.data().getCheckoutShippingAddressUpdate().getCheckout().getId();
-
-                                        Log.d(TAG, "id: " + checkoutId.toString());
+                                    GraphClientManager.mClient.mutateGraph(mutationQuery).enqueue(new GraphCall.Callback<Storefront.Mutation>() {
+                                        @Override
+                                        public void onResponse(@NonNull GraphResponse<Storefront.Mutation> response) {
+                                            if (response.data() != null) {
+                                                String webUrl = response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl();
+                                                Log.d(TAG, "web url: " + response.data().getCheckoutShippingAddressUpdate().getCheckout().getWebUrl());
+                                                ID checkoutId = response.data().getCheckoutShippingAddressUpdate().getCheckout().getId();
 
 
-                                        Intent Getintent = new Intent(activity, PaymentWebViewActivity.class);
-                                        Getintent.putExtra("web_url", webUrl);
-                                        Bundle bundle = new Bundle();
-                                        bundle.putSerializable("checkout_id", (Serializable) checkoutId);
-                                        Getintent.putExtras(bundle);
-                                        activity.startActivityForResult(Getintent, LAUNCH_PAYMENT_ACTIVITY);
+                                                Intent customerIntent = new Intent(activity, PaymentWebViewActivity.class);
+                                                customerIntent.putExtra("web_url", webUrl);
+                                                activity.startActivityForResult(customerIntent, LAUNCH_PAYMENT_ACTIVITY);
 
-                                        Log.d(TAG, "iddd: " + checkoutId.toString());
-                                    }
+                                                Log.d(TAG, "iddd: " + checkoutId.toString());
+                                            }
+                                        }
 
-                                    @Override
-                                    public void onFailure(@NonNull GraphError error) {
-                                        Log.e(TAG, "onFailure: " + error.getMessage());
-                                    }
-                                });
+                                        @Override
+                                        public void onFailure(@NonNull GraphError error) {
+                                            Log.e(TAG, "onFailure: " + error.getMessage());
+                                        }
+                                    });
+                                }
+
                             }
 
-                        }
+                            @Override
+                            public void onFailure(@NonNull GraphError error) {
 
-                        @Override
-                        public void onFailure(@NonNull GraphError error) {
-
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
 
             }

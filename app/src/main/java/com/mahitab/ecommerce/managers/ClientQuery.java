@@ -19,12 +19,10 @@ public class ClientQuery {
                                                         .acceptedCardBrands()
                                         )
                                         .privacyPolicy(
-                                                privacyQuery -> privacyQuery
-                                                        .url()
+                                                Storefront.ShopPolicyQuery::url
                                         )
                                         .termsOfService(
-                                                termsQuery -> termsQuery
-                                                        .url()
+                                                Storefront.ShopPolicyQuery::url
                                         )
 
                         )
@@ -40,8 +38,7 @@ public class ClientQuery {
                                                 arg -> arg.first(100),
                                                 collectionsQuery -> collectionsQuery
                                                         .pageInfo(
-                                                                colPageQuery -> colPageQuery
-                                                                        .hasNextPage()
+                                                                Storefront.PageInfoQuery::hasNextPage
                                                         )
                                                         .edges(
                                                                 colEdgeQuery -> colEdgeQuery
@@ -63,8 +60,7 @@ public class ClientQuery {
                                                                                                                                                         .edges(
                                                                                                                                                                 pieq -> pieq
                                                                                                                                                                         .node(
-                                                                                                                                                                                pienq -> pienq
-                                                                                                                                                                                        .src()
+                                                                                                                                                                                Storefront.ImageQuery::src
                                                                                                                                                                         )
                                                                                                                                                         )
                                                                                                                                         )
@@ -114,8 +110,7 @@ public class ClientQuery {
                                                 arg -> arg.first(100),
                                                 collectionsQuery -> collectionsQuery
                                                         .pageInfo(
-                                                                colPageQuery -> colPageQuery
-                                                                        .hasNextPage()
+                                                                Storefront.PageInfoQuery::hasNextPage
                                                         )
                                                         .edges(
                                                                 colEdgeQuery -> colEdgeQuery
@@ -137,8 +132,7 @@ public class ClientQuery {
                                                                                                                                                         .edges(
                                                                                                                                                                 pieq -> pieq
                                                                                                                                                                         .node(
-                                                                                                                                                                                pienq -> pienq
-                                                                                                                                                                                        .src()
+                                                                                                                                                                                Storefront.ImageQuery::src
                                                                                                                                                                         )
                                                                                                                                                         )
                                                                                                                                         )
@@ -188,8 +182,7 @@ public class ClientQuery {
                                                 arg -> arg.first(600),
                                                 collectionsQuery -> collectionsQuery
                                                         .pageInfo(
-                                                                colPageQuery -> colPageQuery
-                                                                        .hasNextPage()
+                                                                Storefront.PageInfoQuery::hasNextPage
                                                         )
                                                         .edges(
                                                                 colEdgeQuery -> colEdgeQuery
@@ -211,8 +204,7 @@ public class ClientQuery {
                                                                                                                                                         .edges(
                                                                                                                                                                 pieq -> pieq
                                                                                                                                                                         .node(
-                                                                                                                                                                                pienq -> pienq
-                                                                                                                                                                                        .src()
+                                                                                                                                                                                Storefront.ImageQuery::src
                                                                                                                                                                         )
                                                                                                                                                         )
                                                                                                                                         )
@@ -264,8 +256,7 @@ public class ClientQuery {
                                                                 arg -> arg.first(250),
                                                                 productsQuery -> productsQuery
                                                                         .pageInfo(
-                                                                                productPageQuery -> productPageQuery
-                                                                                        .hasNextPage()
+                                                                                Storefront.PageInfoQuery::hasNextPage
                                                                         )
                                                                         .edges(
                                                                                 productEdgeQuery -> productEdgeQuery
@@ -284,8 +275,7 @@ public class ClientQuery {
                                                                                                                         .edges(
                                                                                                                                 edge -> edge
                                                                                                                                         .node(
-                                                                                                                                                node -> node
-                                                                                                                                                        .src()
+                                                                                                                                                Storefront.ImageQuery::src
                                                                                                                                         )
                                                                                                                         )
                                                                                                         )
@@ -293,8 +283,7 @@ public class ClientQuery {
                                                                                                                 args -> args.first(250),
                                                                                                                 variantsQuery -> variantsQuery
                                                                                                                         .pageInfo(
-                                                                                                                                variantsPageQuery -> variantsPageQuery
-                                                                                                                                        .hasNextPage()
+                                                                                                                                Storefront.PageInfoQuery::hasNextPage
                                                                                                                         )
                                                                                                                         .edges(
                                                                                                                                 variantsEdgeQuery -> variantsEdgeQuery
