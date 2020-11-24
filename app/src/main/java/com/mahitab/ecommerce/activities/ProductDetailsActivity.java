@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
@@ -524,18 +525,39 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     }
 
     private void getProductReviews(String productId) {
+        String currentUserEmail = Objects.requireNonNull(defaultPreferences.getString("email", "")).toLowerCase().trim();
         productReviewsReference.child(productId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             productReviews.clear();
-                            cvReviews.setVisibility(View.VISIBLE);
-                            rvProductReviews.setVisibility(View.VISIBLE);
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                ProductReviewModel productReview = snapshot.getValue(ProductReviewModel.class);
-                                productReviews.add(productReview);
-                                reviewAdapter.notifyDataSetChanged();
+                                if (snapshot.child("accepted").getValue() instanceof Boolean &&
+                                        snapshot.child("firstName").getValue() instanceof String &&
+                                        snapshot.child("lastName").getValue() instanceof String &&
+                                        snapshot.child("message").getValue() instanceof String &&
+                                        snapshot.child("productId").getValue() instanceof String &&
+                                        snapshot.child("rating").getValue() instanceof Long &&
+                                        snapshot.child("title").getValue() instanceof String) {
+                                    ProductReviewModel productReview = snapshot.getValue(ProductReviewModel.class);
+                                    if (productReview != null) {
+                                        String email = Objects.requireNonNull(snapshot.getKey())
+                                                .replace("*", ".")
+                                                .replace("^", "#")
+                                                .replace("?", "$")
+                                                .replace("!", "[")
+                                                .replace("%", "]");
+                                        productReview.setEmail(email.toLowerCase().trim());
+                                        boolean currentCustomerPendingReview = (!productReview.isAccepted()) && productReview.getEmail().equals(currentUserEmail);
+                                        if (currentCustomerPendingReview || productReview.isAccepted()) {
+                                            cvReviews.setVisibility(View.VISIBLE);
+                                            rvProductReviews.setVisibility(View.VISIBLE);
+                                            productReviews.add(productReview);
+                                            reviewAdapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                }
                             }
                             rbAverageRating.setRating(calculateAverageRatings(productReviews));
                         } else {
