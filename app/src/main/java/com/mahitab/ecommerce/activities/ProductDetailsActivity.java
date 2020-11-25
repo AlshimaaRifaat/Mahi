@@ -384,7 +384,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         recentlyViewedProducts = new ArrayList<>();
         for (int i = 0; i < viewedProductList.size(); i++) {
             ProductModel productModel = DataManager.getInstance().getProductByID(viewedProductList.get(i));
-            recentlyViewedProducts.add(productModel);
+            if(productModel!=null){
+                recentlyViewedProducts.add(productModel);
+            }
+
         }
         rvRecentlyViewed.setHasFixedSize(true);
         rvRecentlyViewed.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
