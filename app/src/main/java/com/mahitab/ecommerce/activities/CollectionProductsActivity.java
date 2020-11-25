@@ -147,6 +147,7 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
     @Override
     protected void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
         overridePendingTransition(0, 0); // remove activity default transition
     }
 

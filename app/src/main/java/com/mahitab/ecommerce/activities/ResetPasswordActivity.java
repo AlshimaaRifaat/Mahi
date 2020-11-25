@@ -88,6 +88,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
         overridePendingTransition(0, 0); // remove activity default transition
     }
 

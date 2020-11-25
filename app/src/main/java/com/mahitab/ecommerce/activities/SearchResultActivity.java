@@ -106,6 +106,12 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setArDefaultLocale(this);
+        overridePendingTransition(0, 0); // remove activity default transition
+    }
 
     private void setupFloatingSearch() {
         mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {

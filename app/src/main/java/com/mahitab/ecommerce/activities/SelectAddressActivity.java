@@ -39,6 +39,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+
 public class SelectAddressActivity extends AppCompatActivity implements SelectAddressAdapter.SelectAddressItemInterface {
     private static final String TAG = "SelectAddressActivity";
     private RecyclerView rvAddresses;
@@ -542,8 +544,8 @@ public class SelectAddressActivity extends AppCompatActivity implements SelectAd
     @Override
     protected void onResume() {
         super.onResume();
-
-
+        setArDefaultLocale(this);
+        overridePendingTransition(0, 0); // remove activity default transition
     }
 
     @Override

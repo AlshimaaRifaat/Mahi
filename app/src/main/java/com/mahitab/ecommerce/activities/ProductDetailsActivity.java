@@ -396,6 +396,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
         overridePendingTransition(0, 0); // remove activity default transition
 
         if (llCartQuantityControl.getVisibility() == View.VISIBLE) {

@@ -29,6 +29,8 @@ import com.shopify.buy3.Storefront;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+
 public class PaymentWebViewActivity extends AppCompatActivity {
     private static final String TAG = "PaymentWebViewActivity";
     private SharedPreferences sharedPreferences;
@@ -162,6 +164,8 @@ public class PaymentWebViewActivity extends AppCompatActivity {
 
     public void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
+        overridePendingTransition(0, 0); // remove activity default transition
         if (!running) {
             timerStart();
         }

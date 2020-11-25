@@ -66,6 +66,7 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
     @Override
     protected void onResume() {
         super.onResume();
+        setArDefaultLocale(this);
         overridePendingTransition(0, 0); // remove activity default transition
 
         List<String> wishListItems;

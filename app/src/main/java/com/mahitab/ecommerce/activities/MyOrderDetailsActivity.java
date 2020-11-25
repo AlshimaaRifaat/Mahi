@@ -1,5 +1,6 @@
 package com.mahitab.ecommerce.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.models.MyOrdersModel;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+
 public class MyOrderDetailsActivity extends AppCompatActivity {
     private static final String TAG ="MyOrderDetailsActivity";
     MyOrdersModel myOrdersModel;
     WebView mywebview;
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +33,13 @@ public class MyOrderDetailsActivity extends AppCompatActivity {
         mywebview.getSettings().setJavaScriptEnabled(true);
         mywebview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         mywebview.loadUrl(myOrdersModel.getStatutsUrl());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setArDefaultLocale(this);
+        overridePendingTransition(0, 0); // remove activity default transition
     }
 
     private class MyBrowser extends WebViewClient {

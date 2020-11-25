@@ -29,6 +29,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
+
 public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapter.MyOrderItemInterface {
     private static final String TAG = "MyOrdersActivity";
     ArrayList<MyOrdersModel> myOrdersModelArrayList=null;
@@ -46,6 +48,13 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         getSavedAccessToken();
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setArDefaultLocale(this);
+        overridePendingTransition(0, 0); // remove activity default transition
     }
 
     private void getSavedAccessToken() {
