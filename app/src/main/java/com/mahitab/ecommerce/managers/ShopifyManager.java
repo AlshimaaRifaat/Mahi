@@ -223,16 +223,30 @@ public class ShopifyManager {
                                     Log.d(TAG, "itt: " + checkoutId);
 
                                     //queryUpdateAddress(checkoutId);
-                                    Storefront.MailingAddressInput inputAddress = new Storefront.MailingAddressInput()
-                                            .setFirstName(currentCustomer.getFirstName())
-                                            .setLastName(currentCustomer.getLastName())
-                                            .setPhone(currentCustomer.getPhone())
-                                            .setCity(addressModel.getCity())
-                                            .setCountry(addressModel.getCountry())
-                                            .setZip(addressModel.getZipCode())
-                                            .setProvince(addressModel.getProvince())
-                                            .setAddress1(addressModel.getAddress1())
-                                            .setAddress2(addressModel.getAddress2());
+                                    Storefront.MailingAddressInput inputAddress;
+                                    if (addressModel != null) {
+                                        inputAddress = new Storefront.MailingAddressInput()
+                                                .setFirstName(currentCustomer.getFirstName())
+                                                .setLastName(currentCustomer.getLastName())
+                                                .setPhone(currentCustomer.getPhone())
+                                                .setCity(addressModel.getCity())
+                                                .setCountry(addressModel.getCountry())
+                                                .setZip(addressModel.getZipCode())
+                                                .setProvince(addressModel.getProvince())
+                                                .setAddress1(addressModel.getAddress1())
+                                                .setAddress2(addressModel.getAddress2());
+                                    } else {
+                                        inputAddress = new Storefront.MailingAddressInput()
+                                                .setFirstName(currentCustomer.getFirstName())
+                                                .setLastName(currentCustomer.getLastName())
+                                                .setPhone(currentCustomer.getPhone())
+                                                .setCity("")
+                                                .setCountry("")
+                                                .setZip("")
+                                                .setProvince("")
+                                                .setAddress1("")
+                                                .setAddress2("");
+                                    }
 
                                     Storefront.MutationQuery mutationQuery = Storefront.mutation(mutation -> mutation
                                             .checkoutShippingAddressUpdate(

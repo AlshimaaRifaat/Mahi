@@ -180,7 +180,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
             if (token == null) {
                 ShopifyManager.checkoutAsGuest(requireActivity(), cartProducts);
             } else {
-                if (customerAddresses != null && customerAddresses.size() == 1) {
+                if (customerAddresses != null && customerAddresses.size() <= 1) {
                     ShopifyManager.getCurrentCustomer(token).subscribe(new Observer<QueryGraphCall>() {
                         @Override
                         public void onSubscribe(Disposable d) {
@@ -193,12 +193,15 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
                                 @Override
                                 public void onResponse(@NonNull GraphResponse<Storefront.QueryRoot> response) {
                                     if (!response.hasErrors() && response.data() != null) {
-                                        Storefront.Customer currentCustomer=response.data().getCustomer();
-                                        AddressModel selectedAddress=customerAddresses.get(0);
-                                        selectedAddress.setFirstName(currentCustomer.getFirstName());
-                                        selectedAddress.setLastName(currentCustomer.getLastName());
-                                        selectedAddress.setZipCode("12345");
-                                        ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, currentCustomer, selectedAddress);
+                                        Storefront.Customer currentCustomer = response.data().getCustomer();
+                                        if (customerAddresses.size() == 1) {
+                                            AddressModel selectedAddress = customerAddresses.get(0);
+                                            selectedAddress.setFirstName(currentCustomer.getFirstName());
+                                            selectedAddress.setLastName(currentCustomer.getLastName());
+                                            selectedAddress.setZipCode("12345");
+                                            ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, currentCustomer, selectedAddress);
+                                        } else
+                                            ShopifyManager.checkoutAsCustomer(requireActivity(), cartProducts, currentCustomer, null);
                                     }
                                 }
 
@@ -219,7 +222,8 @@ public class CartFragment extends Fragment implements CartAdapter.CartProductCli
 
                         }
                     });
-                }else startActivityForResult(new Intent(requireActivity(), SelectAddressActivity.class),LAUNCH_PAYMENT_ACTIVITY);
+                } else
+                    startActivityForResult(new Intent(requireActivity(), SelectAddressActivity.class), LAUNCH_PAYMENT_ACTIVITY);
             }
         });
     }
