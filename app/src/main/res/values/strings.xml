@@ -161,5 +161,6 @@
     <string name="check_your_email_and_password">"The email or password is incorrect !"</string>
     <string name="Select">اختر العنوان</string>
     <string name="under_review">Under review</string>
+    <string name="oops_no_product_found">Oops! .. No Product Found</string>
 
 </resources>

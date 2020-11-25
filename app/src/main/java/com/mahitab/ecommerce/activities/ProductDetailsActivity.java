@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.text.HtmlCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,6 +67,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         ProductImageSliderAdapter.ImageSliderItemClickInterface {
 
     private static final String TAG = "ProductDetailsActivity";
+    private LinearLayout llBuy;
+    private LinearLayout llProductNotFound;
+    private NestedScrollView nlvProductDetails;
+
     // change the number to see badge in action
     private int cartProductsCount = 0;
 
@@ -157,30 +162,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
         if (getIntent().getExtras() != null) {
             currentProductId = getIntent().getExtras().getString("productId");
-
-            boolean isViewedBefore = viewedProductsIds.stream()
-                    .anyMatch(productId -> productId.equals(currentProductId));
-
-            if (!isViewedBefore) {
-                if (viewedProductsIds.size() == 5) {
-                    viewedProductsIds.add(currentProductId);
-                    viewedProductsIds.remove(0);
-                } else {
-                    viewedProductsIds.add(currentProductId);
-                }
-                defaultPreferences.edit().putString("viewedProductsIds", new Gson().toJson(viewedProductsIds)).apply();
-            }
-
-            boolean isAddedBefore = cartProducts.stream()
-                    .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
-
-            displayQuantityControls(isAddedBefore);
-
-            isWishedBefore = wishListProducts.stream()
-                    .anyMatch(wishedProduct -> wishedProduct.equals(currentProductId));
-
-            displayIsWishedProduct(isWishedBefore);
-
             product = DataManager.getInstance().getProductByID(currentProductId);
 
             Log.e(TAG, "onCreate: " + currentProductId);
@@ -189,6 +170,33 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     getSupportActionBar().setTitle(product.getTitle());
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 }
+
+                llProductNotFound.setVisibility(View.GONE);
+                nlvProductDetails.setVisibility(View.VISIBLE);
+                llBuy.setVisibility(View.VISIBLE);
+
+                boolean isViewedBefore = viewedProductsIds.stream()
+                        .anyMatch(productId -> productId.equals(currentProductId));
+
+                if (!isViewedBefore) {
+                    if (viewedProductsIds.size() == 5) {
+                        viewedProductsIds.add(currentProductId);
+                        viewedProductsIds.remove(0);
+                    } else {
+                        viewedProductsIds.add(currentProductId);
+                    }
+                    defaultPreferences.edit().putString("viewedProductsIds", new Gson().toJson(viewedProductsIds)).apply();
+                }
+
+                boolean isAddedBefore = cartProducts.stream()
+                        .anyMatch(cartItemQuantity -> cartItemQuantity.getProductID().equals(currentProductId));
+
+                displayQuantityControls(isAddedBefore);
+
+                isWishedBefore = wishListProducts.stream()
+                        .anyMatch(wishedProduct -> wishedProduct.equals(currentProductId));
+
+                displayIsWishedProduct(isWishedBefore);
 
                 tvTitle.setText(product.getTitle());
 
@@ -269,6 +277,14 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                     rvRelatedProducts.setAdapter(productAdapter);
                     productAdapter.setProductClickListener(this);
                 }
+            }else {
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(getResources().getString(R.string.title_activity_product_details));
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                }
+                llProductNotFound.setVisibility(View.VISIBLE);
+                nlvProductDetails.setVisibility(View.GONE);
+                llBuy.setVisibility(View.GONE);
             }
 
             cvAddReview.setOnClickListener(v -> {
@@ -454,6 +470,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     }
 
     private void initView() {
+        llBuy = findViewById(R.id.llBuy_ProductDetailsActivity);
+        llProductNotFound = findViewById(R.id.llProductNotFound_ProductDetailsActivity);
+        nlvProductDetails = findViewById(R.id.nlvProductDetails_ProductDetailsActivity);
         viewPager = findViewById(R.id.viewPager);
         indicatorView = findViewById(R.id.pageIndicatorView);
         tvTitle = findViewById(R.id.tvTitle_ProductDetailsActivity);

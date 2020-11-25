@@ -26,15 +26,25 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <include layout="@layout/content_product_details" />
+        <include
+            android:id="@+id/nlvProductDetails_ProductDetailsActivity"
+            layout="@layout/content_product_details" />
+
+        <include
+            android:id="@+id/llProductNotFound_ProductDetailsActivity"
+            layout="@layout/product_not_found_layout"
+            android:visibility="gone" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout
+        android:id="@+id/llBuy_ProductDetailsActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="8dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/llCartQuantityControl_ProductDetailsActivity"
