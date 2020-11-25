@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -22,6 +23,8 @@ import com.mahitab.ecommerce.models.ProductModel;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+
+import static com.mahitab.ecommerce.utils.CommonUtils.getImageThumbnailURL;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -43,15 +46,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         ProductModel product = DataManager.getInstance().getProductByID(cartItemQuantities.get(position).getProductID());
-        Glide.with(context)
-                .load(product.getImages()[0])
-                .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-//                .placeholder(R.drawable.ic_image_gray_24dp)
-                .fallback(R.drawable.ic_image_gray_24dp)
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.ivProductImage);
+
+        if (product.getImages()[0] != null) {
+            String thumbnailURL = getImageThumbnailURL(product.getImages()[0]);
+            Glide.with(holder.itemView)
+                    .load(thumbnailURL)
+                    .thumbnail(/*sizeMultiplier*/ 0.50f)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.progress_animation)
+                            .fallback(R.drawable.ic_image_gray_24dp)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform())
+                    .into(holder.ivProductImage);
+        } else Glide.with(holder.itemView).clear(holder.ivProductImage);
 
         holder.tvProductTitle.setText(product.getTitle());
 

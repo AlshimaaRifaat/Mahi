@@ -13,6 +13,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -36,15 +37,20 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MainCategoryViewHolder holder, int position) {
-        Glide.with(holder.itemView.getContext())
-                .load(categoryList.get(position).getImage())
-                .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-//                .placeholder(R.drawable.ic_image_gray_24dp)
-                .fallback(R.drawable.ic_image_gray_24dp)
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.ivCategoryImage);
+
+        if (categoryList.get(position).getImage() != null)
+            Glide.with(holder.itemView)
+                    .load(categoryList.get(position).getImage())
+                    .thumbnail(/*sizeMultiplier*/ 0.50f)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.progress_animation)
+                            .fallback(R.drawable.ic_image_gray_24dp)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform())
+                    .into(holder.ivCategoryImage);
+        else Glide.with(holder.itemView).clear(holder.ivCategoryImage);
 
         holder.itemView.setSelected(selectedPosition == position);
         holder.itemView.setEnabled(selectedPosition != position);

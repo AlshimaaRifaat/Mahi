@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.asksira.loopingviewpager.LoopingPagerAdapter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -30,19 +31,23 @@ public class SliderBannersAdapter extends LoopingPagerAdapter<BannerModel> {
 
 
     @Override
-    protected void bindView(View view, int position, int viewType) {
-        ImageView ivImage = view.findViewById(R.id.ivImage);
-        Glide.with(context)
-                .load(imageSliderModelList.get(position).getImage())
-                .thumbnail(Glide.with(context).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-//                .placeholder(R.drawable.ic_image_gray_24dp)
-                .fallback(R.drawable.ic_image_gray_24dp)
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(ivImage);
+    protected void bindView(View itemView, int position, int viewType) {
+        ImageView ivImage = itemView.findViewById(R.id.ivImage);
+        if (imageSliderModelList.get(position).getImage() != null)
+            Glide.with(itemView)
+                    .load(imageSliderModelList.get(position).getImage())
+                    .thumbnail(/*sizeMultiplier*/ 0.50f)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.progress_animation)
+                            .fallback(R.drawable.ic_image_gray_24dp)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform())
+                    .into(ivImage);
+        else Glide.with(itemView).clear(ivImage);
 
-        view.setOnClickListener(v -> {
+        itemView.setOnClickListener(v -> {
             if (listener != null)
                 listener.onSliderBannerClick(imageSliderModelList.get(position));
         });

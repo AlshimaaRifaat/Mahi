@@ -181,5 +181,13 @@ public class CommonUtils {
         AlertDialog dialog=builder.create();
         dialog.show();
     }
+
+    public static String getImageThumbnailURL(String imageURL){
+        String originalImageURL=imageURL.split("\\?v=")[0];
+        int lastIndexOfDot = originalImageURL.lastIndexOf(".");
+        String imageWithoutExtension=originalImageURL.substring(0,lastIndexOfDot);
+        String imageExtension=originalImageURL.substring(lastIndexOfDot);
+        return imageWithoutExtension+"_medium@2x.progressive"+imageExtension;
+    }
 }
 

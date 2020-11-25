@@ -8,6 +8,7 @@ import android.widget.ImageView;
 
 import com.asksira.loopingviewpager.LoopingPagerAdapter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -16,8 +17,8 @@ import com.mahitab.ecommerce.R;
 import java.util.List;
 
 public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
-    private  List<String> imageList;
-    private  Context context;
+    private final List<String> imageList;
+    private final Context context;
     private ImageSliderItemClickInterface imageSliderItemClickInterface;
     public ProductImageSliderAdapter(Context context, List<String> itemList, boolean isInfinite) {
         super(context, itemList, isInfinite);
@@ -32,23 +33,25 @@ public class ProductImageSliderAdapter extends LoopingPagerAdapter<String> {
     }
 
     @Override
-    protected void bindView(View convertView,  int listPosition, int viewType) {
+    protected void bindView(View itemView,  int listPosition, int viewType) {
 
-        ImageView ivSlideImage = convertView.findViewById(R.id.ivSlideImage_ProductImageSlide);
+        ImageView ivSlideImage = itemView.findViewById(R.id.ivSlideImage_ProductImageSlide);
 
-        Glide.with(context)
-                .load(imageList.get(listPosition))
-                .thumbnail(Glide.with(context).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(ivSlideImage);
-        ivSlideImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageSliderItemClickInterface.imageSliderItemClick(convertView,listPosition,imageList);
-            }
-        });
+        if (imageList.get(listPosition) != null)
+            Glide.with(itemView)
+                    .load(imageList.get(listPosition))
+                    .thumbnail(/*sizeMultiplier*/ 0.50f)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.progress_animation)
+                            .fallback(R.drawable.ic_image_gray_24dp)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform())
+                    .into(ivSlideImage);
+        else Glide.with(itemView).clear(ivSlideImage);
+
+        ivSlideImage.setOnClickListener(v -> imageSliderItemClickInterface.imageSliderItemClick(itemView,listPosition,imageList));
 
     }
 

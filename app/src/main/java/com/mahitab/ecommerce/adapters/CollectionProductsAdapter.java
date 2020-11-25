@@ -3,6 +3,7 @@ package com.mahitab.ecommerce.adapters;
 import android.app.Activity;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -22,6 +24,8 @@ import com.mahitab.ecommerce.models.ProductModel;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+
+import static com.mahitab.ecommerce.utils.CommonUtils.getImageThumbnailURL;
 
 public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final CollectionModel collectionModel;
@@ -55,18 +59,19 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
             case VIEW_TYPE_COLLECTION:
                 CollectionViewHolder viewHolder1 = (CollectionViewHolder) holder;
 
-                if (collectionModel.getImage() != null)
-                    Glide.with(viewHolder1.itemView.getContext())
+                if (collectionModel.getImage() != null) {
+                    Glide.with(viewHolder1.itemView)
                             .load(collectionModel.getImage())
-                            .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                            .apply(new RequestOptions())
-//                            .placeholder(R.drawable.ic_image_gray_24dp)
-                            .fallback(R.drawable.ic_image_gray_24dp)
-                            .dontTransform()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .thumbnail(/*sizeMultiplier*/ 0.50f)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.progress_animation)
+                                    .fallback(R.drawable.ic_image_gray_24dp)
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .priority(Priority.HIGH)
+                                    .dontAnimate()
+                                    .dontTransform())
                             .into(viewHolder1.ivCollectionImage);
-                else
-                    Glide.with(viewHolder1.itemView.getContext()).clear(viewHolder1.ivCollectionImage);
+                } else Glide.with(viewHolder1.itemView).clear(viewHolder1.ivCollectionImage);
 
                 viewHolder1.tvCollectionTitle.setText(collectionModel.getTitle());
                 break;
@@ -74,16 +79,21 @@ public class CollectionProductsAdapter extends RecyclerView.Adapter<RecyclerView
                 ProductViewHolder viewHolder2 = (ProductViewHolder) holder;
 
                 ProductModel product = productList.get(position - 1);
-
-                Glide.with(holder.itemView.getContext())
-                        .load(product.getImages()[0])
-                        .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                        .apply(new RequestOptions())
-//                        .placeholder(R.drawable.ic_image_gray_24dp)
-                        .fallback(R.drawable.ic_image_gray_24dp)
-                        .dontTransform()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(viewHolder2.ivImage);
+                if (product.getImages()[0] != null) {
+                    String thumbnailURL = getImageThumbnailURL(product.getImages()[0]);
+                    Log.e("TAG", "product thumbnailURL: " + thumbnailURL);
+                    Glide.with(viewHolder2.itemView)
+                            .load(thumbnailURL)
+                            .thumbnail(/*sizeMultiplier*/ 0.50f)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.progress_animation)
+                                    .fallback(R.drawable.ic_image_gray_24dp)
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .priority(Priority.HIGH)
+                                    .dontAnimate()
+                                    .dontTransform())
+                            .into(viewHolder2.ivImage);
+                } else Glide.with(viewHolder2.itemView).clear(viewHolder2.ivImage);
 
                 viewHolder2.tvTitle.setText(product.getTitle());
 

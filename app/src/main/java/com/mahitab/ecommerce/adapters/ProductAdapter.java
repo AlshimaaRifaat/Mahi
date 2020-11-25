@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
+
+import static com.mahitab.ecommerce.utils.CommonUtils.getImageThumbnailURL;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> implements Observer {
 
@@ -45,8 +48,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         updateList();
     }
 
-    public ProductAdapter(LinearLayoutManager layoutManager,int sectionWidth, ArrayList<ProductModel> productList) {
-        this.layoutManager=layoutManager;
+    public ProductAdapter(LinearLayoutManager layoutManager, int sectionWidth, ArrayList<ProductModel> productList) {
+        this.layoutManager = layoutManager;
         this.sectionWidth = sectionWidth;
         this.productList = productList;
         updateList();
@@ -62,15 +65,21 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         ProductModel product = productsDataList.get(position);
 
-        Glide.with(holder.itemView.getContext())
-                .load(product.getImages()[0])
-                .thumbnail(Glide.with(holder.itemView.getContext()).load(R.drawable.loadimg))//.thumbnail(/*sizeMultiplier*/ 0.25f)
-                .apply(new RequestOptions())
-//                .placeholder(R.drawable.ic_image_gray_24dp)
-                .fallback(R.drawable.ic_image_gray_24dp)
-                .dontTransform()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.ivImage);
+        if (product.getImages()[0] != null){
+            String thumbnailURL = getImageThumbnailURL(product.getImages()[0]);
+            Glide.with(holder.itemView)
+                    .load(thumbnailURL)
+                    .thumbnail(/*sizeMultiplier*/ 0.50f)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.progress_animation)
+                            .fallback(R.drawable.ic_image_gray_24dp)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .priority(Priority.HIGH)
+                            .dontAnimate()
+                            .dontTransform())
+                    .into(holder.ivImage);
+        }
+        else Glide.with(holder.itemView).clear(holder.ivImage);
 
         holder.tvTitle.setText(product.getTitle());
 
@@ -150,7 +159,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvPrice = itemView.findViewById(R.id.tvPrice_ProductItem);
             tvOldPrice = itemView.findViewById(R.id.tvOldPrice_ProductItem);
             tvDiscount = itemView.findViewById(R.id.tvDiscount_ProductItem);
-            if (layoutManager instanceof LinearLayoutManager && ((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.HORIZONTAL){
+            if (layoutManager instanceof LinearLayoutManager && ((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.HORIZONTAL) {
                 itemView.getLayoutParams().width = (int) (sectionWidth / 2.8);
             }
             itemView.setOnClickListener(v -> {
@@ -168,8 +177,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.listener = listener;
     }
 
-    public void setProductList(ArrayList<ProductModel> productList){
-        this.productsDataList=productList;
+    public void setProductList(ArrayList<ProductModel> productList) {
+        this.productsDataList = productList;
         notifyDataSetChanged();
     }
 }
