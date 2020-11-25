@@ -4,20 +4,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -26,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.adapters.ProductAdapter;
+import com.mahitab.ecommerce.fragments.HomeFragment;
 import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.DataManagerHelper;
 import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
@@ -62,6 +68,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
     public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
     private String mLastQuery = "";
     SharedPreferences.Editor shEditor;
+    Dialog dialog;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -77,19 +84,9 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         DataManager.getInstance().setClientManager(this);
-        DataManager.getInstance().collectionsAllProducts(new BaseCallback() {
-            @Override
-            public void onResponse(int status) {
-                if (status == 200){
-                    Log.e(TAG, "onResponse: all products loaded" );
-                }
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Log.e(TAG, "onFailure: " );
-            }
-        });
+        dialog=new Dialog(this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.load_dialog);
 
         shEditor = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE).edit();
         defaultPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
@@ -123,13 +120,12 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                 /*   */
 
                 x = 1;
-                if (newQuery != null) {
-
-                    getSearchResult();
+              /*  if (newQuery != null) {
+                   getSearchResult();
                     selectedOptions.setSearchCriteria(newQuery);
 
 
-                }
+                }*/
                 Log.d(TAG, "list: " + recentlySearchedList.toString());
 
 
@@ -205,9 +201,24 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
 
 
                                 x = 1;
-                                getSearchResult();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialog.show();
+                                        HomeFragment.liveData.observe(SearchResultActivity.this, new Observer<ArrayList<ProductModel>>() {
+                                            @Override
+                                            public void onChanged(ArrayList<ProductModel> productModels) {
+                                                if (productModels.size()>0) {
+                                                    dialog.dismiss();
+                                                    getSearchResult();
+                                                    selectedOptions.setSearchCriteria(mLastQuery.toString());
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                                 Log.d(TAG, "onResults: "+mLastQuery);
-                                selectedOptions.setSearchCriteria(mLastQuery.toString());
+
 
 
                                 recentlySearchedList.add(new ColorSuggestion(mLastQuery));
@@ -256,21 +267,37 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
         //handle menu clicks the same way as you would
         //in a regular activity
 
-
         mSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
+                Log.d(TAG, "onActionMenuItemSelected: "+"sucess");
                 //just print action
                 String query=mSearchView.getQuery();
-
                 x = 1;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.show();
+                        HomeFragment.liveData.observe(SearchResultActivity.this, new Observer<ArrayList<ProductModel>>() {
+                            @Override
+                            public void onChanged(ArrayList<ProductModel> productModels) {
+                                if (productModels.size()>0) {
+                                    dialog.dismiss();
+                                    getSearchResult();
+                                    selectedOptions.setSearchCriteria(query);
+                                    Log.d(TAG, "onChanged: "+"item selected");
 
-                if (item.getItemId() == R.id.action_search) {
-                    getSearchResult();
-                    selectedOptions.setSearchCriteria(query);
-                    mSearchView.clearSuggestions();
-                    mSearchView.setSearchFocusable(false);
-                }
+                                    mSearchView.clearSuggestions();
+
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+
+
 
 
             }
@@ -305,12 +332,13 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
         rvProducts = findViewById(R.id.rvProducts);
         toolbar = findViewById(R.id.toolbar);
         mSearchView = findViewById(R.id.floating_search_view);
+
     }
 
 
 
     private void getSearchResult() {
-        DataManager.getInstance().setClientManager(this);
+
         DataManager.getInstance().products("Z2lkOi8vc2hvcGlmeS9Db2xsZWN0aW9uLzIzMDU5MTA3MDM3NQ==",
                 new BaseCallback() {
                     @Override
@@ -319,7 +347,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                             productList = DataManager.getInstance().getCollectionByID("Z2lkOi8vc2hvcGlmeS9Db2xsZWN0aW9uLzIzMDU5MTA3MDM3NQ==").getPreviewProducts();
                             Log.d(TAG, "productList: "+productList.size());
                             productAdapter = new ProductAdapter(SearchResultActivity.this, productList);
-                            //productAdapter.setProductClickListener(SearchResultActivity.this::onProductClick);
+                            productAdapter.setProductClickListener(SearchResultActivity.this::onProductClick);
                             selectedOptions.addObserver(productAdapter);
                             rvProducts.setLayoutManager(new GridLayoutManager(SearchResultActivity.this, 2));
                             rvProducts.setHasFixedSize(true);

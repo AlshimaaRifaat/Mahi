@@ -18,6 +18,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mahitab.ecommerce.R;
+import com.mahitab.ecommerce.activities.SearchResultActivity;
 import com.mahitab.ecommerce.models.ProductModel;
 import com.mahitab.ecommerce.models.SelectedOptions;
 
@@ -129,12 +130,37 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Log.d("mohamed", "onQueryTextChange: 2" + productList);
 
         for (ProductModel p : productList) {
-            if (p.getTitle().toLowerCase().contains(selectedOptions.getSearchCriteria().toLowerCase())) {
+            String searchCriteria = selectedOptions.getSearchCriteria().toLowerCase();
+            String reverseSearchCriteria = "";
+            if( searchCriteria.startsWith("ال"))
+            {
+                reverseSearchCriteria = searchCriteria.substring(2,searchCriteria.length());
+            }else if( searchCriteria.startsWith("ال")&&searchCriteria.endsWith("ة"))
+            {
+                reverseSearchCriteria = searchCriteria.substring(2,searchCriteria.length());
+            }else if( searchCriteria.startsWith("ال")&&searchCriteria.endsWith("ه"))
+            {
+                reverseSearchCriteria = searchCriteria.substring(2,searchCriteria.length());
+            }
+            else if (searchCriteria.endsWith("ة")) {
+                reverseSearchCriteria = searchCriteria.substring(0, searchCriteria.length() - 1);
+                reverseSearchCriteria = reverseSearchCriteria + "ه";
+            } else if (searchCriteria.endsWith("ه")) {
+                reverseSearchCriteria = searchCriteria.substring(0, searchCriteria.length() - 1);
+                reverseSearchCriteria = reverseSearchCriteria + "ة";
+            } else {
+                reverseSearchCriteria = searchCriteria;
+            }
+            Log.d("searchlogg", reverseSearchCriteria);
+
+            if ((p.getTitle().toLowerCase().contains(reverseSearchCriteria) || p.getTitle().toLowerCase().contains(searchCriteria))) {
                 aux.add(p);
             }
         }
         productsDataList.addAll(aux);
         Log.d("ab", "updateList: " + productsDataList.toString());
+        this.notifyDataSetChanged();
+        SearchResultActivity.x = 0;
     }
 
     @Override

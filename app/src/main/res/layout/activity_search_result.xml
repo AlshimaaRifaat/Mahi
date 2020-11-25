@@ -12,7 +12,6 @@
         android:id="@+id/rvProducts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_marginTop="75dp"
         />
 
@@ -32,8 +31,9 @@
         app:floatingSearch_showSearchKey="true"
         android:layout_alignParentTop="true"
         app:iconifiedByDefault="false"
-        app:searchIcon="@null"
         app:floatingSearch_close_search_on_keyboard_dismiss="true"
+        android:focusableInTouchMode="false"
+        app:floatingSearch_dismissFocusOnItemSelection="true"
         />
 
 

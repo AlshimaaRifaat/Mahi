@@ -1,26 +1,37 @@
 package com.mahitab.ecommerce.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mahitab.ecommerce.R;
 import com.mahitab.ecommerce.activities.CollectionProductsActivity;
 import com.mahitab.ecommerce.activities.HomeActivity;
@@ -29,10 +40,15 @@ import com.mahitab.ecommerce.activities.SearchResultActivity;
 import com.mahitab.ecommerce.adapters.BannerAdapter;
 import com.mahitab.ecommerce.adapters.CollectionsAdapter;
 import com.mahitab.ecommerce.adapters.SliderBannersAdapter;
+import com.mahitab.ecommerce.managers.DataManager;
 import com.mahitab.ecommerce.managers.FirebaseManager;
+import com.mahitab.ecommerce.managers.interfaces.BaseCallback;
 import com.mahitab.ecommerce.models.BannerModel;
+import com.mahitab.ecommerce.models.CartItemQuantity;
 import com.mahitab.ecommerce.models.CollectionModel;
+import com.mahitab.ecommerce.models.ProductModel;
 import com.rd.PageIndicatorView;
+import com.shopify.buy3.Storefront;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -60,6 +76,38 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
     private CollectionsAdapter midCollectionsAdapter;
     private RecyclerView rvBottomCollectionProducts;
     private CollectionsAdapter bottomCollectionsAdapter;
+    String TAG="HomeFragment";
+    ArrayList<ProductModel> allProductList;
+    private SharedPreferences defaultPreferences;
+    public static MutableLiveData<ArrayList<ProductModel>> liveData = new MutableLiveData<>();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        allProductList=new ArrayList<>();
+        defaultPreferences = getActivity().getSharedPreferences(requireContext().getPackageName(), Context.MODE_PRIVATE);
+        DataManager.getInstance().collectionsAllProducts(new BaseCallback() {
+            @Override
+            public void onResponse(int status) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        liveData.postValue(DataManager.getInstance().getCollectionByID("Z2lkOi8vc2hvcGlmeS9Db2xsZWN0aW9uLzIzMDU5MTA3MDM3NQ==").getPreviewProducts());
+
+
+                        // defaultPreferences.edit().putString("allProductList", new Gson().toJson(allProductList)).apply();
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Log.e(TAG, "onFailure: " );
+            }
+        });
+    }
 
     public HomeFragment() {
         // Required empty public constructor
@@ -83,6 +131,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         super.onViewCreated(view, savedInstanceState);
 
         initView(view);
+
 
         if (getActivity() != null && getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).setSupportActionBar(toolbar);
@@ -164,8 +213,18 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_search)
+
+
+       /* if (defaultPreferences.getString("allProductList", null) == null)
+            allProductList = new ArrayList<>();
+        else
+            allProductList = new Gson().fromJson(defaultPreferences.getString("allProductList", null), new TypeToken<ArrayList<ProductModel>>() {
+            }.getType());*/
+
+        if (item.getItemId() == R.id.action_search) {
             startActivity(new Intent(getContext(), SearchResultActivity.class));
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -249,6 +308,7 @@ public class HomeFragment extends Fragment implements BannerAdapter.BannerClickL
         rvMidCollectionProducts = view.findViewById(R.id.rvMidCollectionProducts_HomeFragment);
         rvBottomBanners = view.findViewById(R.id.rvBottomBanners_HomeFragment);
         rvBottomCollectionProducts = view.findViewById(R.id.rvBottomCollectionProducts_HomeFragment);
+
     }
 
     @Override
