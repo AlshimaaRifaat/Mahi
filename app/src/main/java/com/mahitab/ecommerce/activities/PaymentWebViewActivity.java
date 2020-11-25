@@ -55,6 +55,7 @@ public class PaymentWebViewActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             String webUrl = getIntent().getExtras().getString("web_url");
             wvCheckOut.setWebViewClient(new MyBrowser());
+            wvCheckOut.getSettings().setAllowFileAccess(false); // handel WebView failing only the very first time crash
             wvCheckOut.getSettings().setLoadsImagesAutomatically(true);
             wvCheckOut.getSettings().setJavaScriptEnabled(true);
             wvCheckOut.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
