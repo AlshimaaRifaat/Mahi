@@ -213,16 +213,7 @@
                         android:textSize="17sp"
                         android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/ivDescription_ProductDetailsActivity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?android:attr/actionBarItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_keyboard_arrow_right_gray_24dp"
-                        tools:ignore="ContentDescription" />
+
                 </LinearLayout>
 
                 <TextView
@@ -354,15 +345,7 @@
                         android:textSize="17sp"
                         android:textStyle="bold" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?android:attr/actionBarItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_keyboard_arrow_right_gray_24dp"
-                        tools:ignore="ContentDescription" />
+
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
