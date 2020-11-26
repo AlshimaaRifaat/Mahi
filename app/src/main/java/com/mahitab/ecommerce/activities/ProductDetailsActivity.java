@@ -80,7 +80,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
     private TextView tvTitle, tvDiscount;
     private TextView tvPrice;
     private TextView tvDescription;
-    private ImageView ivDescription;
 
     private ImageView ivShareProduct;
 
@@ -301,11 +300,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                 intent.putExtra("description", product.getDescription());
                 startActivity(intent);
             });
-            ivDescription.setOnClickListener(v -> {
-                Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
-                intent.putExtra("description", product.getDescription());
-                startActivity(intent);
-            });
 
             btnAddToCart.setOnClickListener(v -> {
                 cartProducts.add(new CartItemQuantity(1, product.getID().toString(), product.getVariants().get(0).getPrice().doubleValue(), product.getVariants().get(0).getID()));
@@ -487,7 +481,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         tvTitle = findViewById(R.id.tvTitle_ProductDetailsActivity);
         tvPrice = findViewById(R.id.tvPrice_ProductDetailsActivity);
         tvDescription = findViewById(R.id.tvDescription_ProductDetailsActivity);
-        ivDescription = findViewById(R.id.ivDescription_ProductDetailsActivity);
         rvRelatedProducts = findViewById(R.id.rvRelatedProducts_ProductDetailsActivity);
         llCartQuantityControl = findViewById(R.id.llCartQuantityControl_ProductDetailsActivity);
         btnAddToCart = findViewById(R.id.btnAddToCart_ProductDetailsActivity);
