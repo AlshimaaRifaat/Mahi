@@ -584,6 +584,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements
                         } else {
                             cvReviews.setVisibility(View.GONE);
                             rvProductReviews.setVisibility(View.GONE);
+                            rbAverageRating.setVisibility(View.GONE);
                         }
                     }
 
