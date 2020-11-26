@@ -93,6 +93,11 @@ public class MyWishListActivity extends AppCompatActivity implements ProductAdap
         startActivity(intent);
     }
 
+    @Override
+    public void onSearchFinished(int resultSize) {
+
+    }
+
     private void getWishedProducts(List<String> productsIds) {
         if (productsIds.size() > 0) {
             for (String productId : productsIds) {

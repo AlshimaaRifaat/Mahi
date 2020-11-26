@@ -238,4 +238,9 @@ public class SubCategoriesFragment extends Fragment implements BannerAdapter.Ban
         intent.putExtra("productId", productId);
         startActivity(intent);
     }
+
+    @Override
+    public void onSearchFinished(int resultSize) {
+
+    }
 }

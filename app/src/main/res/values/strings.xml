@@ -162,5 +162,6 @@
     <string name="Select">اختر العنوان</string>
     <string name="under_review">Under review</string>
     <string name="oops_no_product_found">Oops! .. No Product Found</string>
+    <string name="re_enter_search_key">لا توجد نتيجه للبحث,حاول البحث بكلمه اخري!</string>
 
 </resources>

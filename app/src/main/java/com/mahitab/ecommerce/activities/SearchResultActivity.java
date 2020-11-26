@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -48,6 +49,7 @@ import java.util.List;
 import static com.mahitab.ecommerce.utils.CommonUtils.setArDefaultLocale;
 
 
+
 public class SearchResultActivity extends AppCompatActivity implements ProductAdapter.ProductClickListener {
     private static final String TAG = "SearchResultActivity";
     SelectedOptions selectedOptions;
@@ -69,6 +71,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
     private String mLastQuery = "";
     SharedPreferences.Editor shEditor;
     Dialog dialog;
+    TextView tNoSearchResult;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -181,10 +184,30 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                             @Override
                             public void onResults(ArrayList<ProductModel> searchResultList) {
                                 //show search results
-                                getSearchResult();
-                                selectedOptions.setSearchCriteria(colorSuggestion.getBody());
-                                mSearchView.clearSuggestions();
-                                mSearchView.setSearchFocusable(false);
+
+                                String query=colorSuggestion.getBody();
+                                x = 1;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialog.show();
+                                        HomeFragment.liveData.observe(SearchResultActivity.this, new Observer<ArrayList<ProductModel>>() {
+                                            @Override
+                                            public void onChanged(ArrayList<ProductModel> productModels) {
+                                                if (productModels.size()>0) {
+                                                    dialog.dismiss();
+                                                    getSearchResult();
+                                                    selectedOptions.setSearchCriteria(query);
+                                                    mSearchView.clearSuggestions();
+                                                    mSearchView.setSearchFocusable(true);
+                                                    mSearchView.setCloseSearchOnKeyboardDismiss(false);
+
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                               /* */
 
                             }
 
@@ -214,11 +237,13 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                                         HomeFragment.liveData.observe(SearchResultActivity.this, new Observer<ArrayList<ProductModel>>() {
                                             @Override
                                             public void onChanged(ArrayList<ProductModel> productModels) {
+                                                Log.d(TAG, "onChanged: "+productModels.size());
                                                 if (productModels.size()>0) {
                                                     dialog.dismiss();
                                                     getSearchResult();
                                                     selectedOptions.setSearchCriteria(mLastQuery.toString());
                                                 }
+
                                             }
                                         });
                                     }
@@ -278,7 +303,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
             public void onActionMenuItemSelected(MenuItem item) {
                 Log.d(TAG, "onActionMenuItemSelected: "+"sucess");
                 //just print action
-                String query=mSearchView.getQuery();
+            /*    String query=mSearchView.getQuery();
                 x = 1;
                 runOnUiThread(new Runnable() {
                     @Override
@@ -292,14 +317,13 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                                     getSearchResult();
                                     selectedOptions.setSearchCriteria(query);
                                     Log.d(TAG, "onChanged: "+"item selected");
-
                                     mSearchView.clearSuggestions();
 
                                 }
                             }
                         });
                     }
-                });
+                });*/
 
 
 
@@ -338,6 +362,7 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
         rvProducts = findViewById(R.id.rvProducts);
         toolbar = findViewById(R.id.toolbar);
         mSearchView = findViewById(R.id.floating_search_view);
+        tNoSearchResult=findViewById(R.id.tNoSearchResult);
 
     }
 
@@ -349,16 +374,25 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
                 new BaseCallback() {
                     @Override
                     public void onResponse(int status) {
-                        if (status == RESULT_OK) {
+                        if(status==RESULT_OK) {
                             productList = DataManager.getInstance().getCollectionByID("Z2lkOi8vc2hvcGlmeS9Db2xsZWN0aW9uLzIzMDU5MTA3MDM3NQ==").getPreviewProducts();
-                            Log.d(TAG, "productList: "+productList.size());
-                            productAdapter = new ProductAdapter(SearchResultActivity.this, productList);
-                            productAdapter.setProductClickListener(SearchResultActivity.this::onProductClick);
-                            selectedOptions.addObserver(productAdapter);
-                            rvProducts.setLayoutManager(new GridLayoutManager(SearchResultActivity.this, 2));
-                            rvProducts.setHasFixedSize(true);
-                            rvProducts.setAdapter(productAdapter);
+
+                                Log.d(TAG, "productList: " + productList.size());
+                                productAdapter = new ProductAdapter(SearchResultActivity.this, productList);
+                            productAdapter.setProductClickListener(SearchResultActivity.this);
+                            productAdapter.setSearchFinished(SearchResultActivity.this);
+                                selectedOptions.addObserver(productAdapter);
+
+                                rvProducts.setVisibility(View.VISIBLE);
+                                tNoSearchResult.setVisibility(View.GONE);
+                                rvProducts.setLayoutManager(new GridLayoutManager(SearchResultActivity.this, 2));
+                                rvProducts.setHasFixedSize(true);
+                                rvProducts.setAdapter(productAdapter);
+
+
                         }
+
+
                     }
 
                     @Override
@@ -380,5 +414,17 @@ public class SearchResultActivity extends AppCompatActivity implements ProductAd
         Intent intent = new Intent(getApplicationContext(), ProductDetailsActivity.class);
         intent.putExtra("productId", productId);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSearchFinished(int resultSize) {
+        dialog.dismiss();
+        if (resultSize==0){
+            rvProducts.setVisibility(View.GONE);
+            tNoSearchResult.setVisibility(View.VISIBLE);
+        }else{
+            rvProducts.setVisibility(View.VISIBLE);
+            tNoSearchResult.setVisibility(View.GONE);
+        }
     }
 }

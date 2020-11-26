@@ -166,6 +166,11 @@ public class CollectionProductsActivity extends AppCompatActivity implements Pro
         finish();
     }
 
+    @Override
+    public void onSearchFinished(int resultSize) {
+
+    }
+
     private void initView() {
         rvCollectionBanners = findViewById(R.id.rvCollectionBanners_CollectionProductsActivity);
         rvCollectionProducts = findViewById(R.id.rvCollectionProducts_CollectionProductsActivity);

@@ -37,7 +37,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private RecyclerView.LayoutManager layoutManager;
     private ProductClickListener listener;
 
-    private ArrayList<ProductModel> productsDataList;
+    public static ArrayList<ProductModel> productsDataList;
     private SelectedOptions selectedOptions = new SelectedOptions();
 
     public ProductAdapter(ArrayList<ProductModel> productList) {
@@ -158,7 +158,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         }
         productsDataList.addAll(aux);
-        Log.d("ab", "updateList: " + productsDataList.toString());
+        Log.d("ab", "updateList: " + productsDataList.size());
         this.notifyDataSetChanged();
         SearchResultActivity.x = 0;
     }
@@ -169,6 +169,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             selectedOptions = (SelectedOptions) observable;
             this.updateList();
         }
+        if (listener != null)
+            listener.onSearchFinished(productsDataList.size());
     }
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
@@ -197,6 +199,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     public interface ProductClickListener {
         void onProductClick(String productId);
+        void onSearchFinished(int resultSize);
+    }
+    public void setSearchFinished(ProductClickListener listener) {
+        this.listener = listener;
     }
 
     public void setProductClickListener(ProductClickListener listener) {

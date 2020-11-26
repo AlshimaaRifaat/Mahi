@@ -473,6 +473,11 @@ public class ProductDetailsActivity extends AppCompatActivity implements
         finish();
     }
 
+    @Override
+    public void onSearchFinished(int resultSize) {
+
+    }
+
     private void initView() {
         llBuy = findViewById(R.id.llBuy_ProductDetailsActivity);
         llProductNotFound = findViewById(R.id.llProductNotFound_ProductDetailsActivity);
