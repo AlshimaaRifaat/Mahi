@@ -624,7 +624,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements
 
     @Override
     public void imageSliderItemClick(View view, int position, List<String> imageList) {
-        new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, (imageView, image) -> Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView))
-                .withStartPosition(position).show();
+        if(imageList.get(position)!=null) {
+            new StfalconImageViewer.Builder<>(ProductDetailsActivity.this, imageList, (imageView, image) -> Glide.with(ProductDetailsActivity.this).load(imageList.get(position)).into(imageView))
+                    .withStartPosition(position).show();
+        }
     }
 }
